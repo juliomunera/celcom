@@ -53,6 +53,12 @@ public class OngoingCall {
         }
     }
 
+    public final void reject() {
+        if (null != call) {
+            call.reject(false,"ds");
+        }
+    }
+
     @NotNull private static BehaviorSubject<Integer> state;
     private static Call.Callback callback;
     public static OngoingCall INSTANCE;

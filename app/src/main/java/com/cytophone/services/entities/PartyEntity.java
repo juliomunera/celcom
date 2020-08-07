@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 
+import java.io.Serializable;
 import java.util.Date;
 
 @Entity(tableName = "Party",
@@ -16,7 +17,7 @@ import java.util.Date;
         name = "UX_Party_ID",
         unique = true),
         }*/)
-public class PartyEntity implements IEntityBase {
+public class PartyEntity implements IEntityBase, Serializable {
     //Getter methods
     public Date getCreatedDate() {
         return this._createdDate;

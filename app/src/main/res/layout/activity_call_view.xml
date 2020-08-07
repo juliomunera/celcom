@@ -12,7 +12,6 @@
         android:layout_height="294dp"
         android:background="@drawable/grad"
         android:paddingBottom="20dp">
-
         <RelativeLayout
             android:id="@+id/imgUser"
             android:layout_width="wrap_content"
@@ -21,7 +20,6 @@
             android:layout_centerHorizontal="true"
             android:layout_marginTop="50dp"
             android:background="@drawable/circle_border">
-
             <ImageView
                 android:layout_width="120dp"
                 android:layout_height="120dp"
@@ -31,9 +29,7 @@
                 android:padding="16dp"
                 android:scaleType="centerInside"
                 android:src="@drawable/ic_user" />
-
         </RelativeLayout>
-
         <TextView
             android:id="@+id/tv_name"
             android:layout_width="wrap_content"
@@ -44,20 +40,16 @@
             android:text="Oculto Alias1"
             android:textColor="@color/primaryButton"
             android:textSize="43sp" />
-
-
     </RelativeLayout>
-
     <LinearLayout
         android:id="@+id/linlay1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/rellay1"
         android:orientation="horizontal">
-
         <TextView
             android:paddingTop="30dp"
-            android:id="@+id/txtaction"
+            android:id="@+id/tv_action"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Llamada entrante"
@@ -65,9 +57,7 @@
             android:background="#000000"
             android:textColor="@color/blinkTextColor"
             android:textSize="25sp" />
-
     </LinearLayout>
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -75,7 +65,6 @@
         android:gravity="center|bottom"
         android:paddingBottom="30dp"
         android:layout_below="@+id/linlay1">
-
         <ImageView
             android:id="@+id/iv_answer"
             android:layout_width="85dp"
@@ -85,7 +74,6 @@
             android:background="@drawable/circle_call"
             android:src="@drawable/ic_call"
             android:scaleType="centerInside" />
-
         <ImageView
             android:id="@+id/iv_hangout"
             android:layout_width="85dp"
@@ -95,7 +83,5 @@
             android:background="@drawable/circle_end"
             android:src="@drawable/ic_call_end"
             android:scaleType="centerInside" />
-
     </LinearLayout>
-
 </RelativeLayout>

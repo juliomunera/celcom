@@ -333,6 +333,7 @@ public class ContactListitem extends AppCompatActivity {
     //region fields declarations
     //Permissions that need to be explicitly requested from end user.
     private static final String[] REQUIRED_SDK_PERMISSIONS = new String[] {
+            //Manifest.permission.ANSWER_PHONE_CALLS,
             Manifest.permission.READ_PHONE_STATE,
             Manifest.permission.CALL_PHONE,
             Manifest.permission.READ_SMS,
