@@ -1,0 +1,29 @@
+<resources>
+    <string name="app_name">Celcom</string>
+    <string name="message_label">Mensajes</string>
+    <string name="title_activity_view_list_messages"> </string>
+    <string name="accept_button">Aceptar</string>
+
+    <string name="buttonUnlock">Unlock Button </string>
+    <string name="buttonRecentCalls">Recent Calls Button</string>
+    <string name="buttonDialPad">Dial Pad Button</string>
+    <string name="buttonVoiceMail">Voice Mail Button</string>
+
+    <string name="networkTypeTextView">UMTS</string>
+    <string name="hourTextView">13:00</string>
+    <string name="percentLevelPart1">1</string>
+    <string name="percentLevelPart2">0</string>
+    <string name="percentLevelPart3">0</string>
+    <string name="percent">%</string>
+    <string name="title_activity_main_bottom">MainActivityBottom</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
+    <string name="codeLabel">Ingrese el código</string>
+    <string name="acceptButton">Aceptar</string>
+
+    <!-- Hamilton -->
+    <string name="deviceOwner">Eres el administrador</string>
+    <string name="notDeviceOwner">No eres el propietario</string>
+
+</resources>

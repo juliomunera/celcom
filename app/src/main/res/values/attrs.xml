@@ -1,0 +1,33 @@
+<resources>
+
+    <!-- Declare custom theme attributes that allow changing which styles are
+         used for button bars depending on the API level.
+         ?android:attr/buttonBarStyle is new as of API 11 so this is
+         necessary to support previous API levels. -->
+    <declare-styleable name="ButtonBarContainerTheme">
+        <attr name="metaButtonBarStyle" format="reference" />
+        <attr name="metaButtonBarButtonStyle" format="reference" />
+    </declare-styleable>
+
+    <declare-styleable name="BatteryLevelTheme">
+        <attr name="batteryShape" format="color" />
+        <attr name="poorLevel" format="color" />
+        <attr name="lowLevel" format="color" />
+        <attr name="middleLevel" format="color" />
+        <attr name="highLevel" format="color" />
+    </declare-styleable>
+
+    <declare-styleable name="SignalLevelTheme">
+        <attr name="signalShape" format="color" />
+        <attr name="weakSignal" format="color" />
+        <attr name="moderateSignal" format="color" />
+        <attr name="goodSignal" format="color" />
+        <attr name="excellentSignal" format="color" />
+    </declare-styleable>
+
+    <declare-styleable name="ButtonsTheme">
+        <attr name="unSelected" format="color" />
+        <attr name="selected" format="color" />
+    </declare-styleable>
+
+</resources>

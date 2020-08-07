@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".fragments.SecurityFragment">
+
+
+    <LinearLayout
+        android:id="@+id/linearCode"
+        android:layout_width="349dp"
+        android:layout_height="159dp"
+        android:layout_gravity="center_vertical|center_horizontal"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/textSecurity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical|center_horizontal"
+            android:text="@string/codeLabel"
+            android:textColor="@color/primaryButton"
+            android:padding="10dp"
+            android:textSize="22dp"></TextView>
+
+        <EditText
+            android:id="@+id/codeInput"
+            android:layout_width="251dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:background="#D77A20"
+            android:gravity="center_horizontal"
+            android:paddingLeft="30dp"
+            android:paddingRight="30dp"
+            android:textSize="28dp"
+            android:maxLength="5"
+            android:textAllCaps="true"
+            android:inputType="number"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/AcceptButton"
+            android:layout_marginTop="20dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_width="130dp"
+            android:layout_height="40dp"
+            android:text="@string/acceptButton"
+         />
+
+    </LinearLayout>
+
+
+</FrameLayout>

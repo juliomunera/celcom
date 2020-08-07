@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="10dp"
+    android:paddingBottom="10dp"
+    android:paddingRight="10dp"
+    android:layout_alignParentBottom="false"
+    android:layout_alignParentTop="true"
+    android:gravity="center">
+
+    <TableLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:weightSum="6">
+
+        <TableRow>
+
+            <TextView
+                android:layout_height="match_parent"
+                android:layout_weight="1.88"
+                android:gravity="center_horizontal|center_vertical"
+                android:text="" />
+
+            <ImageView
+                android:id="@+id/textNetworkType"
+                android:layout_height="match_parent"
+                android:layout_weight="0.02"
+                android:gravity="end|top"
+                android:textSize="11sp"
+                android:src="@drawable/ic_signal_wifi_2_bar_black_24dp" />
+
+            <ImageView
+                android:id="@+id/imageSignalLevel"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="0.02"
+                android:gravity="end"
+                android:src="@drawable/ic_signal_cellular_3_bar_black_24dp" />
+
+            <ImageView
+                android:id="@+id/imageBatteryLevel"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="0.02"
+                android:gravity="end"
+                android:src="@drawable/ic_battery_90_black_24dp" />
+
+            <TextView
+                android:id="@+id/textBatteryLevel1"
+                android:layout_height="match_parent"
+                android:layout_weight="0.02"
+                android:gravity="end|center_vertical"
+                android:padding="0sp"
+                android:text="@string/percentLevelPart1"
+                android:tag="textBatteryLevel1"
+                android:textSize="11sp"
+                android:textColor="#FFFFFF" />
+
+            <TextView
+                android:id="@+id/textBatteryLevel2"
+                android:layout_height="match_parent"
+                android:layout_weight="0.02"
+                android:gravity="end|center_vertical"
+                android:padding="0sp"
+                android:text="@string/percentLevelPart2"
+                android:textSize="11sp"
+                android:tag="textBatteryLevel2"
+                android:textColor="#FFFFFF" />
+
+            <TextView
+                android:id="@+id/textBatteryLevel3"
+                android:layout_height="match_parent"
+                android:layout_weight="0.02"
+                android:gravity="end|center_vertical"
+                android:padding="0sp"
+                android:text="@string/percentLevelPart3"
+                android:textSize="11sp"
+                android:tag="textBatteryLevel3"
+                android:textColor="#FFFFFF" />
+
+            <TextView
+                android:layout_height="match_parent"
+                android:layout_weight="0.02"
+                android:gravity="end|center_vertical"
+                android:padding="0sp"
+                android:text="@string/percent"
+                android:textSize="11sp"
+                android:textColor="#FFFFFF" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingRight="6dp"
+                android:paddingLeft="20dp"
+                android:layout_weight="0.02"
+                android:gravity="center_horizontal"
+                android:text="@string/hourTextView"
+                android:textColor="#FFFFFF" />
+        </TableRow>
+
+    </TableLayout>
+</RelativeLayout>

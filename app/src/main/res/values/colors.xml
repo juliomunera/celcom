@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="primaryColor">#263238</color>
+    <color name="primaryDarkColor">#000a12</color>
+    <color name="headerColor">#7E072A46</color>
+    <color name="primaryTextColor">#ffffff</color>
+    <color name="black_overlay">#66000000</color>
+    <color name="primaryButton">#FF7F00</color>
+    <color name="solidCircle">#AAFFFFFF</color>
+    <color name="circleBorder">#50FFFFFF</color>
+    <color name="gradEnd">#000000</color>
+    <color name="gradStart">#3A3939</color>
+    <color name="white">#FFFFFF</color>
+    <color name="callColor">#016813</color>
+    <color name="endColor">#801818</color>
+    <color name="blinkTextColor">#BA6B1D</color>
+    <color name="black">#000000</color>
+    <color name="solidContact">#AA827D7D</color>
+    <color name="focusIcon">#E8A35F</color>
+    <color name="bottomNavigation">#1B1B1C</color>
+</resources>
