@@ -86,6 +86,7 @@ public class CallView extends AppCompatActivity {
             @Override
             public Unit invoke(Integer state) {
                 if( CallView.this._party == null ) {
+                    // End call
                     OngoingCall.INSTANCE.reject();
                     OngoingCall.INSTANCE.hangup();
                 } else {
