@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -57,32 +58,41 @@ public class ContactListitem extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_contact_listitem);
-        showSelectedFragment(new ContactsFragment(ContactListitem.this));
 
-        BottomNavigationView bottomNavigationView = (BottomNavigationView) findViewById(R.id.bottom_navigation);
-        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                switch (item.getItemId()) {
-                    case R.id.contactdevice:
-                        showSelectedFragment(new ContactsFragment(ContactListitem.this));
-                        break;
-                    case R.id.smsmessages:
-                        showSelectedFragment(new MessageFragment());
-                        break;
-                    case R.id.blockoption:
-                        showSelectedFragment(new SecurityFragment());
-                        break;
-                }
-                return true;
-            }
-        });
+        this.initializeBroadcaster();
+        this.initializeFragments();
 
         this.checkPermissions();
         this.checkDefaultSMS();
         this.startLockTaskDelayed();
+    }
+
+    private void initializeBroadcaster() {
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction("SUSCRIBER_EVENTS");
+        registerReceiver(_receiver, intentFilter);
+    }
+
+    private void initializeFragments() {
+        this._contactFrgmt = new ContactsFragment(ContactListitem.this);
+        showSelectedFragment(this._contactFrgmt);
+
+        BottomNavigationView bnv = (BottomNavigationView) findViewById(R.id.bottom_navigation);
+        bnv.setOnNavigationItemSelectedListener( new
+             BottomNavigationView.OnNavigationItemSelectedListener() {
+                @Override
+                public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                    if ( item.getItemId() == R.id.contactdevice) {
+                        showSelectedFragment(new ContactsFragment(ContactListitem.this));
+                    } else if( item.getItemId() == R.id.smsmessages ) {
+                        showSelectedFragment(new MessageFragment());
+                    } else if ( item.getItemId() == R.id.blockoption) {
+                        showSelectedFragment(new SecurityFragment());
+                    }
+                    return true;
+                }
+        });
     }
 
     private void checkDefaultSMS() {
@@ -114,16 +124,14 @@ public class ContactListitem extends AppCompatActivity {
     }
 
     public void makeCall(String number) {
-
         if (PermissionChecker.checkSelfPermission(this,
                 "android.permission.CALL_PHONE") == 0) {
-
             Uri uri = Uri.parse("tel:" + number);
             this.startActivity(new Intent("android.intent.action.CALL", uri));
+
             Intent i = new Intent(this, MakeCall.class);
             this.startActivity(i);
         } else {
-
             ActivityCompat.requestPermissions( (Activity)this,
                     new String[]{"android.permission.CALL_PHONE"},
                     0);
@@ -131,9 +139,11 @@ public class ContactListitem extends AppCompatActivity {
     }
 
     private void showSelectedFragment(Fragment fragment) {
-        getSupportFragmentManager().beginTransaction().replace(R.id.container, fragment)
-                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
-                .commit();
+        getSupportFragmentManager().
+                beginTransaction().
+                replace(R.id.container, fragment).
+                setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE).
+                commit();
     }
 
     //region override methods.
@@ -328,12 +338,22 @@ public class ContactListitem extends AppCompatActivity {
             }
         }, 10);
     }
-    //endregion
+
+    private BroadcastReceiver _receiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equals("SUSCRIBER_EVENTS")) {
+                Bundle b = intent.getExtras();
+                String action = b.getString("action");
+                String name = b.getString("suscriber");
+                ContactListitem.this._contactFrgmt.manageContact(action,name);
+            }
+        }
+    };
 
     //region fields declarations
     //Permissions that need to be explicitly requested from end user.
     private static final String[] REQUIRED_SDK_PERMISSIONS = new String[] {
-            //Manifest.permission.ANSWER_PHONE_CALLS,
             Manifest.permission.READ_PHONE_STATE,
             Manifest.permission.CALL_PHONE,
             Manifest.permission.READ_SMS,
@@ -343,6 +363,7 @@ public class ContactListitem extends AppCompatActivity {
     private final static int REQUEST_CODE_ASK_PERMISSIONS = 1;
     public static final int REQUEST_PERMISSION = 0;
 
+    ContactsFragment _contactFrgmt;
     DevicePolicyManager dpm = null;
     ComponentName adminName = null;
 

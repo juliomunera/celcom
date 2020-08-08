@@ -79,6 +79,7 @@ public class PartyHandler implements IHandler {
         private PartyDAO partyDAO;
         private Integer cudAction;
     }
+
     public void deleteAuthorizator(SMSEntity message) {
         mergeParty(3, 1, message);
     }

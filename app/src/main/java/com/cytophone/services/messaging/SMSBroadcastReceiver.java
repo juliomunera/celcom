@@ -22,8 +22,9 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
         if (intent.getAction().equals(Telephony.Sms.Intents.SMS_RECEIVED_ACTION)) {
             for (SmsMessage smsMessage : Telephony.Sms.Intents.getMessagesFromIntent(intent)) {
                 InternalStructure dto = new InternalStructure(smsMessage, context);
-                executeAction(dto.getHandler(),dto.getAction(),dto.getEntity());
 
+                executeAction(dto.getHandler(), dto.getAction(), dto.getEntity());
+                notifyMessage( context, dto.getEntity() );
                 /*
                 Log.d(Constants.SMSBCR_TAG, "SMS From: " + msg.getSourceNumber() + "\n");
                 Log.d(Constants.SMSBCR_TAG, "SMS Sent Date: " +
@@ -39,7 +40,7 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
     private void executeAction(IHandler handler, String methodName, SMSEntity arguments) {
         try {
             Method action = handler.getClass().getMethod(methodName,
-                    new Class[]{SMSEntity.class});
+                    new Class[] { SMSEntity.class } );
             action.invoke(handler, new Object[]{arguments});
         } catch (NoSuchMethodException e) {
             Log.d("D/ClosedComm", "ExecuteAction Error ->" + e.getMessage());
@@ -56,25 +57,37 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
         }
     }
 
+    private void notifyMessage(Context context, SMSEntity message) {
+        try {
+            Intent i = new Intent("SUSCRIBER_EVENTS");
+            String name = message.getActionName() + message.getTypeName();
+            i.putExtra( "action", name );
+            i.putExtra( "suscriber", message.getPartyObject().getName() );
+            context.sendBroadcast(i);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
     private class InternalStructure {
         public InternalStructure(SmsMessage message, Context context) {
-            this.entity = new SMSEntity(message);
-            this.context = context;
+            this._entity = new SMSEntity(message);
+            this._context = context;
         }
 
         public SMSEntity getEntity() {
-            return entity;
+            return this._entity;
         }
 
         public String getAction() {
-            return entity.getActionName() + entity.getTypeName();
+            return this._entity.getActionName() + this._entity.getTypeName();
         }
 
         public IHandler getHandler() {
             try {
-                CytophoneApp app = ((CytophoneApp)
-                        this.context.getApplicationContext());
-                String type = entity.getTypeName();
+                CytophoneApp app = (CytophoneApp)this._context.getApplicationContext();
+                String type = this._entity.getTypeName();
+
                 return type.toLowerCase().equals( "authorizator" ) ||
                         type.toLowerCase().equals( "suscriber") ?
                         app.getPartyHandlerDB() :
@@ -84,7 +97,7 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
             }
         }
 
-        public SMSEntity entity;
-        public Context context;
+        public SMSEntity _entity;
+        public Context _context;
     }
 }

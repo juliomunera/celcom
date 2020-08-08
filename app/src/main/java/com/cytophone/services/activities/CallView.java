@@ -56,9 +56,11 @@ public class CallView extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_call_view);
+        Object o;
 
-        Intent i = getIntent();
-        _party = (PartyEntity)i.getSerializableExtra("PartyEntity");
+        if( (o = getIntent().getSerializableExtra("PartyEntity")) != null) {
+            this._party = o instanceof  PartyEntity ? (PartyEntity) o: null;
+        }
     }
 
     @Override
@@ -85,11 +87,10 @@ public class CallView extends AppCompatActivity {
         Function1<Integer, Unit> updateUI = new Function1<Integer, Unit>() {
             @Override
             public Unit invoke(Integer state) {
-                if( CallView.this._party == null ) {
-                    // End call
+                if( null == CallView.this._party ) { // End call
                     OngoingCall.INSTANCE.reject();
                     OngoingCall.INSTANCE.hangup();
-                } else {
+                } else {  // Show caller info
                     CallView.this.updateUI(state);
                 }
                 return null;
@@ -100,7 +101,8 @@ public class CallView extends AppCompatActivity {
         DisposableKt.addTo(subscribers, this._disposables);
 
         subscribers = OngoingCall.INSTANCE.getState().
-                filter(i -> i.equals(Call.STATE_DISCONNECTING) || i.equals(Call.STATE_DISCONNECTED)).
+                filter(i -> i.equals(Call.STATE_DISCONNECTING) ||
+                       i.equals(Call.STATE_DISCONNECTED)).
                 delay(1L, TimeUnit.SECONDS).
                 firstElement().
                 subscribe(new Consumer() {
@@ -117,7 +119,7 @@ public class CallView extends AppCompatActivity {
     @SuppressLint({"SetTextI18n"})
     private final void updateUI(int state) {
         TextView tvw = (TextView)CallView.this.findViewById(R.id.tv_name);
-        tvw.setText(_party.getName());
+        tvw.setText(this._party.getName());
 
         tvw = (TextView)this.findViewById(R.id.tv_action);
         String text = StringsKt.capitalize(CallStateStringKt.asString(state).toLowerCase());
@@ -140,7 +142,7 @@ public class CallView extends AppCompatActivity {
     private final class CustomerConsumer implements Consumer {
         public CustomerConsumer(Function1 func) { this._func = func; }
 
-                @Override
+        @Override
         public void accept(Object o) throws Exception { this._func.invoke(o); }
         private final Function1 _func;
     }
@@ -154,14 +156,11 @@ public class CallView extends AppCompatActivity {
         context.startActivity(i);
     }
 
-    // Fields declarations
-
     //region fields declaration
     //Permissions request code.
     private final CompositeDisposable _disposables = new CompositeDisposable();
-    private Handler _handler = new Handler();
 
-    //Caller info.
+    // Caller info.
     private PartyEntity _party;
     //endregion
 }

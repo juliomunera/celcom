@@ -1,8 +1,10 @@
 package com.cytophone.services.fragments;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -27,39 +29,54 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ContactsFragment extends Fragment {
-
-    RecyclerAdapter recyclerAdapter;
-    List<String> contactList;
-    Activity parentActivity;
-
     public ContactsFragment(Activity activity) {
-        this.parentActivity = activity;
+        this._parentActivity = activity;
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(LayoutInflater inflater,
+                             ViewGroup container,
                              Bundle savedInstanceState) {
-
         View view = inflater.inflate(R.layout.fragment_contacts, container, false);
-        RecyclerView recyclerView = (RecyclerView)view.findViewById(R.id.recyclerView);
+        RecyclerView rvw = (RecyclerView)view.findViewById(R.id.recyclerView);
+        List<PartyEntity> list = CytophoneApp.getPersistenceDB().partyDAO().getAllParties();
 
-        List<PartyEntity> list =CytophoneApp.getPersistenceDB().partyDAO().getAllParties();
-
-        contactList = new ArrayList<>();
+        this._contactList = new ArrayList<>();
         for (PartyEntity data : list) {
-            contactList.add(data.getName());
+            this._contactList.add(data.getName());
         }
 
-        RecyclerAdapter recyclerAdapter = new RecyclerAdapter(contactList, this.parentActivity);
-        recyclerView.setAdapter(recyclerAdapter);
-
-        recyclerView.setLayoutManager(
-                new LinearLayoutManager(container.getContext(), LinearLayoutManager.VERTICAL, false));
-        recyclerView.addItemDecoration(
-                new DividerItemDecoration(container.getContext(), DividerItemDecoration.VERTICAL));
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
-
+        this._recyclerAdapter = new RecyclerAdapter(this._contactList, this._parentActivity);
+        rvw.setAdapter(this._recyclerAdapter);
+        rvw.setLayoutManager( new LinearLayoutManager(container.getContext(),
+                                    LinearLayoutManager.VERTICAL,
+                        false));
+        rvw.addItemDecoration(new DividerItemDecoration(container.getContext(),
+                                    DividerItemDecoration.VERTICAL));
+        rvw.setItemAnimator(new DefaultItemAnimator());
         return view;
     }
 
+    public void manageContact(String action, String name) {
+        try {
+            if( action.contains("delete") ) {
+                this._contactList.removeIf(n -> n.equals(name));
+            } else if ( action.contains("update") ){
+                this._contactList.removeIf(n -> n.equals(name));
+                this._contactList.add(name);
+            } else if ( action.contains("insert") ){
+                this._contactList.add(name);
+            }
+            this._recyclerAdapter.notifyDataSetChanged();
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    };
+
+    //region fields declarations
+    RecyclerAdapter _recyclerAdapter;
+    List<String> _contactList;
+    Activity _parentActivity;
+    //end region
 }

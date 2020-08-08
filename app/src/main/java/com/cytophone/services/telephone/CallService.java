@@ -30,6 +30,7 @@ public final class CallService extends InCallService {
 
         String callerNumber = call.getDetails().getHandle().getSchemeSpecificPart();
         PartyEntity party = CytophoneApp.getPartyHandlerDB().searchSuscriber(callerNumber);
+
         OngoingCall.INSTANCE.setCall(call);
         CallView.start((Context) this, call, party);
     }

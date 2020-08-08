@@ -10,23 +10,17 @@
         android:launchMode="singleTask"
         android:roundIcon="@mipmap/icon_cytophone_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
-
-        <activity android:name=".activities.DailerView">
-
-        </activity>
-
+        android:theme="@style/AppTheme"
+        android:testOnly="true">
+        <!-- Start Activities -->
         <activity android:name=".activities.CallView" />
-
         <activity android:name=".activities.ContactListitem">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.HOME" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
             <intent-filter>
                 <!-- Handle links from other applications -->
                 <action android:name="android.intent.action.DIAL" />
@@ -47,9 +41,8 @@
                 <data android:scheme="mmsto" />
             </intent-filter>
         </activity>
-
         <activity android:name=".activities.MakeCall" />
-
+        <!-- End Activities -->
         <!-- Start Receivers -->
         <receiver
             android:name=".messaging.SMSBroadcastReceiver"
@@ -65,7 +58,6 @@
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
         </receiver>
-
         <receiver
             android:name=".messaging.MMSBroadcastReceiver"
             android:exported="true"
@@ -75,7 +67,6 @@
                 <data android:mimeType="application/vnd.wap.mms-message" />
             </intent-filter>
         </receiver>
-
         <receiver android:name=".DeviceAdministrator"
             android:description="@string/app_name"
             android:label="@string/app_name"
@@ -87,14 +78,12 @@
                 <action android:name="android.app.action.DEVICE_ADMIN_ENABLED" />
             </intent-filter>
         </receiver>
-
         <receiver android:name=".BootReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
         <!-- End receivers -->
-
         <!-- Start Services -->
         <service android:name=".telephone.CallService"
             android:permission="android.permission.BIND_INCALL_SERVICE">
@@ -121,24 +110,17 @@
         </service>
         <!-- End Services -->
     </application>
-
     <!-- PHONE permissions -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.REORDER_TASKS" />
-
-    <!--CALLS  permissions -->
-    <!--
-    <uses-permission android:name="android.permission.ANSWER_PHONE_CALLS" />
-    -->
+    <!-- CALLS  permissions -->
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.READ_CALL_LOG" />
     <uses-permission android:name="android.permission.CALL_PHONE" />
-
     <!-- SMS permissions -->
     <uses-permission android:name="android.permission.RECEIVE_MMS" />
     <uses-permission android:name="android.permission.RECEIVE_SMS" />
     <uses-permission android:name="android.permission.WRITE_SMS" />
     <uses-permission android:name="android.permission.READ_SMS" />
     <uses-permission android:name="android.permission.SEND_SMS" />
-
 </manifest>
