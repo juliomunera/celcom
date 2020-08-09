@@ -84,8 +84,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         @Override
         protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
             RecyclerAdapter.this._contactList.clear();
-            RecyclerAdapter.this._contactList.addAll
-            (
+            RecyclerAdapter.this._contactList.addAll (
                 (Collection<? extends PartyEntity>) filterResults.values
             );
             notifyDataSetChanged();

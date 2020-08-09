@@ -64,7 +64,6 @@ public class ContactListitem extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contact_listitem);
 
-        this.initializeBroadcaster();
         this.initializeFragments();
 
         this.checkPermissions();
@@ -108,13 +107,7 @@ public class ContactListitem extends AppCompatActivity {
     }
     //endregion
 
-    //region initialize component methos
-    private void initializeBroadcaster() {
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction("SUSCRIBER_EVENTS");
-        registerReceiver(_receiver, intentFilter);
-    }
-
+    //region initialize component methods
     private void initializeFragments() {
         this._contactFrgmt = new ContactsFragment();
         this._contactFrgmt.setListener(new ItemSelectListener<PartyEntity>() {
@@ -190,9 +183,6 @@ public class ContactListitem extends AppCompatActivity {
                 "android.permission.CALL_PHONE") == 0) {
             Uri uri = Uri.parse("tel:" + number);
             this.startActivity(new Intent("android.intent.action.CALL", uri));
-
-            Intent i = new Intent(this, MakeCall.class);
-            this.startActivity(i);
         } else {
             ActivityCompat.requestPermissions( (Activity)this,
                     new String[]{"android.permission.CALL_PHONE"},
@@ -379,22 +369,6 @@ public class ContactListitem extends AppCompatActivity {
             }
         }, 10);
     }
-
-    private BroadcastReceiver _receiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if ( intent.getAction().equals("SUSCRIBER_EVENTS") ) {
-                Bundle bundle = intent.getExtras();
-                String action = bundle.getString("action");
-                SMSEntity message = (SMSEntity)intent.getSerializableExtra("suscriber") ;
-                try {
-                    ContactListitem.this._contactFrgmt.applyChanges(action, message);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    };
 
     //region fields declarations
     //Permissions that need to be explicitly requested from end user.

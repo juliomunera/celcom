@@ -123,7 +123,7 @@ public class EventEntity implements IEntityBase {
                        @NonNull Date endDateTime,
                        @NonNull String action) {
         this(aPartyNumber, bPartyNumber, eventType, startDateTime, action);
-        if (startDateTime.compareTo(endDateTime) >= 0) {
+        if (endDateTime != null && startDateTime.compareTo(endDateTime) >= 0) {
             this._endDateTime = endDateTime;
         }
     }

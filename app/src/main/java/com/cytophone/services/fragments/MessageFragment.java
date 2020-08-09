@@ -61,8 +61,6 @@ public class MessageFragment extends Fragment {
         return view;
     }
 
-    RecyclerView _recyclerView;
-
     private void initializeBroadcaster(View view) {
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction("SUSCRIBER_EVENTS");
@@ -82,4 +80,5 @@ public class MessageFragment extends Fragment {
     };
 
     List<EventEntity> _messages;
+    RecyclerView _recyclerView;
 }

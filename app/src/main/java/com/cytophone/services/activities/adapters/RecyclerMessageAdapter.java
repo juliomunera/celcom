@@ -42,7 +42,7 @@ public class RecyclerMessageAdapter extends RecyclerView.Adapter<RecyclerMessage
     @Override
     public void onBindViewHolder(@NonNull ViewMessageHolder holder, int position) {
         holder.myText1.setText(_messages.get(position).getAction());
-        holder.myText2.setText(String.format("%tY-%<tm-%<td %<tH:%<tM:%<tS.%",_messages.get(position).getCreatedDate()));
+        holder.myText2.setText(String.format("%tY-%<tm-%<td %<tH:%<tM:%<tS",_messages.get(position).getCreatedDate()));
 
         String actionType = _messages.get(position).getAction().toLowerCase();
         if(actionType.contains(("subscriber"))){
