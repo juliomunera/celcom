@@ -8,21 +8,27 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.cytophone.services.R;
+import com.cytophone.services.entities.EventEntity;
+
+import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class RecyclerMessageAdapter extends RecyclerView.Adapter<RecyclerMessageAdapter.ViewMessageHolder> {
 
-    String data1[], data2[];
-    int images[];
+    List<EventEntity> _messages;
     Context context;
 
-    public RecyclerMessageAdapter(Context ct, String s1[], String s2[], int img[]){
+    public RecyclerMessageAdapter(Context ct, List<EventEntity> eventList){
         context = ct;
+        /*
         data1 = s1;
         data2 = s2;
         images = img;
+        */
+
+        _messages = eventList;
     }
 
     @NonNull
@@ -35,14 +41,42 @@ public class RecyclerMessageAdapter extends RecyclerView.Adapter<RecyclerMessage
 
     @Override
     public void onBindViewHolder(@NonNull ViewMessageHolder holder, int position) {
-        holder.myText1.setText(data1[position]);
-        holder.myText2.setText(data2[position]);
-        holder.myImage.setImageResource(images[position]);
+        holder.myText1.setText(_messages.get(position).getAction());
+        holder.myText2.setText(String.format("%tY-%<tm-%<td %<tH:%<tM:%<tS.%",_messages.get(position).getCreatedDate()));
+
+        String actionType = _messages.get(position).getAction().toLowerCase();
+        if(actionType.contains(("subscriber"))){
+            if(actionType.contains(("insert")))
+                holder.myImage.setImageResource(R.drawable.ic_playlist_add_black_24dp);
+            else if(actionType.contains(("delete")))
+                holder.myImage.setImageResource(R.drawable.ic_clear_black_24dp);
+            else if(actionType.contains(("update")))
+                holder.myImage.setImageResource(R.drawable.ic_swap_horiz_black_24dp);
+        }else if(actionType.contains(("authorizator"))){
+            if(actionType.contains(("insert")))
+                holder.myImage.setImageResource(R.drawable.ic_playlist_add_black_24dp);
+            else if(actionType.contains(("delete")))
+                holder.myImage.setImageResource(R.drawable.ic_clear_black_24dp);
+            else if(actionType.contains(("update")))
+                holder.myImage.setImageResource(R.drawable.ic_swap_horiz_black_24dp);
+        }else if(actionType.contains(("unlock"))){
+            holder.myImage.setImageResource(R.drawable.ic_playlist_add_black_24dp);
+        }
     }
+
+    /*
+    int _images[] = {
+            R.drawable.ic_playlist_add_black_24dp,
+            R.drawable.ic_swap_horiz_black_24dp,
+            R.drawable.ic_clear_black_24dp,
+            R.drawable.ic_playlist_add_black_24dp,
+            R.drawable.ic_playlist_add_black_24dp
+    };
+     */
 
     @Override
     public int getItemCount() {
-        return data1.length;
+        return _messages.size();
     }
 
     public class ViewMessageHolder extends RecyclerView.ViewHolder {

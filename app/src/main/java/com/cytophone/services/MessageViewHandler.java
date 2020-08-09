@@ -46,7 +46,8 @@ public class MessageViewHandler extends AndroidViewModel {
                     EventEntity event = new EventEntity(message[0].getSourceNumber(),
                             party.getNumber(),
                             "SMS",
-                            message[0].getMesageDate());
+                            message[0].getMesageDate(),
+                            message[0].getTypeName().concat(message[0].getActionName()));
                     party.setRoleID(roleID);
                     partyDAO.add(party, event);
                 //}
@@ -71,7 +72,8 @@ public class MessageViewHandler extends AndroidViewModel {
                 EventEntity event = new EventEntity(message[0].getSourceNumber(),
                         unLockCode.getMsisdn(),
                         "SMS",
-                        message[0].getMesageDate());
+                        message[0].getMesageDate(),
+                        message[0].getTypeName().concat(message[0].getActionName()));
                 unlockCodeDAO.add(unLockCode, event);
                 //}
             }catch (Exception ex){

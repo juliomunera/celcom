@@ -3,10 +3,12 @@ package com.cytophone.services.entities;
 import com.cytophone.services.utilities.*;
 
 import android.telephony.SmsMessage;
+
+import java.io.Serializable;
 import java.util.regex.Matcher;
 import java.util.Date;
 
-public class SMSEntity implements IEntityBase {
+public class SMSEntity implements IEntityBase, Serializable {
     // Private methods declaration
     private String decodedMessage(String Message) {
         if (Utils.isHexadecimal(Message)) {

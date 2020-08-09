@@ -25,6 +25,7 @@ import com.cytophone.services.R;
 import com.cytophone.services.activities.ContactListitem;
 import com.cytophone.services.activities.adapters.RecyclerAdapter;
 import com.cytophone.services.entities.PartyEntity;
+import com.cytophone.services.entities.SMSEntity;
 import com.cytophone.services.utilities.ItemSelectListener;
 
 import java.util.ArrayList;
@@ -62,22 +63,23 @@ public class ContactsFragment extends Fragment {
     // endregion
 
     // region public methods declarations
-    private void add(PartyEntity party) {
+    private void add(SMSEntity message) throws Exception {
+        PartyEntity party = message.getPartyObject();
         _parties.add(party);
     }
 
-    public void applyChanges(String action, PartyEntity party) {
-        if( party == null ) return;
+    public void applyChanges(String action, SMSEntity message) throws Exception {
+        if( message == null ) return;
 
-        if ( action.contains("delete") )  this.remove(party);
-        else if ( action.contains("update") ) this.update(party);
-        else if ( action.contains("insert") ) this.add(party);
+        if ( action.contains("delete") )  this.remove(message);
+        else if ( action.contains("update") ) this.update(message);
+        else if ( action.contains("insert") ) this.add(message);
 
         this._recyclerAdapter.notifyDataSetChanged();
     };
 
-    private void remove(PartyEntity party)
-    {
+    private void remove(SMSEntity message) throws Exception {
+        PartyEntity party = message.getPartyObject();
         _parties.removeIf(p ->  p.getNumber().equals(party.getNumber()) &&
                                 p.getPlaceID().equals(party.getPlaceID()));
     }
@@ -86,11 +88,27 @@ public class ContactsFragment extends Fragment {
         _listener = listener;
     }
 
-    private void update(PartyEntity party) {
-        this.remove(party);
-        this.add(party);
+    private void update(SMSEntity message) throws Exception {
+        this.remove(message);
+        this.add(message);
     }
     // endregion
+
+    private BroadcastReceiver _receiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if ( intent.getAction().equals("SUSCRIBER_EVENTS") ) {
+                Bundle bundle = intent.getExtras();
+                String action = bundle.getString("action");
+                SMSEntity party = (SMSEntity)intent.getSerializableExtra("suscriber") ;
+                try {
+                    applyChanges(action, party);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    };
 
     // region fields declarations
     ItemSelectListener<PartyEntity> _listener;

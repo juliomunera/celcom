@@ -12,7 +12,7 @@ public class UnlockCodeHandler implements IHandler {
     }
 
     private EventEntity createEvent(String sourceNumber, String targetNumber, Date messageDate) {
-        return new EventEntity(sourceNumber, targetNumber, "SMS", messageDate);
+        return new EventEntity(sourceNumber, targetNumber, "SMS", messageDate, "unlock");
     }
 
     private UnlockCodeEntity createUnlockCode(SMSEntity message) {

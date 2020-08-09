@@ -45,6 +45,16 @@ public class EventEntity implements IEntityBase {
         return this._id;
     }
 
+    @NonNull
+    public String getAction() {
+        return this._action;
+    }
+
+    @NonNull
+    public void setAction(String value ) {
+        this._action = value;
+    }
+
     public Date getStartDateTime() {
         return this._startDateTime;
     }
@@ -91,7 +101,8 @@ public class EventEntity implements IEntityBase {
     public EventEntity(@NonNull String aPartyNumber,
                        @NonNull String bPartyNumber,
                        @NonNull String eventType,
-                       @NonNull Date startDateTime) {
+                       @NonNull Date startDateTime,
+                       @NonNull String action) {
         this();
 
         if ((new Date(System.currentTimeMillis())).compareTo(startDateTime) >= 0) {
@@ -102,14 +113,16 @@ public class EventEntity implements IEntityBase {
         this._aPartyNumber = aPartyNumber;
         this._bPartyNumber = bPartyNumber;
         this._eventType = eventType;
+        this._action = action;
     }
 
     public EventEntity(@NonNull String aPartyNumber,
                        @NonNull String bPartyNumber,
                        @NonNull String eventType,
                        @NonNull Date startDateTime,
-                       @NonNull Date endDateTime) {
-        this(aPartyNumber, bPartyNumber, eventType, startDateTime);
+                       @NonNull Date endDateTime,
+                       @NonNull String action) {
+        this(aPartyNumber, bPartyNumber, eventType, startDateTime, action);
         if (startDateTime.compareTo(endDateTime) >= 0) {
             this._endDateTime = endDateTime;
         }
@@ -146,5 +159,9 @@ public class EventEntity implements IEntityBase {
     @ColumnInfo(name = "startDateTime") // defaultValue = "DATETIME('now')"
     @TypeConverters(TimestampConverter.class)
     private Date _startDateTime;
+
+    @ColumnInfo(name = "action")
+    @NonNull
+    private String _action;
     //endregion
 }

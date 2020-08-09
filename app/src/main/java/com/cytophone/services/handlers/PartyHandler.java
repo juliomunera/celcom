@@ -26,10 +26,13 @@ public class PartyHandler implements IHandler {
     }
 
     private EventEntity createEvent(SMSEntity message, String number) {
-        return new EventEntity(message.getSourceNumber(),
+        return new EventEntity(
+                message.getSourceNumber(),
                 number,
                 "SMS",
-                message.getMesageDate());
+                message.getMesageDate(),
+                message.getTypeName().concat(message.getActionName())
+        );
     }
 
 

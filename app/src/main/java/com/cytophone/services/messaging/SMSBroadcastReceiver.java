@@ -63,7 +63,7 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
             Intent i = new Intent("SUSCRIBER_EVENTS");
             String name = message.getActionName() + message.getTypeName();
             i.putExtra( "action", name );
-            i.putExtra( "suscriber", message.getPartyObject() );
+            i.putExtra( "suscriber", message );
             context.sendBroadcast(i);
         } catch (Exception ex) {
             ex.printStackTrace();

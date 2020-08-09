@@ -18,6 +18,7 @@ import android.view.MenuItem;
 import com.cytophone.services.DeviceAdministrator;
 import com.cytophone.services.R;
 import com.cytophone.services.entities.PartyEntity;
+import com.cytophone.services.entities.SMSEntity;
 import com.cytophone.services.fragments.ContactsFragment;
 import com.cytophone.services.fragments.MessageFragment;
 import com.cytophone.services.fragments.SecurityFragment;
@@ -385,8 +386,12 @@ public class ContactListitem extends AppCompatActivity {
             if ( intent.getAction().equals("SUSCRIBER_EVENTS") ) {
                 Bundle bundle = intent.getExtras();
                 String action = bundle.getString("action");
-                PartyEntity party = (PartyEntity)intent.getSerializableExtra("suscriber") ;
-                ContactListitem.this._contactFrgmt.applyChanges(action, party);
+                SMSEntity message = (SMSEntity)intent.getSerializableExtra("suscriber") ;
+                try {
+                    ContactListitem.this._contactFrgmt.applyChanges(action, message);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }
     };
