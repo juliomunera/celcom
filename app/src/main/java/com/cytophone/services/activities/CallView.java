@@ -90,7 +90,7 @@ public class CallView extends AppCompatActivity {
                 if( null == CallView.this._party ) { // End call
                     OngoingCall.INSTANCE.reject();
                     OngoingCall.INSTANCE.hangup();
-                } else {  // Show caller info
+                } else {  // Accept call and show caller info
                     CallView.this.updateUI(state);
                 }
                 return null;
@@ -102,7 +102,7 @@ public class CallView extends AppCompatActivity {
 
         subscribers = OngoingCall.INSTANCE.getState().
                 filter(i -> i.equals(Call.STATE_DISCONNECTING) ||
-                       i.equals(Call.STATE_DISCONNECTED)).
+                            i.equals(Call.STATE_DISCONNECTED)).
                 delay(1L, TimeUnit.SECONDS).
                 firstElement().
                 subscribe(new Consumer() {

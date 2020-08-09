@@ -12,13 +12,16 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Telephony;
+import android.telecom.TelecomManager;
 import android.view.MenuItem;
 
 import com.cytophone.services.DeviceAdministrator;
 import com.cytophone.services.R;
+import com.cytophone.services.entities.PartyEntity;
 import com.cytophone.services.fragments.ContactsFragment;
 import com.cytophone.services.fragments.MessageFragment;
 import com.cytophone.services.fragments.SecurityFragment;
+import com.cytophone.services.utilities.ItemSelectListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 
@@ -54,7 +57,7 @@ import androidx.core.content.ContextCompat;
 
 
 public class ContactListitem extends AppCompatActivity {
-
+    //region events methods
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,9 +68,46 @@ public class ContactListitem extends AppCompatActivity {
 
         this.checkPermissions();
         this.checkDefaultSMS();
+        this.checkDefaultDialer();
         this.startLockTaskDelayed();
     }
 
+    @Override
+    public void onBackPressed() {}
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 123) {
+            //checkSetDefaultDialerResult(resultCode);
+        }
+    }
+
+    public void onRequestPermissionsResult(int requestCode,
+                                           @NotNull String[] permissions,
+                                           @NotNull int[] grantResults) {
+        if( requestCode == REQUEST_CODE_ASK_PERMISSIONS ) {
+            for (int index = permissions.length - 1; index >= 0; --index) {
+                if (grantResults[index] != PackageManager.PERMISSION_GRANTED) {
+                    // Exit the app if one permission is not granted.
+                    Toast.makeText(this, "El permiso '" +
+                                    permissions[index] + "' no fue otorgado.",
+                            Toast.LENGTH_LONG).show();
+                    return;
+                }
+            }
+        }
+    }
+
+    protected void onStart() {
+        super.onStart();
+
+        //this.offerReplacingDefaultSMS();
+        //this.offerReplacingDefaultDialer();
+    }
+    //endregion
+
+    //region initialize component methos
     private void initializeBroadcaster() {
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction("SUSCRIBER_EVENTS");
@@ -75,25 +115,46 @@ public class ContactListitem extends AppCompatActivity {
     }
 
     private void initializeFragments() {
-        this._contactFrgmt = new ContactsFragment(ContactListitem.this);
+        this._contactFrgmt = new ContactsFragment();
+        this._contactFrgmt.setListener(new ItemSelectListener<PartyEntity>() {
+            @Override
+            public void onSelect(PartyEntity party) {
+                ContactListitem.this.makeCall(party.getNumber());
+            }
+        });
         showSelectedFragment(this._contactFrgmt);
 
         BottomNavigationView bnv = (BottomNavigationView) findViewById(R.id.bottom_navigation);
         bnv.setOnNavigationItemSelectedListener( new
-             BottomNavigationView.OnNavigationItemSelectedListener() {
-                @Override
-                public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                    if ( item.getItemId() == R.id.contactdevice) {
-                        showSelectedFragment(new ContactsFragment(ContactListitem.this));
-                    } else if( item.getItemId() == R.id.smsmessages ) {
-                        showSelectedFragment(new MessageFragment());
-                    } else if ( item.getItemId() == R.id.blockoption) {
-                        showSelectedFragment(new SecurityFragment());
-                    }
-                    return true;
+            BottomNavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                if ( item.getItemId() == R.id.contactdevice) {
+                    showSelectedFragment(new ContactsFragment());
+                } else if( item.getItemId() == R.id.smsmessages ) {
+                    showSelectedFragment(new MessageFragment());
+                } else if ( item.getItemId() == R.id.blockoption) {
+                    showSelectedFragment(new SecurityFragment());
                 }
+                return true;
+            }
         });
     }
+    private void initializePolices(){
+        int owner = R.string.deviceOwner;
+
+        adminName = DeviceAdministrator.getComponentName(this);
+        dpm = (DevicePolicyManager) getSystemService(Context.DEVICE_POLICY_SERVICE);
+
+        if (!dpm.isDeviceOwnerApp(getPackageName())) {
+            owner = R.string.notDeviceOwner;
+            this.isAdmin = false;
+        }
+
+        Toast.makeText(this, owner, Toast.LENGTH_SHORT).show();
+        this.setPolicies(true, this.isAdmin);
+    }
+    //endregion
 
     private void checkDefaultSMS() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return;
@@ -146,34 +207,6 @@ public class ContactListitem extends AppCompatActivity {
                 commit();
     }
 
-    //region override methods.
-    @Override
-    public void onBackPressed() {}
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == 123) {
-            //checkSetDefaultDialerResult(resultCode);
-        }
-    }
-
-    public void onRequestPermissionsResult(int requestCode,
-                                           @NotNull String[] permissions,
-                                           @NotNull int[] grantResults) {
-
-        if( requestCode == REQUEST_CODE_ASK_PERMISSIONS ) {
-            for (int index = permissions.length - 1; index >= 0; --index) {
-                if (grantResults[index] != PackageManager.PERMISSION_GRANTED) {
-                    // Exit the app if one permission is not granted.
-                    Toast.makeText(this, "El permiso '" +
-                                    permissions[index] + "' no fue otorgado.",
-                            Toast.LENGTH_LONG).show();
-                    return;
-                }
-            }
-        }
-    }
 
     //region private methods declaration
     protected void checkPermissions() {
@@ -203,19 +236,25 @@ public class ContactListitem extends AppCompatActivity {
         }
     }
 
-    private void initializePolices(){
-        int owner = R.string.deviceOwner;
+    private void checkDefaultDialer() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return;
+        if (!((TelecomManager) getApplicationContext().getSystemService(TELECOM_SERVICE)).
+                getDefaultDialerPackage().equals(this.getPackageName())) return;
 
-        adminName = DeviceAdministrator.getComponentName(this);
-        dpm = (DevicePolicyManager) getSystemService(Context.DEVICE_POLICY_SERVICE);
+        Intent i = new Intent(TelecomManager.ACTION_CHANGE_DEFAULT_DIALER).
+                putExtra(TelecomManager.EXTRA_CHANGE_DEFAULT_DIALER_PACKAGE_NAME,
+                        this.getPackageName());
+        startActivityForResult(i, 123);
+    }
 
-        if (!dpm.isDeviceOwnerApp(getPackageName())) {
-            owner = R.string.notDeviceOwner;
-            this.isAdmin = false;
+    private final void offerReplacingDefaultDialer() {
+        final TelecomManager tm = this.getSystemService(TelecomManager.class);
+        if (this.getPackageName().equals(tm.getDefaultDialerPackage())) {
+            final Intent i = new Intent("android.telecom.action.CHANGE_DEFAULT_DIALER").
+                    putExtra("android.telecom.extra.CHANGE_DEFAULT_DIALER_PACKAGE_NAME",
+                            this.getPackageName());
+            this.startActivity(i);
         }
-
-        Toast.makeText(this, owner, Toast.LENGTH_SHORT).show();
-        this.setPolicies(true, this.isAdmin);
     }
 
     private void enableStayOnWhilePluggedIn(Boolean active) {
@@ -241,8 +280,7 @@ public class ContactListitem extends AppCompatActivity {
             this.dpm.addPersistentPreferredActivity(
                     this.adminName,
                     intentFilter,
-                    new ComponentName(getPackageName(),
-                            ContactListitem.class.getName())
+                    new ComponentName(getPackageName(), ContactListitem.class.getName())
             );
         } else {
             ContactListitem.this.dpm.clearPackagePersistentPreferredActivities(
@@ -296,7 +334,9 @@ public class ContactListitem extends AppCompatActivity {
     private void setLockTask(Boolean start, Boolean isAdministrator) {
         if (isAdministrator) {
             this.dpm.setLockTaskPackages(this.adminName,
-                    new String[]{ getPackageName() });
+                    new String[]{ getPackageName(),
+                            "com.google.android.dialer",
+                            "com.android.server.telecom" });
         }
         if (start) this.startLockTask();
         else this.stopLockTask();
@@ -332,7 +372,7 @@ public class ContactListitem extends AppCompatActivity {
                         //activatePackages();
                     }
                 } catch(IllegalArgumentException e) {
-                    Log.e("D/ClosedComm", "Was not in foreground yet, try again..");
+                    Log.e("D/CytoPhone", "Was not in foreground yet, try again..");
                     startLockTaskDelayed();
                 }
             }
@@ -342,11 +382,11 @@ public class ContactListitem extends AppCompatActivity {
     private BroadcastReceiver _receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (intent.getAction().equals("SUSCRIBER_EVENTS")) {
-                Bundle b = intent.getExtras();
-                String action = b.getString("action");
-                String name = b.getString("suscriber");
-                ContactListitem.this._contactFrgmt.manageContact(action,name);
+            if ( intent.getAction().equals("SUSCRIBER_EVENTS") ) {
+                Bundle bundle = intent.getExtras();
+                String action = bundle.getString("action");
+                PartyEntity party = (PartyEntity)intent.getSerializableExtra("suscriber") ;
+                ContactListitem.this._contactFrgmt.applyChanges(action, party);
             }
         }
     };

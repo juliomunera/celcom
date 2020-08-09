@@ -1,6 +1,7 @@
 package com.cytophone.services.messaging;
 
 import com.cytophone.services.CytophoneApp;
+import com.cytophone.services.activities.CallView;
 import com.cytophone.services.entities.SMSEntity;
 import com.cytophone.services.handlers.*;
 
@@ -17,7 +18,7 @@ import java.lang.reflect.Method;
 public class SMSBroadcastReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
-        Log.d("D/ClosedComm", "Receiving SMS...");
+        Log.d("D/CytoPhone", "Receiving SMS...");
 
         if (intent.getAction().equals(Telephony.Sms.Intents.SMS_RECEIVED_ACTION)) {
             for (SmsMessage smsMessage : Telephony.Sms.Intents.getMessagesFromIntent(intent)) {
@@ -62,7 +63,7 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
             Intent i = new Intent("SUSCRIBER_EVENTS");
             String name = message.getActionName() + message.getTypeName();
             i.putExtra( "action", name );
-            i.putExtra( "suscriber", message.getPartyObject().getName() );
+            i.putExtra( "suscriber", message.getPartyObject() );
             context.sendBroadcast(i);
         } catch (Exception ex) {
             ex.printStackTrace();

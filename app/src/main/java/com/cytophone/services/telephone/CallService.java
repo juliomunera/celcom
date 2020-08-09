@@ -1,6 +1,5 @@
 package com.cytophone.services.telephone;
 
-import com.android.internal.telephony.ITelephony;
 import com.cytophone.services.CytophoneApp;
 import com.cytophone.services.activities.CallView;
 import com.cytophone.services.entities.PartyEntity;
@@ -16,7 +15,6 @@ import android.telecom.Call;
 import android.os.Bundle;
 import android.telephony.TelephonyManager;
 import android.util.Log;
-import android.net.Uri;
 
 import java.lang.reflect.Method;
 
@@ -61,31 +59,9 @@ public final class CallService extends InCallService {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
-        Log.d("D/ClosedComm", "OnStart");
+        Log.d("D/CytoPhone/CallService/onStartCommand", "OnStart");
         return START_STICKY;
     }
 
-    private void rejectCall() {
-        try {
-            TelephonyManager tm= (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
-            @SuppressLint("SoonBlockedPrivateApi")
-            Method m = tm.getClass().getDeclaredMethod("getITelephony");
-            m.setAccessible(true);
-            ITelephony telephonyService = (ITelephony) m.invoke(tm);
-            telephonyService.endCall();
-        } catch (Exception e) {
-            Log.d("D/ClosedComm", "Error -> " + e.getMessage());
-        }
-    }
-
-
-    private Handler _handler = new Handler();
-    private Runnable _hangUp = new Runnable() {
-        @Override
-        public void run() {
-            _call.reject(true,"No Authorized");
-            //_call.disconnect();
-        }
-    };
     private Call _call;
 }

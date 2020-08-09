@@ -114,7 +114,7 @@ public class SMSEntity implements IEntityBase {
     public PartyEntity getPartyObject() throws Exception {
         String[] msgParts = this._decodeMessage.split("[|]");
         if( !isItOkPartyMgmtMsg(msgParts) ) {
-            throw new Exception("The message to third party management isn't valid.");
+            throw new Exception("El mensaje message para registro de un suscriptor/autorizador  no es válido.");
         }
         return new PartyEntity(msgParts[2], msgParts[1], msgParts[3], this.getRole());
     }
@@ -130,7 +130,7 @@ public class SMSEntity implements IEntityBase {
     public UnlockCodeEntity getUnlockCodeObject() throws Exception {
         String[] msgParts = this._decodeMessage.split("[|]");
         if( !isItOkUnlockMsg(msgParts) ) {
-            throw new Exception("The message to unlock device isn’t valid.");
+            throw new Exception("El mensaje de desbloqueo del dispositivo no es válido.");
         }
         return new UnlockCodeEntity(msgParts[2], msgParts[1], Integer.parseInt(msgParts[3]));
     }
@@ -149,8 +149,8 @@ public class SMSEntity implements IEntityBase {
         }
     }
 
-    // Fields declarations
-    // Actions.
+    // region fields declarations
+    // Actions by type message.
     private final String[][] ACTIONS = {
             { "none", "none", null },
             { "Authorizator", "insert", "1" },
@@ -166,5 +166,6 @@ public class SMSEntity implements IEntityBase {
     private String _sourceNumber;
     private String _rawMessage;
     private Date _messageDate;
+    //endregion
 }
 

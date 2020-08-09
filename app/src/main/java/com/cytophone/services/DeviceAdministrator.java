@@ -15,12 +15,12 @@ public class DeviceAdministrator extends DeviceAdminReceiver {
     @Override
     public void onLockTaskModeEntering(Context context, Intent intent, String pkg) {
         super.onLockTaskModeEntering(context, intent, pkg);
-        Log.d("D/ClosedComm", "onLockTaskModeEntering");
+        Log.d("D/CytoPhone", "onLockTaskModeEntering");
     }
 
     @Override
     public void onLockTaskModeExiting(Context context, Intent intent) {
         super.onLockTaskModeExiting(context, intent);
-        Log.d("D/ClosedComm", "onLockTaskModeExiting");
+        Log.d("D/CytoPhone", "onLockTaskModeExiting");
     }
 }

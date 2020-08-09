@@ -3,17 +3,18 @@ package com.cytophone.services.dao;
 import com.cytophone.services.entities.*;
 
 import androidx.room.OnConflictStrategy;
-import androidx.lifecycle.LiveData;
 import androidx.room.Transaction;
 import androidx.room.Insert;
 import androidx.room.Update;
 import androidx.room.Query;
 import androidx.room.Dao;
 
+import androidx.lifecycle.LiveData;
 import java.util.List;
 
 @Dao
 public abstract class PartyDAO implements IDAO {
+    //region add methods
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract void add(PartyEntity ... party);
 
@@ -25,7 +26,9 @@ public abstract class PartyDAO implements IDAO {
         add(event);
         add(party);
     }
+    //endregion
 
+    //region delete methods.
     @Query("DELETE FROM party WHERE number = :number AND roleID = :roleID")
     abstract void delete(String number, int roleID);
 
@@ -34,7 +37,9 @@ public abstract class PartyDAO implements IDAO {
         add(event);
         delete(party.getNumber(), party.getRoleID());
     }
+    //endregion
 
+    //region get methods.
     @Query("SELECT * FROM party WHERE number = :number")
     public abstract PartyEntity getPartyByNumber(String number);
 
@@ -49,9 +54,11 @@ public abstract class PartyDAO implements IDAO {
     public abstract LiveData<List<PartyEntity>> getSortAllParties();
     */
 
-    @Query("SELECT * FROM party ORDER BY name ASC")
-    public abstract List<PartyEntity> getAllParties();
+    @Query("SELECT * FROM party WHERE roleID = 2 ORDER BY name ASC")
+    public abstract List<PartyEntity> getAllOrderSuscribers();
+    //endregion
 
+    //region update methods.
     @Update()
     abstract void update(PartyEntity ... partyEntities);
 
@@ -60,4 +67,5 @@ public abstract class PartyDAO implements IDAO {
         add(event);
         update(party);
     }
+    //endregion
 }

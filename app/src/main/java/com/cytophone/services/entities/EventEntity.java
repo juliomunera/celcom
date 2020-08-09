@@ -8,13 +8,14 @@ import androidx.room.ColumnInfo;
 import androidx.room.PrimaryKey;
 import androidx.room.Entity;
 import androidx.room.Ignore;
+import androidx.room.Index;
 
 import java.util.Date;
 import java.util.UUID;
-@Entity(tableName = "EventLog")
 
+@Entity( tableName = "EventLog"
+         , indices = { @Index(value = { "createdDate" }, name = "IX_EventLog_createdDate") })
 public class EventEntity implements IEntityBase {
-    //region public properties
     //region getter methods
     @NonNull
     public String getAPartyNumber() {
@@ -49,7 +50,7 @@ public class EventEntity implements IEntityBase {
     }
     //endregion
 
-    //region setter Methods
+    //region setter methods
     public void setAPartyNumber(@NonNull String number) {
         this._aPartyNumber = number;
     }
@@ -77,17 +78,15 @@ public class EventEntity implements IEntityBase {
     public void setStartDateTime(Date dateTime) {
         this._startDateTime = dateTime;
     }
+    //endregion
 
-    //Constructor Methods
+    //region constructor methods
     @Ignore()
     public EventEntity() {
         this._createdDate = new Date(System.currentTimeMillis());
         this._id = UUID.randomUUID().toString();
     }
 
-    //endregion
-    //endregion
-    //region constructors declarations
     @Ignore()
     public EventEntity(@NonNull String aPartyNumber,
                        @NonNull String bPartyNumber,
@@ -99,9 +98,9 @@ public class EventEntity implements IEntityBase {
             this._startDateTime = startDateTime;
         }
 
+        this._startDateTime = startDateTime;
         this._aPartyNumber = aPartyNumber;
         this._bPartyNumber = bPartyNumber;
-        this._startDateTime = startDateTime;
         this._eventType = eventType;
     }
 
@@ -144,7 +143,7 @@ public class EventEntity implements IEntityBase {
     @NonNull
     private String _id;
 
-    @ColumnInfo(name = "startDateTime") //defaultValue = "DATETIME('now')"
+    @ColumnInfo(name = "startDateTime") // defaultValue = "DATETIME('now')"
     @TypeConverters(TimestampConverter.class)
     private Date _startDateTime;
     //endregion

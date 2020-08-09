@@ -22,61 +22,79 @@ import android.view.ViewGroup;
 
 import com.cytophone.services.CytophoneApp;
 import com.cytophone.services.R;
+import com.cytophone.services.activities.ContactListitem;
 import com.cytophone.services.activities.adapters.RecyclerAdapter;
 import com.cytophone.services.entities.PartyEntity;
+import com.cytophone.services.utilities.ItemSelectListener;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class ContactsFragment extends Fragment {
-    public ContactsFragment(Activity activity) {
-        this._parentActivity = activity;
-    }
-
+    // region events methods declarations
     @Override
     public View onCreateView(LayoutInflater inflater,
                              ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_contacts, container, false);
         RecyclerView rvw = (RecyclerView)view.findViewById(R.id.recyclerView);
-        List<PartyEntity> list = CytophoneApp.getPersistenceDB().partyDAO().getAllParties();
 
-        this._contactList = new ArrayList<>();
-        for (PartyEntity data : list) {
-            this._contactList.add(data.getName());
-        }
+        _parties = CytophoneApp.getInstanceDB().partyDAO().getAllOrderSuscribers();
 
-        this._recyclerAdapter = new RecyclerAdapter(this._contactList, this._parentActivity);
+        _recyclerAdapter = new RecyclerAdapter(this._parties);
+        _recyclerAdapter.setListener(new ItemSelectListener<PartyEntity>() {
+            @Override
+            public void onSelect(PartyEntity item) {
+                if( _listener != null) _listener.onSelect(item);
+            }
+        });
         rvw.setAdapter(this._recyclerAdapter);
         rvw.setLayoutManager( new LinearLayoutManager(container.getContext(),
-                                    LinearLayoutManager.VERTICAL,
+                              LinearLayoutManager.VERTICAL,
                         false));
         rvw.addItemDecoration(new DividerItemDecoration(container.getContext(),
                                     DividerItemDecoration.VERTICAL));
         rvw.setItemAnimator(new DefaultItemAnimator());
         return view;
     }
+    // endregion
 
-    public void manageContact(String action, String name) {
-        try {
-            if( action.contains("delete") ) {
-                this._contactList.removeIf(n -> n.equals(name));
-            } else if ( action.contains("update") ){
-                this._contactList.removeIf(n -> n.equals(name));
-                this._contactList.add(name);
-            } else if ( action.contains("insert") ){
-                this._contactList.add(name);
-            }
-            this._recyclerAdapter.notifyDataSetChanged();
-        }
-        catch (Exception ex) {
-            ex.printStackTrace();
-        }
+    // region public methods declarations
+    private void add(PartyEntity party) {
+        _parties.add(party);
+    }
+
+    public void applyChanges(String action, PartyEntity party) {
+        if( party == null ) return;
+
+        if ( action.contains("delete") )  this.remove(party);
+        else if ( action.contains("update") ) this.update(party);
+        else if ( action.contains("insert") ) this.add(party);
+
+        this._recyclerAdapter.notifyDataSetChanged();
     };
 
-    //region fields declarations
+    private void remove(PartyEntity party)
+    {
+        _parties.removeIf(p ->  p.getNumber().equals(party.getNumber()) &&
+                                p.getPlaceID().equals(party.getPlaceID()));
+    }
+
+    public void setListener(ItemSelectListener<PartyEntity> listener) {
+        _listener = listener;
+    }
+
+    private void update(PartyEntity party) {
+        this.remove(party);
+        this.add(party);
+    }
+    // endregion
+
+    // region fields declarations
+    ItemSelectListener<PartyEntity> _listener;
     RecyclerAdapter _recyclerAdapter;
-    List<String> _contactList;
-    Activity _parentActivity;
-    //end region
+    List<PartyEntity> _parties;
+    // endregion
 }

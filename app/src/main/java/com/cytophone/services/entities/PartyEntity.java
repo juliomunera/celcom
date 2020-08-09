@@ -17,8 +17,8 @@ import java.util.Date;
         name = "UX_Party_ID",
         unique = true),
         }*/)
-public class PartyEntity implements IEntityBase, Serializable {
-    //Getter methods
+public class PartyEntity implements IEntityBase, Serializable  {
+    //region getter methods
     public Date getCreatedDate() {
         return this._createdDate;
     }
@@ -47,16 +47,10 @@ public class PartyEntity implements IEntityBase, Serializable {
         return this._updatedDate;
     }
 
-    //Setter methods
+    //region setter methods
     public void setCreatedDate(@NonNull Date createdDate) {
         this._createdDate = createdDate;
     }
-
-    /*
-    public void setId(@NonNull String id) {
-    this._id = id;
-    }
-    */
 
     public void setName(@NonNull String name) {
         this._name = name;
@@ -81,8 +75,9 @@ public class PartyEntity implements IEntityBase, Serializable {
     public void setUpdateDateToCurrentDate() {
         this._updatedDate = new Date(System.currentTimeMillis());
     }
+    //endregion
 
-    //Constructors Methods.
+    //region constructors methods.
     public PartyEntity() {
         this._createdDate = new Date(System.currentTimeMillis());
     }
@@ -98,16 +93,12 @@ public class PartyEntity implements IEntityBase, Serializable {
         this._number = number;
         this._name = name;
     }
+    //endregion
 
-    //Fields declaration
+    //region fields declarations
     @ColumnInfo(name="createdDate")
     @TypeConverters(TimestampConverter.class)
     private Date _createdDate;
-
-    //@ColumnInfo(name="id")
-    //@PrimaryKey
-    //@NonNull
-    //private String _id;
 
     @ColumnInfo(name="name")
     @NonNull
@@ -128,4 +119,5 @@ public class PartyEntity implements IEntityBase, Serializable {
     @ColumnInfo(name="updatedDate")
     @TypeConverters(TimestampConverter.class)
     private Date _updatedDate;
+    //endregion
 }

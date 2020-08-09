@@ -13,7 +13,8 @@
         android:theme="@style/AppTheme"
         android:testOnly="true">
         <!-- Start Activities -->
-        <activity android:name=".activities.CallView" />
+        <activity android:name=".activities.CallView"
+            android:lockTaskMode="if_whitelisted"/>
         <activity android:name=".activities.ContactListitem">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

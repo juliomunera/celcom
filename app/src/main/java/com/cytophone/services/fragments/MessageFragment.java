@@ -17,7 +17,6 @@ import com.cytophone.services.activities.adapters.RecyclerMessageAdapter;
 
 public class MessageFragment extends Fragment {
 
-    RecyclerView recyclerView;
 
     String s1[] = { "Mensaje No. 1 ingreso", "Mensaje dos actualización",
                     "Mensaje eliminación", "Un nuevo mensaje de ingreso",
@@ -27,33 +26,33 @@ public class MessageFragment extends Fragment {
                      "2020-06-20 16:50", "2020-06-20 13:25",
                     "2020-06-20 13:24"};
 
-    int images[] = { R.drawable.ic_playlist_add_black_24dp,
-                     R.drawable.ic_swap_horiz_black_24dp,
-                     R.drawable.ic_clear_black_24dp,
-                     R.drawable.ic_playlist_add_black_24dp,
-                     R.drawable.ic_playlist_add_black_24dp };
-
-    public MessageFragment() {
-    }
+    public MessageFragment() {}
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(LayoutInflater inflater,
+                             ViewGroup container,
                              Bundle savedInstanceState) {
-
         View view = inflater.inflate(R.layout.fragment_message, container, false);
-        RecyclerView recyclerView = (RecyclerView)view.findViewById(R.id.recyclerMessages);
+        this._recyclerView = (RecyclerView)view.findViewById(R.id.recyclerMessages);
 
-        RecyclerMessageAdapter adapter = new RecyclerMessageAdapter(container.getContext(), s1, s2, images);
-        recyclerView.setAdapter(adapter);
-
-        recyclerView.setLayoutManager(
-                new LinearLayoutManager(container.getContext()));
-
-        recyclerView.addItemDecoration(
+        RecyclerMessageAdapter adapter = new RecyclerMessageAdapter(container.getContext(),
+                s1,
+                s2,
+                _images);
+        _recyclerView.setAdapter(adapter);
+        _recyclerView.setLayoutManager(new LinearLayoutManager(container.getContext()));
+        _recyclerView.addItemDecoration(
                 new DividerItemDecoration(container.getContext(), DividerItemDecoration.VERTICAL));
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
-
+        _recyclerView.setItemAnimator(new DefaultItemAnimator());
         return view;
     }
 
+    RecyclerView _recyclerView;
+    int _images[] = {
+            R.drawable.ic_playlist_add_black_24dp,
+            R.drawable.ic_swap_horiz_black_24dp,
+            R.drawable.ic_clear_black_24dp,
+            R.drawable.ic_playlist_add_black_24dp,
+            R.drawable.ic_playlist_add_black_24dp
+    };
 }

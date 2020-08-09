@@ -1,0 +1,175 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 5,
+    "identityHash": "aff033598373fe968b29780e92909ec5",
+    "entities": [
+      {
+        "tableName": "Party",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`createdDate` TEXT, `name` TEXT NOT NULL, `number` TEXT NOT NULL, `placeID` TEXT NOT NULL, `roleID` INTEGER NOT NULL, `updatedDate` TEXT, PRIMARY KEY(`number`, `placeID`, `roleID`))",
+        "fields": [
+          {
+            "fieldPath": "_createdDate",
+            "columnName": "createdDate",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "_name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "_number",
+            "columnName": "number",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "_placeID",
+            "columnName": "placeID",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "_roleID",
+            "columnName": "roleID",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "_updatedDate",
+            "columnName": "updatedDate",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "number",
+            "placeID",
+            "roleID"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "EventLog",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`aPartyNumber` TEXT NOT NULL, `bPartyNumber` TEXT NOT NULL, `createdDate` TEXT NOT NULL, `eventType` TEXT NOT NULL, `endDateTime` TEXT, `id` TEXT NOT NULL, `startDateTime` TEXT, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "_aPartyNumber",
+            "columnName": "aPartyNumber",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "_bPartyNumber",
+            "columnName": "bPartyNumber",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "_createdDate",
+            "columnName": "createdDate",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "_eventType",
+            "columnName": "eventType",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "_endDateTime",
+            "columnName": "endDateTime",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "_id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "_startDateTime",
+            "columnName": "startDateTime",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "IX_EventLog_createdDate",
+            "unique": false,
+            "columnNames": [
+              "createdDate"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `IX_EventLog_createdDate` ON `${TABLE_NAME}` (`createdDate`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "UnlockCodes",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`createdDate` TEXT, `code` TEXT NOT NULL, `endDate` TEXT, `id` TEXT NOT NULL, `msisdn` TEXT NOT NULL, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "createdDate",
+            "columnName": "createdDate",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "code",
+            "columnName": "code",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "endDate",
+            "columnName": "endDate",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "msisdn",
+            "columnName": "msisdn",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'aff033598373fe968b29780e92909ec5')"
+    ]
+  }
+}

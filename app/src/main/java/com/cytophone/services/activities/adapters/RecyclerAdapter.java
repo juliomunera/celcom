@@ -15,6 +15,7 @@ import com.cytophone.services.R;
 import com.cytophone.services.activities.ContactListitem;
 import com.cytophone.services.entities.PartyEntity;
 import com.cytophone.services.fragments.ContactsFragment;
+import com.cytophone.services.utilities.ItemSelectListener;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -23,19 +24,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHolder> implements Filterable {
+public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHolder>
+        implements Filterable {
 
-    private static final String TAG = "RecyclerAdapter";
-    private List<String> contactList;
-    private List<String> contactListAll;
-    private Activity parentActivity;
-
-    public RecyclerAdapter(List<String> paramContactList, Activity activity) {
-        this.contactList = paramContactList;
-        contactListAll = new ArrayList<>();
-        contactListAll.addAll(paramContactList);
-
-        this.parentActivity = activity;
+    public RecyclerAdapter(List<PartyEntity> parties) {
+        this._contactListAll.addAll(parties);
+        this._contactList = parties;
     }
 
     @NonNull
@@ -43,43 +37,42 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
         View view = layoutInflater.inflate(R.layout.row_item, parent, false);
+
         ViewHolder viewHolder = new ViewHolder(view);
         return viewHolder;
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        holder.rowCountTextView.setText(String.format("Contacto %s", String.valueOf(position + 1)));
-        holder.textView.setText(contactList.get(position));
+        holder._tvRowCount.setText(String.format("Contacto %s", String.valueOf(position + 1)));
+        holder._tvNumber.setText(_contactList.get(position).getName());
+        holder._tvName.setText(_contactList.get(position).getName());
     }
 
     @Override
     public int getItemCount() {
-        return contactList.size();
+        return _contactList.size();
     }
 
     @Override
     public Filter getFilter() {
-
-        return myFilter;
+        return _filter;
     }
 
-    Filter myFilter = new Filter() {
-
+    Filter _filter = new Filter() {
         //Automatic on background thread
         @Override
         protected FilterResults performFiltering(CharSequence charSequence) {
-
-            List<String> filteredList = new ArrayList<>();
+            List<PartyEntity> filteredList = new ArrayList<>();
 
             if (charSequence == null || charSequence.length() == 0) {
-                filteredList.addAll(contactListAll);
+                filteredList.addAll(_contactListAll);
             } else {
-                for (String movie: contactListAll) {
-                    if (movie.toLowerCase().contains(charSequence.toString().toLowerCase())) {
-                        filteredList.add(movie);
+                _contactListAll.stream().forEachOrdered(n -> {
+                    if (n.getName().toLowerCase().contains(charSequence.toString().toLowerCase())) {
+                        filteredList.add(n);
                     }
-                }
+                });
             }
 
             FilterResults filterResults = new FilterResults();
@@ -90,40 +83,49 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         //Automatic on UI thread
         @Override
         protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
-            contactList.clear();
-            contactList.addAll((Collection<? extends String>) filterResults.values);
+            RecyclerAdapter.this._contactList.clear();
+            RecyclerAdapter.this._contactList.addAll
+            (
+                (Collection<? extends PartyEntity>) filterResults.values
+            );
             notifyDataSetChanged();
         }
     };
 
-
-
-    class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-
-        ImageView imageView;
-        TextView textView, rowCountTextView;
-
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
 
-            imageView = itemView.findViewById(R.id.imageView);
-            textView = itemView.findViewById(R.id.textView);
-            rowCountTextView = itemView.findViewById(R.id.rowCountTextView);
+            _tvRowCount = itemView.findViewById(R.id.rowCountTextView);
+            _tvNumber = itemView.findViewById(R.id.tv_number);
+            _ivItem = itemView.findViewById(R.id.imageView);
+            _tvName = itemView.findViewById(R.id.textView);
 
             itemView.setOnClickListener(this);
         }
 
         @Override
         public void onClick(View view) {
-            Toast.makeText(view.getContext(), contactList.get(getAdapterPosition()), Toast.LENGTH_SHORT).show();
+            PartyEntity party = _contactList.get(getAdapterPosition());
+            Toast.makeText(view.getContext(), party.getName(), Toast.LENGTH_SHORT).show();
 
-            PartyEntity party = CytophoneApp.getPartyHandlerDB().
-                    searchSuscriberByName(contactList.get(getAdapterPosition()));
-
-            if (party != null) {
-                ((ContactListitem)RecyclerAdapter.this.parentActivity).makeCall(party.getNumber());
-            }
+            if( _listener != null) _listener.onSelect(party);
         }
 
+        TextView _tvRowCount;
+        TextView _tvNumber;
+        TextView _tvName;
+
+        ImageView _ivItem;
     }
+
+    public void setListener(ItemSelectListener<PartyEntity> listener) {
+        _listener = listener;
+    }
+
+    //region fields declaration
+    private List<PartyEntity> _contactListAll  = new ArrayList<>();
+    private ItemSelectListener<PartyEntity> _listener;
+    private List<PartyEntity> _contactList;
+    //endregion
 }

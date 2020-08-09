@@ -5,7 +5,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.cytophone.services.activities.CallView">
-
     <RelativeLayout
         android:id="@+id/rellay1"
         android:layout_width="match_parent"
@@ -37,7 +36,7 @@
             android:layout_below="@+id/imgUser"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="30dp"
-            android:text="Oculto Alias1"
+            android:text="Número desconocido"
             android:textColor="@color/primaryButton"
             android:textSize="43sp" />
     </RelativeLayout>
@@ -73,6 +72,7 @@
             android:adjustViewBounds="true"
             android:background="@drawable/circle_call"
             android:src="@drawable/ic_call"
+            android:visibility="invisible"
             android:scaleType="centerInside" />
         <ImageView
             android:id="@+id/iv_hangout"
@@ -80,6 +80,7 @@
             android:layout_height="85dp"
             android:layout_margin="9dp"
             android:adjustViewBounds="true"
+            android:visibility="invisible"
             android:background="@drawable/circle_end"
             android:src="@drawable/ic_call_end"
             android:scaleType="centerInside" />

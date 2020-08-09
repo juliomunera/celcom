@@ -1,16 +1,14 @@
 package com.cytophone.services.dao;
 
-import com.cytophone.services.entities.UnlockCodeEntity;
-import com.cytophone.services.entities.EventEntity;
-import com.cytophone.services.entities.PartyEntity;
-import androidx.room.RoomDatabase;
+import com.cytophone.services.entities.*;
 import android.content.Context;
 
 import androidx.room.TypeConverters;
+import androidx.room.RoomDatabase;
 import androidx.room.Database;
 import androidx.room.Room;
 
-@Database(entities = {PartyEntity.class, EventEntity.class, UnlockCodeEntity.class}, version = 4)
+@Database(entities = {PartyEntity.class, EventEntity.class, UnlockCodeEntity.class}, version = 5)
 @TypeConverters({DateConverter.class})
 public abstract class Persistence extends RoomDatabase {
     public static Persistence getInstance(Context context) {
@@ -32,5 +30,6 @@ public abstract class Persistence extends RoomDatabase {
 
     public abstract UnlockCodeDAO unlockCodeDAO();
     public abstract PartyDAO partyDAO();
+
     private static Persistence dbInstancce;
 }

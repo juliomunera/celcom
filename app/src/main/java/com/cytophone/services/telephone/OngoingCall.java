@@ -5,12 +5,14 @@ import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.NotNull;
 
 import android.telecom.Call;
+import android.util.Log;
 
 public class OngoingCall {
     static {
         state = BehaviorSubject.create();
         callback = new Call.Callback() {
             public void onStateChanged(@NotNull Call call, int newState) {
+                Log.d("D/CytoPhone/OngoingCall", "onStateChanged");
                 if (null != call) {
                     OngoingCall.INSTANCE.getState().onNext(newState);
                 }
