@@ -22,6 +22,14 @@
     <string name="codeLabel">Ingrese el código</string>
     <string name="acceptButton">Aceptar</string>
 
+    <string name="suscriberinsert">Ingreso nuevo residente</string>
+    <string name="suscriberupdate">Actualización información residente</string>
+    <string name="suscriberdelete">Eliminación residente</string>
+    <string name="authorizatorinsert">Ingreso nuevo autorizador</string>
+    <string name="authorizatorupdate">Actualizaión autorizador</string>
+    <string name="authorizatordelete">Eliminación autorizador</string>
+    <string name="unlock">Mensaje de desbloqueo</string>
+
     <!-- Hamilton -->
     <string name="deviceOwner">Eres el administrador</string>
     <string name="notDeviceOwner">No eres el propietario</string>
