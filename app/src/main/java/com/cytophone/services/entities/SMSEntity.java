@@ -9,7 +9,7 @@ import java.util.regex.Matcher;
 import java.util.Date;
 
 public class SMSEntity implements IEntityBase, Serializable {
-    // Private methods declaration
+    // region private methods declaration
     private String decodedMessage(String Message) {
         if (Utils.isHexadecimal(Message)) {
             String hexMsg = Utils.convertHexToString(Message);
@@ -36,6 +36,12 @@ public class SMSEntity implements IEntityBase, Serializable {
         else return ACTIONS[Integer.parseInt(action)][1];
     }
 
+    public String getObjectType() {
+        String action = this.getActionID();
+        if (!isItOkAction(action) ) return ACTIONS[0][0];
+        else return ACTIONS[Integer.parseInt(action)][0];
+    }
+
     private String getPlaceID() {
         String[] msgParts = this._decodeMessage.split("[|]");
         return msgParts.length >= 4 ? (isItOkPlaceID(msgParts[1]) ? msgParts[1] : "") : "";
@@ -51,6 +57,16 @@ public class SMSEntity implements IEntityBase, Serializable {
         String action = getActionID();
         if(!isItOkAction(action)) return ACTIONS[0][1];
         else return ACTIONS[Integer.parseInt(action)][0];
+    }
+
+    private String getNumberByObjectType() throws Exception {
+        String s =  this.getObjectType();
+
+        return s.contains("UnlockCode")
+               ? this.getUnlockCodeObject().getMsisdn()
+               : s.contains("Authorizator") || s.contains("Suscriber")
+                ? this.getPartyObject().getNumber()
+                : null;
     }
 
     private boolean isItOkAction(String value) {
@@ -100,6 +116,7 @@ public class SMSEntity implements IEntityBase, Serializable {
                 isItOkUnlockCode(messageParts[2]) &
                 isItOkTimeElapsed(messageParts[3]);
     }
+
     // Public methods declaration
     public String getActionName() {
         return this.getOperation();
@@ -119,6 +136,18 @@ public class SMSEntity implements IEntityBase, Serializable {
             throw new Exception("El mensaje message para registro de un suscriptor/autorizador  no es válido.");
         }
         return new PartyEntity(msgParts[2], msgParts[1], msgParts[3], this.getRole());
+    }
+
+    public EventEntity getEventObject() throws Exception {
+        String number = this.getNumberByObjectType();
+
+        return new EventEntity(
+                this.getSourceNumber(),
+                number,
+                "SMS",
+                this.getMesageDate(),
+                this.getTypeName().concat(this.getActionName())
+        );
     }
 
     public String getTypeName() {
@@ -168,6 +197,6 @@ public class SMSEntity implements IEntityBase, Serializable {
     private String _sourceNumber;
     private String _rawMessage;
     private Date _messageDate;
-    //endregion
+    // endregion
 }
 

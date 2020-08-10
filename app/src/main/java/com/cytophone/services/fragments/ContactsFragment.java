@@ -48,7 +48,7 @@ public class ContactsFragment extends Fragment {
         _recyclerAdapter.setListener(new ItemSelectListener<PartyEntity>() {
             @Override
             public void onSelect(PartyEntity item) {
-                if( _listener != null) _listener.onSelect(item);
+                ((ContactListitem)_parentActivity).makeCall(item.getNumber());
             }
         });
         rvw.setAdapter(this._recyclerAdapter);
@@ -62,7 +62,13 @@ public class ContactsFragment extends Fragment {
     }
     // endregion
 
-    // region public methods declarations
+    //region constructors methods
+    public ContactsFragment (Activity activity){
+        _parentActivity = activity;
+    }
+    //end region
+
+    // region public methods
     private void add(SMSEntity message) throws Exception {
         PartyEntity party = message.getPartyObject();
         _parties.add(party);
@@ -84,35 +90,15 @@ public class ContactsFragment extends Fragment {
                                 p.getPlaceID().equals(party.getPlaceID()));
     }
 
-    public void setListener(ItemSelectListener<PartyEntity> listener) {
-        _listener = listener;
-    }
-
     private void update(SMSEntity message) throws Exception {
         this.remove(message);
         this.add(message);
     }
     // endregion
 
-    private BroadcastReceiver _receiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if ( intent.getAction().equals("SUSCRIBER_EVENTS") ) {
-                Bundle bundle = intent.getExtras();
-                String action = bundle.getString("action");
-                SMSEntity party = (SMSEntity)intent.getSerializableExtra("suscriber") ;
-                try {
-                    applyChanges(action, party);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    };
-
     // region fields declarations
-    ItemSelectListener<PartyEntity> _listener;
     RecyclerAdapter _recyclerAdapter;
+    Activity _parentActivity = null;
     List<PartyEntity> _parties;
     // endregion
 }

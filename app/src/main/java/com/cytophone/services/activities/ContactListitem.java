@@ -64,6 +64,7 @@ public class ContactListitem extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contact_listitem);
 
+        this.initializeBroadcaster();
         this.initializeFragments();
 
         this.checkPermissions();
@@ -109,14 +110,8 @@ public class ContactListitem extends AppCompatActivity {
 
     //region initialize component methods
     private void initializeFragments() {
-        this._contactFrgmt = new ContactsFragment();
-        this._contactFrgmt.setListener(new ItemSelectListener<PartyEntity>() {
-            @Override
-            public void onSelect(PartyEntity party) {
-                ContactListitem.this.makeCall(party.getNumber());
-            }
-        });
-        showSelectedFragment(this._contactFrgmt);
+        _fragments[0] = new ContactsFragment( this);
+        showSelectedFragment(_fragments[0]);
 
         BottomNavigationView bnv = (BottomNavigationView) findViewById(R.id.bottom_navigation);
         bnv.setOnNavigationItemSelectedListener( new
@@ -124,11 +119,11 @@ public class ContactListitem extends AppCompatActivity {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 if ( item.getItemId() == R.id.contactdevice) {
-                    showSelectedFragment(new ContactsFragment());
+                    showSelectedFragment(_fragments[0]);
                 } else if( item.getItemId() == R.id.smsmessages ) {
-                    showSelectedFragment(new MessageFragment());
+                    showSelectedFragment(_fragments[1]);
                 } else if ( item.getItemId() == R.id.blockoption) {
-                    showSelectedFragment(new SecurityFragment());
+                    showSelectedFragment(_fragments[2]);
                 }
                 return true;
             }
@@ -148,7 +143,7 @@ public class ContactListitem extends AppCompatActivity {
         Toast.makeText(this, owner, Toast.LENGTH_SHORT).show();
         this.setPolicies(true, this.isAdmin);
     }
-    //endregion
+    // endregion
 
     private void checkDefaultSMS() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return;
@@ -236,6 +231,12 @@ public class ContactListitem extends AppCompatActivity {
                 putExtra(TelecomManager.EXTRA_CHANGE_DEFAULT_DIALER_PACKAGE_NAME,
                         this.getPackageName());
         startActivityForResult(i, 123);
+    }
+
+    private void initializeBroadcaster() {
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction("SUSCRIBER_EVENTS");
+        registerReceiver( _receiver, intentFilter );
     }
 
     private final void offerReplacingDefaultDialer() {
@@ -370,24 +371,46 @@ public class ContactListitem extends AppCompatActivity {
         }, 10);
     }
 
-    //region fields declarations
-    //Permissions that need to be explicitly requested from end user.
-    private static final String[] REQUIRED_SDK_PERMISSIONS = new String[] {
-            Manifest.permission.READ_PHONE_STATE,
-            Manifest.permission.CALL_PHONE,
-            Manifest.permission.READ_SMS,
+    // region fields declarations
+    private BroadcastReceiver _receiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+        if ( intent.getAction().equals("SUSCRIBER_EVENTS") ) {
+            try {
+                Bundle bundle = intent.getExtras();
+                String action = bundle.getString("action");
+                SMSEntity sms = (SMSEntity)intent.getSerializableExtra("suscriber") ;
+
+                ((ContactsFragment)_fragments[0]).applyChanges(action, sms);
+                ((MessageFragment) _fragments[1]).applyChanges(action, sms);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        }
     };
 
-    //Permissions request code.
+    //Permissions that need to be explicitly requested from end user.
+    private static final String[] REQUIRED_SDK_PERMISSIONS = new String[] {
+        Manifest.permission.READ_PHONE_STATE,
+        Manifest.permission.CALL_PHONE,
+        Manifest.permission.READ_SMS,
+    };
+
+    Fragment[]  _fragments = new Fragment[] {
+            new ContactsFragment(this),
+            new MessageFragment(),
+            new SecurityFragment()
+    };
+
+    // Permissions request code.
     private final static int REQUEST_CODE_ASK_PERMISSIONS = 1;
     public static final int REQUEST_PERMISSION = 0;
 
-    ContactsFragment _contactFrgmt;
     DevicePolicyManager dpm = null;
     ComponentName adminName = null;
 
     boolean isLocked = true;
     boolean isAdmin = true;
-    //endregion
-
+    // endregion
 }

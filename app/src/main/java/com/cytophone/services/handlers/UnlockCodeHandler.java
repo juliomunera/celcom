@@ -40,16 +40,19 @@ public class UnlockCodeHandler implements IHandler {
             }
             return null;
         }
+
         private UnlockCodeDAO unlockCodeDAO;
     }
 
     public void insertUnlockCode(SMSEntity message) {
-        UnlockCodeEntity unLockCode = createUnlockCode(message);
-        if (null != unLockCode) {
-            EventEntity event = createEvent(message.getSourceNumber(),
-                    unLockCode.getMsisdn(),
-                    message.getMesageDate());
-            new insertUnlockCodeAsyncTask(unlockCodeDAO).execute(unLockCode, event);
+        try {
+            UnlockCodeEntity unLockCode = createUnlockCode(message);
+            if (null != unLockCode) {
+                EventEntity event = message.getEventObject(); // unLockCode.getMsisdn()
+                new insertUnlockCodeAsyncTask(unlockCodeDAO).execute(unLockCode, event);
+            }
+        } catch (Exception ex) {
+                ex.printStackTrace();
         }
     }
 

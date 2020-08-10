@@ -25,28 +25,15 @@ public class PartyHandler implements IHandler {
         }
     }
 
-    private EventEntity createEvent(SMSEntity message, String number) {
-        return new EventEntity(
-                message.getSourceNumber(),
-                number,
-                "SMS",
-                message.getMesageDate(),
-                message.getTypeName().concat(message.getActionName())
-        );
-    }
-
-
-    // Room executes all queries on a separate thread.
-    // Observed LiveData will notify the observer when the data has changed.
-    //LiveData<List<PartyEntity>> getAllParties() {
-    // return allParties;
-    //}
-
     private void mergeParty(Integer action, Integer roleID, SMSEntity message) {
-        PartyEntity party = createParty(message, roleID);
-        if( null != party ) {
-            EventEntity event = createEvent(message, party.getNumber());
-            new mergePartyAsyncTask(action, partyDAO).execute(party, event);
+        try {
+            PartyEntity party = createParty(message, roleID);
+            if( null != party ) {
+                EventEntity event = message.getEventObject();//party.getNumber());
+                new mergePartyAsyncTask(action, partyDAO).execute(party, event);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
