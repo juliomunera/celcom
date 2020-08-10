@@ -1,37 +1,27 @@
 package com.cytophone.services.fragments;
 
-import android.app.Activity;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.net.Uri;
-import android.os.Bundle;
-
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.PermissionChecker;
-import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
+import android.view.View;
 
-import com.cytophone.services.CytophoneApp;
-import com.cytophone.services.R;
-import com.cytophone.services.activities.ContactListitem;
 import com.cytophone.services.activities.adapters.RecyclerAdapter;
+import com.cytophone.services.utilities.ItemSelectListener;
+import com.cytophone.services.activities.ContactListitem;
 import com.cytophone.services.entities.PartyEntity;
 import com.cytophone.services.entities.SMSEntity;
-import com.cytophone.services.utilities.ItemSelectListener;
+import com.cytophone.services.CytophoneApp;
+import com.cytophone.services.R;
 
-import java.util.ArrayList;
+import android.app.Activity;
+import android.os.Bundle;
+
 import java.util.List;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 public class ContactsFragment extends Fragment {
     // region events methods declarations
