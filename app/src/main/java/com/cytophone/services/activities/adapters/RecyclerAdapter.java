@@ -56,8 +56,44 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 
     @Override
     public Filter getFilter() {
+        return new Filter() {
+            @Override
+            protected FilterResults performFiltering(CharSequence charSequence) {
+                String charString = charSequence.toString();
+                if (charString.isEmpty()) {
+                    _filteredList = _contactListAll;
+                } else {
+                    List<PartyEntity> filteredList = new ArrayList<>();
+                    for (PartyEntity row : _contactListAll) {
+
+                        if (row.getName().toLowerCase().contains(charString.toLowerCase()) ) {
+                            filteredList.add(row);
+                        }
+                    }
+
+                    _filteredList = filteredList;
+                }
+
+                FilterResults filterResults = new FilterResults();
+                filterResults.values = _filteredList;
+                return filterResults;
+            }
+
+            @Override
+            protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
+                _filteredList = (ArrayList<PartyEntity>) filterResults.values;
+
+                notifyDataSetChanged();
+            }
+        };
+    }
+
+    /*
+    @Override
+    public Filter getFilter() {
         return _filter;
     }
+    */
 
     Filter _filter = new Filter() {
         //Automatic on background thread
@@ -126,5 +162,6 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
     private List<PartyEntity> _contactListAll  = new ArrayList<>();
     private ItemSelectListener<PartyEntity> _listener;
     private List<PartyEntity> _contactList;
+    private List<PartyEntity> _filteredList = new ArrayList<>();
     //endregion
 }

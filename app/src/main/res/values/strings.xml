@@ -29,6 +29,7 @@
     <string name="authorizatorupdate">Actualizaión autorizador</string>
     <string name="authorizatordelete">Eliminación autorizador</string>
     <string name="unlock">Mensaje de desbloqueo</string>
+    <string name="action_search">Buscar</string>
 
     <!-- Hamilton -->
     <string name="deviceOwner">Eres el administrador</string>

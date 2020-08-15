@@ -40,10 +40,10 @@ public class RecyclerMessageAdapter extends RecyclerView.Adapter<RecyclerMessage
         messageText = messageText
                 .replace("suscriberinsert", context.getString(R.string.suscriberinsert))
                 .replace("suscriberdelete", context.getString(R.string.suscriberdelete))
-                .replace("suscriberupdate", context.getString(R.string.suscriberdelete))
-                .replace("authorizatorinsert", context.getString(R.string.suscriberdelete))
-                .replace("authorizatorupdate", context.getString(R.string.suscriberdelete))
-                .replace("authorizatordelete", context.getString(R.string.suscriberdelete))
+                .replace("suscriberupdate", context.getString(R.string.suscriberupdate))
+                .replace("authorizatorinsert", context.getString(R.string.authorizatorinsert))
+                .replace("authorizatorupdate", context.getString(R.string.authorizatorupdate))
+                .replace("authorizatordelete", context.getString(R.string.authorizatordelete))
                 .replace("unlock", context.getString(R.string.suscriberdelete));
 
         holder.myText1.setText(messageText);
@@ -52,11 +52,11 @@ public class RecyclerMessageAdapter extends RecyclerView.Adapter<RecyclerMessage
         String actionType = _messages.get(position).getAction().toLowerCase();
         if(actionType.contains(("suscriber"))){
             if(actionType.contains(("insert")))
-                holder.myImage.setImageResource(R.drawable.ic_swap_horiz_black_24dp);
+                holder.myImage.setImageResource(R.drawable.ic_playlist_add_black_24dp);
             else if(actionType.contains(("delete")))
                 holder.myImage.setImageResource(R.drawable.ic_clear_black_24dp);
             else if(actionType.contains(("update")))
-                holder.myImage.setImageResource(R.drawable.ic_playlist_add_black_24dp);
+                holder.myImage.setImageResource(R.drawable.ic_swap_horiz_black_24dp);
         }else if(actionType.contains(("authorizator"))){
             if(actionType.contains(("insert")))
                 holder.myImage.setImageResource(R.drawable.ic_playlist_add_black_24dp);
