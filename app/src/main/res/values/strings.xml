@@ -26,7 +26,7 @@
     <string name="suscriberupdate">Actualización información residente</string>
     <string name="suscriberdelete">Eliminación residente</string>
     <string name="authorizatorinsert">Ingreso nuevo autorizador</string>
-    <string name="authorizatorupdate">Actualizaión autorizador</string>
+    <string name="authorizatorupdate">Actualización autorizador</string>
     <string name="authorizatordelete">Eliminación autorizador</string>
     <string name="unlock">Mensaje de desbloqueo</string>
     <string name="action_search">Buscar</string>

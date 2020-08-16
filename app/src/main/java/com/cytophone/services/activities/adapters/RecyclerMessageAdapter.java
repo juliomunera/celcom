@@ -44,7 +44,7 @@ public class RecyclerMessageAdapter extends RecyclerView.Adapter<RecyclerMessage
                 .replace("authorizatorinsert", context.getString(R.string.authorizatorinsert))
                 .replace("authorizatorupdate", context.getString(R.string.authorizatorupdate))
                 .replace("authorizatordelete", context.getString(R.string.authorizatordelete))
-                .replace("unlock", context.getString(R.string.suscriberdelete));
+                .replace("unlockcodeinsert", context.getString(R.string.unlock));
 
         holder.myText1.setText(messageText);
         holder.myText2.setText(String.format("%tY-%<tm-%<td %<tH:%<tM:%<tS",_messages.get(position).getCreatedDate()));
