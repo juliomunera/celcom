@@ -22,7 +22,8 @@
 
     <string name="codeLabel">Ingrese el código de desbloqueo</string>
     <string name="mobileLabel">Ingrese un número móvil autorizado</string>
-    <string name="acceptButton">Aceptar</string>
+    <string name="acceptButton">Desbloquear</string>
+    <string name="cancelButton">Bloquear</string>
 
     <string name="suscriberinsert">Ingreso residente</string>
     <string name="suscriberdelete">Eliminación residente</string>

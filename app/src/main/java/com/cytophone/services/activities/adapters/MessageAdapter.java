@@ -35,10 +35,10 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewMess
         String text = this._messages.get(position).getAction().toLowerCase();
 
         text = text.replace("suscriberinsert", this._context.getString(R.string.suscriberinsert))
-                .replace("suscriberdelete", this._context.getString(R.string.suscriberdelete))
-                .replace("authorizatorinsert", this._context.getString(R.string.authorizatorinsert))
-                .replace("authorizatordelete", this._context.getString(R.string.authorizatordelete))
-                .replace("unlock", this._context.getString(R.string.unlock));
+            .replace("suscriberdelete", this._context.getString(R.string.suscriberdelete))
+            .replace("authorizatorinsert", this._context.getString(R.string.authorizatorinsert))
+            .replace("authorizatordelete", this._context.getString(R.string.authorizatordelete))
+            .replace("unlockcodeinsert", this._context.getString(R.string.unlock));
 
         holder._text1.setText(text);
         holder._text2.setText(String.format("%tY-%<tm-%<td %<tH:%<tM:%<tS",

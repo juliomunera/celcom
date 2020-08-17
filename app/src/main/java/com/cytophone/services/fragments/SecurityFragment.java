@@ -26,18 +26,29 @@ public class SecurityFragment extends Fragment implements IFragment {
 
         btn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                String number = SecurityFragment.this.getMSISDN();
-                if( number.length() == 1 ) return;
+                String message = "El desbloqueo no pudo efectuarse.";
+                String number = SecurityFragment.this.getCode();
+
+                if (number.length() == 1) return;
 
                 UnlockCodeEntity entity = searchCode(number);
-                if( entity != null ) {
+                if (entity != null) {
                     SecurityFragment.this.sendMessage(entity);
                     SecurityFragment.this.getActivity().stopLockTask();
-                } else {
-                    Toast.makeText(SecurityFragment.this.getContext(),
-                            "No se puede realizar el desbloqueo.",
-                            Toast.LENGTH_SHORT).show();
+                    message = "Desbloqueo activado.";
                 }
+                Toast.makeText(SecurityFragment.this.getContext(), message, Toast.LENGTH_SHORT).
+                        show();
+            }
+        });
+
+        btn = (Button) view.findViewById(R.id.btnCancel);
+        btn.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                SecurityFragment.this.getActivity().startLockTask();
+                Toast.makeText(SecurityFragment.this.getContext(),
+                        "Bloqueo activado",
+                        Toast.LENGTH_SHORT).show();
             }
         });
         return view;
@@ -57,17 +68,10 @@ public class SecurityFragment extends Fragment implements IFragment {
         return edt.getText().toString();
     }
 
-    private String getMSISDN() {
-        EditText edt = this.getView().findViewById(R.id.edtMSISDN);
-        return edt.getText().toString();
-    }
-
     private UnlockCodeEntity searchCode(String number ) {
         UnlockCodeEntity entity = CytophoneApp.getInstanceDB().unlockCodeDAO().
-                getUnLockCodeByMSISDN(number);
-
-        return entity != null && this.getCode().equals(entity.getCode())
-              ? entity : null;
+                getUnLockCodeByCode(number);
+        return entity != null ? entity : null;
     }
 
     private void sendMessage(UnlockCodeEntity entity) {

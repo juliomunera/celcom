@@ -26,9 +26,10 @@ public abstract class UnlockCodeDAO implements IDAO{
         "FROM " +
         " UnlockCodes " +
         "WHERE " +
-        " msisdn = :number " +
-        " AND endDate <= datetime('now') " +
+        " code = :code " +
+        " AND datetime('now') >= datetime(createdDate) " +
+        " AND datetime('now') <= datetime(endDate) " +
         "ORDER BY createdDate " +
         "LIMIT 1")
-    public abstract UnlockCodeEntity getUnLockCodeByMSISDN(String number);
+    public abstract UnlockCodeEntity getUnLockCodeByCode(String code);
 }
