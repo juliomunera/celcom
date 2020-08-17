@@ -1,12 +1,13 @@
 package com.cytophone.services.handlers;
 
+import com.cytophone.services.dao.Persistence;
+import com.cytophone.services.dao.PartyDAO;
+import com.cytophone.services.entities.*;
+
 import androidx.lifecycle.LiveData;
 import android.annotation.*;
 import android.os.AsyncTask;
-
-import com.cytophone.services.dao.PartyDAO;
-import com.cytophone.services.dao.Persistence;
-import com.cytophone.services.entities.*;
+import android.util.Log;
 
 import java.util.List;
 
@@ -21,6 +22,7 @@ public class PartyHandler implements IHandler {
             party.setRoleID(roleID);
             return party;
         } catch (Exception e) {
+            Log.e("E/CellComm", "createParty ->" + e.getMessage());
             return null;
         }
     }
@@ -33,7 +35,7 @@ public class PartyHandler implements IHandler {
                 new mergePartyAsyncTask(action, partyDAO).execute(party, event);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e("E/CellComm", "mergeParty ->" + e.getMessage());
         }
     }
 
@@ -47,9 +49,6 @@ public class PartyHandler implements IHandler {
         private void execute(PartyEntity party, EventEntity event) {
             if( cudAction == 3 ) {
                 partyDAO.delete(party, event);
-            } else if( cudAction == 2 ) {
-                party.setUpdateDateToCurrentDate();
-                partyDAO.update(party,event);
             } else if( cudAction == 1 ) {
                 partyDAO.add(party, event);
             }
@@ -61,8 +60,8 @@ public class PartyHandler implements IHandler {
             //if (null != partyDAO.getPartByNumberAndRole(message[0].getSourceNumber(), roleID)) {
                 execute((PartyEntity) entities[0], (EventEntity) entities[1]);
             //}
-            } catch (Exception ex) {
-                ex.printStackTrace();
+            } catch (Exception e) {
+                Log.e("E/CellComm", "doInBackground ->" + e.getMessage());
             }
             return null;
         }
@@ -86,19 +85,11 @@ public class PartyHandler implements IHandler {
         mergeParty (1, 1, message);
     }
 
-    public void updateSuscriber(SMSEntity message) {
-        mergeParty (2, 2, message);
-    }
-
-    public void updateAuthorizator(SMSEntity message) {
-        mergeParty (2, 1, message);
-    }
-
-    public PartyEntity searchSuscriber(String number){
+    public PartyEntity searchSuscriber(String number) {
         return partyDAO.getPartByNumberAndRole(number,2);
     }
 
-    public PartyEntity searchSuscriberByName(String name){
+    public PartyEntity searchSuscriberByName(String name) {
         return partyDAO.getPartyByName(name);
     }
 

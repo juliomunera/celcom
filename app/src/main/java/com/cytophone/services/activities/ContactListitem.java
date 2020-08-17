@@ -1,61 +1,56 @@
 package com.cytophone.services.activities;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.PermissionChecker;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import org.jetbrains.annotations.NotNull;
 
-import android.app.Activity;
+import androidx.appcompat.app.AppCompatActivity;
+
+import androidx.core.content.PermissionChecker;
+import androidx.core.content.ContextCompat;
+import androidx.core.app.ActivityCompat;
+
+import androidx.fragment.app.FragmentTransaction;
+import androidx.fragment.app.Fragment;
+import androidx.annotation.NonNull;
+
 import android.content.BroadcastReceiver;
-import android.net.Uri;
-import android.os.Build;
-import android.os.Bundle;
-import android.provider.Telephony;
 import android.telecom.TelecomManager;
+import android.provider.Telephony;
 import android.view.MenuItem;
+import android.app.Activity;
+import android.os.Bundle;
+import android.os.Build;
+import android.net.Uri;
 
 import com.cytophone.services.DeviceAdministrator;
-import com.cytophone.services.R;
-import com.cytophone.services.entities.PartyEntity;
 import com.cytophone.services.entities.SMSEntity;
-import com.cytophone.services.fragments.ContactsFragment;
-import com.cytophone.services.fragments.MessageFragment;
-import com.cytophone.services.fragments.SecurityFragment;
-import com.cytophone.services.utilities.ItemSelectListener;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.cytophone.services.fragments.*;
+import com.cytophone.services.R;
 
-
-/// hamilton
-
-import android.Manifest;
 import android.app.admin.DevicePolicyManager;
 import android.app.admin.SystemUpdatePolicy;
 
+import android.provider.Settings;
+import android.Manifest;
+
+import android.content.pm.PackageManager;
 import android.content.ComponentName;
 import android.content.IntentFilter;
 import android.content.Context;
 import android.content.Intent;
 
-import android.content.pm.PackageManager;
 import android.os.BatteryManager;
 import android.os.UserManager;
 import android.os.Handler;
 
-import android.provider.Settings;
 import android.widget.Toast;
 import android.view.View;
 import android.util.Log;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-
+import java.util.Optional;
 
 public class ContactListitem extends AppCompatActivity {
     //region events methods
@@ -110,26 +105,27 @@ public class ContactListitem extends AppCompatActivity {
 
     //region initialize component methods
     private void initializeFragments() {
-        _fragments[0] = new ContactsFragment( this);
-        showSelectedFragment(_fragments[0]);
-
         BottomNavigationView bnv = (BottomNavigationView) findViewById(R.id.bottom_navigation);
         bnv.setOnNavigationItemSelectedListener( new
             BottomNavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                if ( item.getItemId() == R.id.contactdevice) {
-                    showSelectedFragment(_fragments[0]);
-                } else if( item.getItemId() == R.id.smsmessages ) {
-                    showSelectedFragment(_fragments[1]);
-                } else if ( item.getItemId() == R.id.blockoption) {
-                    showSelectedFragment(_fragments[2]);
+                @Override
+                public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                    Optional<Fragment> f = _fragments.stream().filter(i ->
+                            ((IFragment) i).getID() == item.getItemId()).findFirst();
+                    if (f != null) showSelectedFragment(f.get());
+                    return f != null;
                 }
-                return true;
+        });
+
+        ((SecurityFragment)_fragments.get(2)).setListener( new View.OnClickListener() {
+            public void onClick(View v) {
+                ContactListitem.this.stopLockTask();
             }
         });
+        showSelectedFragment(_fragments.get(0));
     }
-    private void initializePolices(){
+
+    public  void initializePolices(){
         int owner = R.string.deviceOwner;
 
         adminName = DeviceAdministrator.getComponentName(this);
@@ -149,9 +145,9 @@ public class ContactListitem extends AppCompatActivity {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return;
         if (Telephony.Sms.getDefaultSmsPackage(this).equals(this.getPackageName())) return;
 
-        Intent i = new Intent(Telephony.Sms.Intents.ACTION_CHANGE_DEFAULT).
+        Intent intent = new Intent(Telephony.Sms.Intents.ACTION_CHANGE_DEFAULT).
                 putExtra(Telephony.Sms.Intents.EXTRA_PACKAGE_NAME, this.getPackageName());
-        startActivityForResult(i, 123);
+        startActivityForResult(intent, 123);
     }
 
     private void checkSetDefaultResult(int resultCode) {
@@ -227,15 +223,15 @@ public class ContactListitem extends AppCompatActivity {
         if (!((TelecomManager) getApplicationContext().getSystemService(TELECOM_SERVICE)).
                 getDefaultDialerPackage().equals(this.getPackageName())) return;
 
-        Intent i = new Intent(TelecomManager.ACTION_CHANGE_DEFAULT_DIALER).
+        Intent intent = new Intent(TelecomManager.ACTION_CHANGE_DEFAULT_DIALER).
                 putExtra(TelecomManager.EXTRA_CHANGE_DEFAULT_DIALER_PACKAGE_NAME,
                         this.getPackageName());
-        startActivityForResult(i, 123);
+        startActivityForResult(intent, 123);
     }
 
     private void initializeBroadcaster() {
         IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction("SUSCRIBER_EVENTS");
+        intentFilter.addAction("CELLCOM_MESSAGE_CONTACTMGMT"); //SUSCRIBER_EVENTS
         registerReceiver( _receiver, intentFilter );
     }
 
@@ -265,17 +261,16 @@ public class ContactListitem extends AppCompatActivity {
 
     private void setAsHomeApp(Boolean enable) {
         if (enable) {
-            IntentFilter intentFilter = new IntentFilter(Intent.ACTION_MAIN);
-            intentFilter.addCategory(Intent.CATEGORY_HOME);
-            intentFilter.addCategory(Intent.CATEGORY_DEFAULT);
+            IntentFilter intent = new IntentFilter(Intent.ACTION_MAIN);
+            intent.addCategory(Intent.CATEGORY_HOME);
+            intent.addCategory(Intent.CATEGORY_DEFAULT);
 
-            this.dpm.addPersistentPreferredActivity(
-                    this.adminName,
-                    intentFilter,
-                    new ComponentName(getPackageName(), ContactListitem.class.getName())
-            );
+            this.dpm.addPersistentPreferredActivity (
+                    ContactListitem.this.adminName,
+                    intent,
+                    new ComponentName(getPackageName(), ContactListitem.class.getName()));
         } else {
-            ContactListitem.this.dpm.clearPackagePersistentPreferredActivities(
+            ContactListitem.this.dpm.clearPackagePersistentPreferredActivities (
                     ContactListitem.this.adminName,
                     getPackageName());
         }
@@ -299,8 +294,8 @@ public class ContactListitem extends AppCompatActivity {
                     | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
         }
 
-        View decorView = this.getWindow().getDecorView();
-        decorView.setSystemUiVisibility(flags);
+        View view = this.getWindow().getDecorView();
+        view.setSystemUiVisibility(flags);
     }
 
     private void setRestrictions(Boolean disallow) {
@@ -339,21 +334,18 @@ public class ContactListitem extends AppCompatActivity {
             this.dpm.setSystemUpdatePolicy(this.adminName,
                     SystemUpdatePolicy.createWindowedInstallPolicy(60, 120));
         } else {
-            this.dpm.setSystemUpdatePolicy(this.adminName,
-                    null);
+            this.dpm.setSystemUpdatePolicy(this.adminName, null);
         }
     }
 
     private void setUserRestriction(String restriction, Boolean disallow) {
-        if (disallow) {
-            this.dpm.addUserRestriction(this.adminName,restriction);
-        } else {
-            this.dpm.clearUserRestriction(this.adminName,restriction);
-        }
+        if (disallow) this.dpm.addUserRestriction(this.adminName,restriction);
+        else this.dpm.clearUserRestriction(this.adminName,restriction);
     }
 
     private void startLockTaskDelayed () {
         final Handler handler = new Handler();
+
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -364,7 +356,7 @@ public class ContactListitem extends AppCompatActivity {
                         //activatePackages();
                     }
                 } catch(IllegalArgumentException e) {
-                    Log.e("D/CytoPhone", "Was not in foreground yet, try again..");
+                    Log.e("E/CellComm", "Was not in foreground yet, try again.");
                     startLockTaskDelayed();
                 }
             }
@@ -375,16 +367,16 @@ public class ContactListitem extends AppCompatActivity {
     private BroadcastReceiver _receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-        if ( intent.getAction().equals("SUSCRIBER_EVENTS") ) {
+            if ( intent.getAction().equals("CELLCOM_MESSAGE_CONTACTMGMT") ) {
             try {
                 Bundle bundle = intent.getExtras();
-                String action = bundle.getString("action");
-                SMSEntity sms = (SMSEntity)intent.getSerializableExtra("suscriber") ;
 
-                ((ContactsFragment)_fragments[0]).applyChanges(action, sms);
-                ((MessageFragment) _fragments[1]).applyChanges(action, sms);
+                SMSEntity sms = (SMSEntity)intent.getSerializableExtra("data") ;
+                String action = bundle.getString("action");
+
+                _fragments.stream().forEach( f-> ((IFragment)f).applyChanges(action, sms) );
             } catch (Exception e) {
-                e.printStackTrace();
+                Log.e("E/CellComm", "onReceive ->" + e.getMessage());
             }
         }
         }
@@ -397,20 +389,19 @@ public class ContactListitem extends AppCompatActivity {
         Manifest.permission.READ_SMS,
     };
 
-    Fragment[]  _fragments = new Fragment[] {
-            new ContactsFragment(this),
+    List<Fragment> _fragments = Arrays.asList( new Fragment[] {
+            new ContactsFragment(),
             new MessageFragment(),
             new SecurityFragment()
-    };
+    });
 
     // Permissions request code.
     private final static int REQUEST_CODE_ASK_PERMISSIONS = 1;
     public static final int REQUEST_PERMISSION = 0;
 
+    boolean isLocked = true, isAdmin = true;
+
     DevicePolicyManager dpm = null;
     ComponentName adminName = null;
-
-    boolean isLocked = true;
-    boolean isAdmin = true;
     // endregion
 }

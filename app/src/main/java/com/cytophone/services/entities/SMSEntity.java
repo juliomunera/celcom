@@ -133,7 +133,7 @@ public class SMSEntity implements IEntityBase, Serializable {
     public PartyEntity getPartyObject() throws Exception {
         String[] msgParts = this._decodeMessage.split("[|]");
         if( !isItOkPartyMgmtMsg(msgParts) ) {
-            throw new Exception("El mensaje message para registro de un suscriptor/autorizador  no es válido.");
+            throw new Exception("El mensaje para el registro de un suscriptor/autorizador no es válido.");
         }
         return new PartyEntity(msgParts[2], msgParts[1], msgParts[3], this.getRole());
     }

@@ -23,8 +23,8 @@ public final class CallService extends InCallService {
     public void onCallAdded(@NotNull Call call) {
         super.onCallAdded(call);
 
-        Log.d("D/ClosedComm", "OnCallAdded");
-        Log.d("D/ClosedComm", "Call details: " + call.getDetails());
+        Log.d("D/CellComm", "OnCallAdded");
+        Log.d("D/CellComm", "Call details: " + call.getDetails());
 
         String callerNumber = call.getDetails().getHandle().getSchemeSpecificPart();
         PartyEntity party = CytophoneApp.getPartyHandlerDB().searchSuscriber(callerNumber);
@@ -37,8 +37,8 @@ public final class CallService extends InCallService {
     public void onCallRemoved(@NotNull Call call) {
         super.onCallRemoved(call);
 
-        Log.d("D/ClosedComm", "OnCallRemoved");
-        Log.d("D/ClosedComm", "Call details: " + call.getDetails());
+        Log.d("D/CellComm", "OnCallRemoved");
+        Log.d("D/CellComm", "Call details: " + call.getDetails());
 
         OngoingCall.INSTANCE.setCall(null);
     }
@@ -47,19 +47,19 @@ public final class CallService extends InCallService {
     public void onConnectionEvent(Call call, String event, Bundle extras) {
         super.onConnectionEvent(call, event, extras);
 
-        Log.d("D/ClosedComm", "Disconnect code: " +
+        Log.d("D/CellComm", "Disconnect code: " +
                 call.getDetails().getDisconnectCause().getCode());
-        Log.d("D/ClosedComm", "Disconnect reason: " +
+        Log.d("D/CellComm", "Disconnect reason: " +
                 call.getDetails().getDisconnectCause().getReason());
-        Log.d("D/ClosedComm", "Disconnect description: " +
+        Log.d("D/CellComm", "Disconnect description: " +
                 call.getDetails().getDisconnectCause().getDescription());
-        Log.d("D/ClosedComm", "Event: " + event);
+        Log.d("D/CellComm", "Event: " + event);
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
-        Log.d("D/CytoPhone/CallService/onStartCommand", "OnStart");
+        Log.d("D/CellComm", "onStartCommand");
         return START_STICKY;
     }
 

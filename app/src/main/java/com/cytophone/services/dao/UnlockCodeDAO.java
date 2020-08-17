@@ -22,18 +22,13 @@ public abstract class UnlockCodeDAO implements IDAO{
         add(event);
     }
 
-    @Query("SELECT * FROM party WHERE number = :number AND roleID = 1")
-    public abstract PartyEntity getPartByNumberAndRole(String number);
-
-    /*
-    @Query( "SELECT max(createdDate), " +
-    "code " +
-    "FROM " +
-    "UnlockCodes " +
-    "WHERE " +
-    "endDate < date('now') " +
-    "GROUP By code " +
-    "LIMIT 1")
-    public abstract UnlockCodeEntity getLastCode();
-    */
+    @Query("SELECT * " +
+        "FROM " +
+        " UnlockCodes " +
+        "WHERE " +
+        " msisdn = :number " +
+        " AND endDate <= datetime('now') " +
+        "ORDER BY createdDate " +
+        "LIMIT 1")
+    public abstract UnlockCodeEntity getUnLockCodeByMSISDN(String number);
 }

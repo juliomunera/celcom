@@ -62,7 +62,7 @@ public class Utils {
         try {
             msg =  new String(Base64.decode(coded.getBytes("UTF-8"), Base64.DEFAULT));
         } catch (UnsupportedEncodingException e) {
-            Log.e(Constants.SMS_BCR_TAG, e.getMessage());
+            Log.e("E/CellComm", "decodeBase64 ->" + e.getMessage());
         }
         return msg;
     }

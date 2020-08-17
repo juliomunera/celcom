@@ -5,7 +5,6 @@ import com.cytophone.services.entities.*;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Transaction;
 import androidx.room.Insert;
-import androidx.room.Update;
 import androidx.room.Query;
 import androidx.room.Dao;
 
@@ -30,12 +29,12 @@ public abstract class PartyDAO implements IDAO {
 
     //region delete methods.
     @Query("DELETE FROM party WHERE number = :number AND roleID = :roleID")
-    abstract void delete(String number, int roleID);
+    abstract int delete(String number, int roleID);
 
     @Transaction()
-    public void delete(PartyEntity party, EventEntity event) {
+    public int delete(PartyEntity party, EventEntity event) {
         add(event);
-        delete(party.getNumber(), party.getRoleID());
+        return delete(party.getNumber(), party.getRoleID());
     }
     //endregion
 
@@ -56,16 +55,5 @@ public abstract class PartyDAO implements IDAO {
 
     @Query("SELECT * FROM party WHERE roleID = 2 ORDER BY name ASC")
     public abstract List<PartyEntity> getAllOrderSuscribers();
-    //endregion
-
-    //region update methods.
-    @Update()
-    abstract void update(PartyEntity ... partyEntities);
-
-    @Transaction()
-    public void update(PartyEntity party, EventEntity event) {
-        add(event);
-        update(party);
-    }
     //endregion
 }

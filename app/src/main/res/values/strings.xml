@@ -19,16 +19,16 @@
     <string name="title_home">Home</string>
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
-    <string name="codeLabel">Ingrese el código</string>
+
+    <string name="codeLabel">Ingrese el código de desbloqueo</string>
+    <string name="mobileLabel">Ingrese un número móvil autorizado</string>
     <string name="acceptButton">Aceptar</string>
 
-    <string name="suscriberinsert">Ingreso nuevo residente</string>
-    <string name="suscriberupdate">Actualización información residente</string>
+    <string name="suscriberinsert">Ingreso residente</string>
     <string name="suscriberdelete">Eliminación residente</string>
-    <string name="authorizatorinsert">Ingreso nuevo autorizador</string>
-    <string name="authorizatorupdate">Actualización autorizador</string>
+    <string name="authorizatorinsert">Ingreso autorizador</string>
     <string name="authorizatordelete">Eliminación autorizador</string>
-    <string name="unlock">Mensaje de desbloqueo</string>
+    <string name="unlock">Desbloqueo</string>
     <string name="action_search">Buscar</string>
 
     <!-- Hamilton -->

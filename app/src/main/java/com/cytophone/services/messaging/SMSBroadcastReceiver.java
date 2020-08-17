@@ -1,8 +1,7 @@
 package com.cytophone.services.messaging;
 
-import com.cytophone.services.CytophoneApp;
-import com.cytophone.services.activities.CallView;
 import com.cytophone.services.entities.SMSEntity;
+import com.cytophone.services.CytophoneApp;
 import com.cytophone.services.handlers.*;
 
 import android.content.BroadcastReceiver;
@@ -12,61 +11,47 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 public class SMSBroadcastReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
-        Log.d("D/CytoPhone", "Receiving SMS...");
-
         if (intent.getAction().equals(Telephony.Sms.Intents.SMS_RECEIVED_ACTION)) {
+            Log.d("D/CellComm", "onReceiveSMS ");
             for (SmsMessage smsMessage : Telephony.Sms.Intents.getMessagesFromIntent(intent)) {
                 InternalStructure dto = new InternalStructure(smsMessage, context);
 
-                executeAction(dto.getHandler(), dto.getAction(), dto.getEntity());
-                notifyMessage( context, dto.getEntity() );
-                /*
-                Log.d(Constants.SMSBCR_TAG, "SMS From: " + msg.getSourceNumber() + "\n");
-                Log.d(Constants.SMSBCR_TAG, "SMS Sent Date: " +
-                android.text.format.DateFormat.
-                getDateFormat(context).format(msg.getMesageDate()) +
-                "\n");
-                Log.d(Constants.SMSBCR_TAG, "Message: " + msg.getDecodeMessage() + "\n");
-                */
+                if(executeAction(dto.getHandler(), dto.getAction(), dto.getEntity())) {
+                    notifyMessage(context, dto.getEntity());
+                }
             }
         }
     }
 
-    private void executeAction(IHandler handler, String methodName, SMSEntity arguments) {
+    private boolean executeAction(IHandler handler, String methodName, SMSEntity arguments) {
         try {
+            Log.d("D/CellComm", "executeAction" );
             Method action = handler.getClass().getMethod(methodName,
                     new Class[] { SMSEntity.class } );
-            action.invoke(handler, new Object[]{arguments});
-        } catch (NoSuchMethodException e) {
-            Log.d("D/ClosedComm", "ExecuteAction Error ->" + e.getMessage());
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            Log.d("D/ClosedComm", "ExecuteAction Error ->" + e.getMessage());
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            Log.d("D/ClosedComm", "ExecuteAction Error ->" + e.getMessage());
-            e.printStackTrace();
+            action.invoke(handler, new Object[]{ arguments });
+            return true;
         } catch (Exception e) {
-            Log.d("D/ClosedComm", "ExecuteAction Error ->" + e.getMessage());
-            e.printStackTrace();
+            Log.e("E/CellComm", "executeAction ->" + e.getMessage());
+            return false;
         }
     }
 
     private void notifyMessage(Context context, SMSEntity message) {
         try {
-            Intent i = new Intent("SUSCRIBER_EVENTS");
+            Log.d("D/CellComm", "notifyMessage");
+
             String name = message.getActionName() + message.getTypeName();
-            i.putExtra( "action", name );
-            i.putExtra( "suscriber", message );
-            context.sendBroadcast(i);
-        } catch (Exception ex) {
-            ex.printStackTrace();
+            Intent intent = new Intent("CELLCOM_MESSAGE_CONTACTMGMT");
+            intent.putExtra( "action", name );
+            intent.putExtra( "data", message );
+            context.sendBroadcast(intent);
+        } catch (Exception e) {
+            Log.e("E/CellComm", "notifyMessage ->" + e.getMessage());
         }
     }
 
@@ -89,11 +74,12 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
                 CytophoneApp app = (CytophoneApp)this._context.getApplicationContext();
                 String type = this._entity.getTypeName();
 
-                return type.toLowerCase().equals( "authorizator" ) ||
-                        type.toLowerCase().equals( "suscriber") ?
-                        app.getPartyHandlerDB() :
-                        app.getUnlockHandlerDB();
-            } catch (Exception ex) {
+                return  type.toLowerCase().equals( "authorizator" ) ||
+                        type.toLowerCase().equals( "suscriber")
+                        ? app.getPartyHandlerDB()
+                        : app.getUnlockHandlerDB();
+            } catch (Exception e) {
+                Log.e("E/CellComm", "getHandler ->" + e.getMessage());
                 return null;
             }
         }

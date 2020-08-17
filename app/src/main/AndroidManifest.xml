@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.cytophone.services">
-    <!-- BOOT permission -->
     <application
         android:name=".CytophoneApp"
         android:allowBackup="false"
@@ -42,9 +41,8 @@
                 <data android:scheme="mmsto" />
             </intent-filter>
         </activity>
-        <activity android:name=".activities.MakeCall" />
         <!-- End Activities -->
-        <!-- Start Receivers -->
+        <!-- Start BroadcastReceivers -->
         <receiver
             android:name=".messaging.SMSBroadcastReceiver"
             android:enabled="true"
@@ -84,7 +82,7 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
-        <!-- End receivers -->
+        <!-- End BroadcastReceivers -->
         <!-- Start Services -->
         <service android:name=".telephone.CallService"
             android:permission="android.permission.BIND_INCALL_SERVICE">
@@ -111,7 +109,7 @@
         </service>
         <!-- End Services -->
     </application>
-    <!-- PHONE permissions -->
+    <!-- BOOT permission -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.REORDER_TASKS" />
     <!-- CALLS  permissions -->
