@@ -15,6 +15,8 @@ import android.widget.Toast;
 import android.view.View;
 import android.os.Bundle;
 
+import java.util.Date;
+
 public class SecurityFragment extends Fragment implements IFragment {
     @Override
     public View onCreateView(LayoutInflater inflater,
@@ -33,9 +35,11 @@ public class SecurityFragment extends Fragment implements IFragment {
 
                 UnlockCodeEntity entity = searchCode(number);
                 if (entity != null) {
-                    SecurityFragment.this.sendMessage(entity);
-                    SecurityFragment.this.getActivity().stopLockTask();
-                    message = "Desbloqueo activado.";
+                    if( entity.getEndDate().after(new Date(System.currentTimeMillis())) ) {
+                        SecurityFragment.this.sendMessage(entity);
+                        SecurityFragment.this.getActivity().stopLockTask();
+                        message = "Desbloqueo activado.";
+                    }
                 }
                 Toast.makeText(SecurityFragment.this.getContext(), message, Toast.LENGTH_SHORT).
                         show();
@@ -68,7 +72,7 @@ public class SecurityFragment extends Fragment implements IFragment {
         return edt.getText().toString();
     }
 
-    private UnlockCodeEntity searchCode(String number ) {
+    private UnlockCodeEntity searchCode(String number) {
         UnlockCodeEntity entity = CytophoneApp.getInstanceDB().unlockCodeDAO().
                 getUnLockCodeByCode(number);
         return entity != null ? entity : null;

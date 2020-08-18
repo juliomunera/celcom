@@ -27,9 +27,7 @@ public abstract class UnlockCodeDAO implements IDAO{
         " UnlockCodes " +
         "WHERE " +
         " code = :code " +
-        " AND datetime('now') >= datetime(createdDate) " +
-        " AND datetime('now') <= datetime(endDate) " +
-        "ORDER BY createdDate " +
+        "ORDER BY createdDate DESC " +
         "LIMIT 1")
     public abstract UnlockCodeEntity getUnLockCodeByCode(String code);
 }

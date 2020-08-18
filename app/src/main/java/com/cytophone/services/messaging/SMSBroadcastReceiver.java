@@ -17,7 +17,7 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         if (intent.getAction().equals(Telephony.Sms.Intents.SMS_RECEIVED_ACTION)) {
-            Log.d("D/CellComm", "onReceiveSMS ");
+            Log.d("D/CellComm", "SMSBroadcastReceiver.onReceiveSMS");
             for (SmsMessage smsMessage : Telephony.Sms.Intents.getMessagesFromIntent(intent)) {
                 InternalStructure dto = new InternalStructure(smsMessage, context);
 
@@ -30,28 +30,31 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
 
     private boolean executeAction(IHandler handler, String methodName, SMSEntity arguments) {
         try {
-            Log.d("D/CellComm", "executeAction" );
+            Log.d("D/CellComm", "SMSBroadcastReceiver.executeAction" );
             Method action = handler.getClass().getMethod(methodName,
                     new Class[] { SMSEntity.class } );
             action.invoke(handler, new Object[]{ arguments });
             return true;
         } catch (Exception e) {
-            Log.e("E/CellComm", "executeAction ->" + e.getMessage());
+            Log.e("E/CellComm", "SMSBroadcastReceiver.executeAction -> " +
+                    e.getMessage());
             return false;
         }
     }
 
     private void notifyMessage(Context context, SMSEntity message) {
         try {
-            Log.d("D/CellComm", "notifyMessage");
+            Log.d("D/CellComm", "SMSBroadcastReceiver.notifyMessage");
 
             String name = message.getActionName() + message.getTypeName();
             Intent intent = new Intent("CELLCOM_MESSAGE_CONTACTMGMT");
+
             intent.putExtra( "action", name );
             intent.putExtra( "data", message );
             context.sendBroadcast(intent);
         } catch (Exception e) {
-            Log.e("E/CellComm", "notifyMessage ->" + e.getMessage());
+            Log.e("E/CellComm", "SMSBroadcastReceiver.notifyMessage -> "
+                    + e.getMessage());
         }
     }
 
@@ -79,7 +82,8 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
                         ? app.getPartyHandlerDB()
                         : app.getUnlockHandlerDB();
             } catch (Exception e) {
-                Log.e("E/CellComm", "getHandler ->" + e.getMessage());
+                Log.e("E/CellComm", "SMSBroadcastReceiver.getHandler -> "
+                        + e.getMessage());
                 return null;
             }
         }
