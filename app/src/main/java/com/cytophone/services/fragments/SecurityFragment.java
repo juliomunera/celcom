@@ -41,6 +41,7 @@ public class SecurityFragment extends Fragment implements IFragment {
                         message = "Desbloqueo activado.";
                     }
                 }
+
                 Toast.makeText(SecurityFragment.this.getContext(), message, Toast.LENGTH_SHORT).
                         show();
             }
