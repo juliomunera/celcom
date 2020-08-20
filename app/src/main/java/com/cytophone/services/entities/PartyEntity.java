@@ -2,6 +2,7 @@ package com.cytophone.services.entities;
 
 import com.cytophone.services.dao.*;
 
+import androidx.room.Ignore;
 import androidx.room.TypeConverters;
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
@@ -23,6 +24,12 @@ public class PartyEntity implements IEntityBase, Serializable  {
         return this._createdDate;
     }
 
+    @NonNull
+    public String getCodedNumber() {
+        return this._codedNumber;
+    }
+
+    @Ignore
     @NonNull
     public String getName() {
         return this._name;
@@ -50,6 +57,10 @@ public class PartyEntity implements IEntityBase, Serializable  {
     //region setter methods
     public void setCreatedDate(@NonNull Date createdDate) {
         this._createdDate = createdDate;
+    }
+
+    public void setCodedNumber(@NonNull String number) {
+        this._codedNumber = number;
     }
 
     public void setName(@NonNull String name) {
@@ -106,6 +117,9 @@ public class PartyEntity implements IEntityBase, Serializable  {
 
     @ColumnInfo(name="number")
     @NonNull
+    private String _codedNumber;
+
+    @Ignore
     private String _number;
 
     @ColumnInfo(name="placeID")

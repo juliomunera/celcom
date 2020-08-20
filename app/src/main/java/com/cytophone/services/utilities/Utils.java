@@ -62,7 +62,17 @@ public class Utils {
         try {
             msg =  new String(Base64.decode(coded.getBytes("UTF-8"), Base64.DEFAULT));
         } catch (UnsupportedEncodingException e) {
-            Log.e("E/CellComm", "decodeBase64 ->" + e.getMessage());
+            Log.e("E/CellComm.Utils", "decodeBase64 ->" + e.getMessage());
+        }
+        return msg;
+    }
+
+    public static String encodeBase64(String text) {
+        String msg = "";
+        try {
+            msg =  new String(Base64.encode(text.getBytes("UTF-8"), Base64.DEFAULT));
+        } catch (UnsupportedEncodingException e) {
+            Log.e("E/CellComm.Utils", "encodeBase64 ->" + e.getMessage());
         }
         return msg;
     }

@@ -3,6 +3,7 @@ package com.cytophone.services.handlers;
 import com.cytophone.services.dao.Persistence;
 import com.cytophone.services.dao.PartyDAO;
 import com.cytophone.services.entities.*;
+import com.cytophone.services.utilities.Utils;
 
 import androidx.lifecycle.LiveData;
 import android.annotation.*;
@@ -13,16 +14,18 @@ import java.util.List;
 
 public class PartyHandler implements IHandler {
     public PartyHandler(Persistence db) {
-        partyDAO = db.partyDAO();
+        _partyDAO = db.partyDAO();
     }
 
     private PartyEntity createParty(SMSEntity message, Integer roleID) {
         try {
             PartyEntity party = message.getPartyObject();
+            party.setCodedNumber(Utils.encodeBase64(party.getNumber()));
             party.setRoleID(roleID);
+
             return party;
         } catch (Exception e) {
-            Log.e("E/CellComm", "createParty ->" + e.getMessage());
+            Log.e("E/CellComm.PartyHandler", "createParty -> " + e.getMessage());
             return null;
         }
     }
@@ -31,11 +34,11 @@ public class PartyHandler implements IHandler {
         try {
             PartyEntity party = createParty(message, roleID);
             if( null != party ) {
-                EventEntity event = message.getEventObject();//party.getNumber());
-                new mergePartyAsyncTask(action, partyDAO).execute(party, event);
+                EventEntity event = message.getEventObject(); //party.getNumber());
+                new mergePartyAsyncTask(action, _partyDAO).execute(party, event);
             }
         } catch (Exception e) {
-            Log.e("E/CellComm", "mergeParty ->" + e.getMessage());
+            Log.e("E/CellComm.PartyHandler", "mergeParty -> " + e.getMessage());
         }
     }
 
@@ -61,7 +64,7 @@ public class PartyHandler implements IHandler {
                 execute((PartyEntity) entities[0], (EventEntity) entities[1]);
             //}
             } catch (Exception e) {
-                Log.e("E/CellComm", "doInBackground ->" + e.getMessage());
+                Log.e("E/CellComm.PartyHandler", "doInBackground -> " + e.getMessage());
             }
             return null;
         }
@@ -86,13 +89,14 @@ public class PartyHandler implements IHandler {
     }
 
     public PartyEntity searchSuscriber(String number) {
-        return partyDAO.getPartByNumberAndRole(number,2);
+        String codedNumber = Utils.encodeBase64(number);
+        return _partyDAO.getPartByNumberAndRole(codedNumber,2);
     }
 
     public PartyEntity searchSuscriberByName(String name) {
-        return partyDAO.getPartyByName(name);
+        return _partyDAO.getPartyByName(name);
     }
 
-    private LiveData<List<PartyEntity>> allParties;
-    private PartyDAO partyDAO;
+    private LiveData<List<PartyEntity>> _allParties;
+    private PartyDAO _partyDAO;
 }

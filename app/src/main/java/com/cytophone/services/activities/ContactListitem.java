@@ -230,9 +230,12 @@ public class ContactListitem extends AppCompatActivity {
     }
 
     private void initializeBroadcaster() {
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction("CELLCOM_MESSAGE_CONTACTMGMT"); //SUSCRIBER_EVENTS
-        registerReceiver( _receiver, intentFilter );
+        IntentFilter filter = new IntentFilter();
+        filter.addAction("CELLCOM_MESSAGE_CONTACTMGMT");
+        registerReceiver( this._cellCommReceiver, filter );
+
+        filter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+        registerReceiver( this._batteryReceiver, filter);
     }
 
     private final void offerReplacingDefaultDialer() {
@@ -343,6 +346,12 @@ public class ContactListitem extends AppCompatActivity {
         else this.dpm.clearUserRestriction(this.adminName,restriction);
     }
 
+    private void setBatteryLevel(Float level) {
+        View vw = findViewById(R.id.headerView);
+        BatteryLevelControl blc = vw.findViewById(R.id.imageBatteryLevel);
+        blc.setLevel(level);
+    }
+
     private void startLockTaskDelayed () {
         final Handler handler = new Handler();
 
@@ -364,7 +373,7 @@ public class ContactListitem extends AppCompatActivity {
     }
 
     // region fields declarations
-    private BroadcastReceiver _receiver = new BroadcastReceiver() {
+    private BroadcastReceiver _cellCommReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             if ( intent.getAction().equals("CELLCOM_MESSAGE_CONTACTMGMT") ) {
@@ -379,6 +388,25 @@ public class ContactListitem extends AppCompatActivity {
                 Log.e("E/CellComm", "onReceive ->" + e.getMessage());
             }
         }
+        }
+    };
+
+    private BroadcastReceiver _batteryReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            boolean isPresent = intent.getBooleanExtra("present", false);
+            Integer rawLevel = intent.getIntExtra("level", -1);
+            Integer scale = intent.getIntExtra("scale", -1);
+
+            if (isPresent) {
+                Float level = 0f;
+                if (rawLevel >= 0 && scale > 0) {
+                    level = (float)((rawLevel * 100) / scale);
+                }
+                setBatteryLevel(level);
+            } else {
+                Log.i("I/CellComm.BatteryReceiver", "onReceive -> Battery not present");
+            }
         }
     };
 
