@@ -9,60 +9,60 @@ import android.util.Log;
 
 public class OngoingCall {
     static {
-        state = BehaviorSubject.create();
-        callback = new Call.Callback() {
+        _callback = new Call.Callback() {
             public void onStateChanged(@NotNull Call call, int newState) {
-                Log.d("D/CytoPhone/OngoingCall", "onStateChanged");
+                Log.d("D/Cellcom.OngoingCall", "onStateChanged");
                 if (null != call) {
                     OngoingCall.INSTANCE.getState().onNext(newState);
                 }
             }
         };
+        _state = BehaviorSubject.create();
         INSTANCE = new OngoingCall();
     }
 
     @NotNull
     public final BehaviorSubject getState() {
-        return state;
+        return _state;
     }
 
     @Nullable
     public final Call getCall() {
-        return call;
+        return _call;
     }
 
     public final void setCall(@Nullable Call value) {
-        if (null != call) {
-            call.unregisterCallback((Call.Callback)callback);
+        if (null != _call) {
+            _call.unregisterCallback((Call.Callback)_callback);
         }
 
         if (null != value ) {
-            value.registerCallback((Call.Callback)callback);
-            state.onNext(value.getState());
+            value.registerCallback((Call.Callback)_callback);
+            _state.onNext(value.getState());
         }
-        call = value;
+        _call = value;
     }
 
     public final void answer() {
-        if (null != call) {
-            call.answer(0);
+        if (null != _call) {
+            _call.answer(0);
         }
     }
 
     public final void hangup() {
-        if (null != call) {
-            call.disconnect();
+        if (null != _call) {
+            _call.disconnect();
         }
     }
 
     public final void reject() {
-        if (null != call) {
-            call.reject(false,"ds");
+        if (null != _call) {
+            _call.reject(false,"ds");
         }
     }
 
-    @NotNull private static BehaviorSubject<Integer> state;
-    private static Call.Callback callback;
+    @NotNull private static BehaviorSubject<Integer> _state;
+    private static Call.Callback _callback;
     public static OngoingCall INSTANCE;
-    @Nullable private static Call call;
+    @Nullable private static Call _call;
 }

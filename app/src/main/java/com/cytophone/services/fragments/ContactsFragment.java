@@ -37,7 +37,7 @@ public class ContactsFragment extends Fragment implements IFragment {
             @Override
             public void onSelect(PartyEntity item) {
                 ((ContactListitem)ContactsFragment.this.getActivity()).
-                        makeCall(item.getNumber());
+                        makeCall(item.getCodedNumber());
             }
         });
         rvw.setAdapter(this._adapter);

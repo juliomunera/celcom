@@ -1,5 +1,6 @@
 package com.cytophone.services.activities;
 
+import com.cytophone.services.utilities.Utils;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import org.jetbrains.annotations.NotNull;
 
@@ -169,10 +170,12 @@ public class ContactListitem extends AppCompatActivity {
         }
     }
 
-    public void makeCall(String number) {
+    public void makeCall(String codedNumber) {
         if (PermissionChecker.checkSelfPermission(this,
                 "android.permission.CALL_PHONE") == 0) {
+            String number = Utils.decodeBase64(codedNumber);
             Uri uri = Uri.parse("tel:" + number);
+
             this.startActivity(new Intent("android.intent.action.CALL", uri));
         } else {
             ActivityCompat.requestPermissions( (Activity)this,
@@ -235,7 +238,7 @@ public class ContactListitem extends AppCompatActivity {
         registerReceiver( this._cellCommReceiver, filter );
 
         filter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
-        registerReceiver( this._batteryReceiver, filter);
+        registerReceiver( this._batteryReceiver, filter );
     }
 
     private final void offerReplacingDefaultDialer() {
@@ -265,17 +268,17 @@ public class ContactListitem extends AppCompatActivity {
     private void setAsHomeApp(Boolean enable) {
         if (enable) {
             IntentFilter intent = new IntentFilter(Intent.ACTION_MAIN);
-            intent.addCategory(Intent.CATEGORY_HOME);
             intent.addCategory(Intent.CATEGORY_DEFAULT);
+            intent.addCategory(Intent.CATEGORY_HOME);
 
             this.dpm.addPersistentPreferredActivity (
                     ContactListitem.this.adminName,
                     intent,
-                    new ComponentName(getPackageName(), ContactListitem.class.getName()));
+                    new ComponentName(getPackageName(), ContactListitem.class.getName()) );
         } else {
             ContactListitem.this.dpm.clearPackagePersistentPreferredActivities (
                     ContactListitem.this.adminName,
-                    getPackageName());
+                    getPackageName() );
         }
     }
 
@@ -324,7 +327,7 @@ public class ContactListitem extends AppCompatActivity {
     private void setLockTask(Boolean start, Boolean isAdministrator) {
         if (isAdministrator) {
             this.dpm.setLockTaskPackages(this.adminName,
-                    new String[]{ getPackageName(),
+                    new String[] { getPackageName(),
                             "com.google.android.dialer",
                             "com.android.server.telecom" });
         }

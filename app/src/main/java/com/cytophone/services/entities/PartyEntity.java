@@ -29,12 +29,12 @@ public class PartyEntity implements IEntityBase, Serializable  {
         return this._codedNumber;
     }
 
-    @Ignore
     @NonNull
     public String getName() {
         return this._name;
     }
 
+    @Ignore
     @NonNull
     public String getNumber() {
         return this._number;
@@ -67,6 +67,7 @@ public class PartyEntity implements IEntityBase, Serializable  {
         this._name = name;
     }
 
+    @Ignore
     public void setNumber(@NonNull String number) {
         this._number = number;
     }

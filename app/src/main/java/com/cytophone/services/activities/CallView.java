@@ -4,8 +4,6 @@ import com.cytophone.services.utilities.CallStateStringKt;
 import com.cytophone.services.telephone.OngoingCall;
 
 
-import com.cytophone.services.CytophoneApp;
-
 import com.cytophone.services.entities.PartyEntity;
 import com.cytophone.services.R;
 
@@ -23,29 +21,18 @@ import kotlin.text.StringsKt;
 import kotlin.Unit;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
-import androidx.core.app.ActivityCompat;
 
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.content.Intent;
-import android.widget.Button;
-import android.widget.Toast;
-import android.os.Handler;
 import android.view.View;
 
-import android.content.pm.PackageManager;
 import android.annotation.SuppressLint;
-import androidx.annotation.NonNull;
 import android.content.Context;
 import android.telecom.Call;
 import android.os.Bundle;
-import android.Manifest;
 
 import java.util.concurrent.TimeUnit;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 public class CallView extends AppCompatActivity {
     // Override methods declaration
@@ -59,7 +46,7 @@ public class CallView extends AppCompatActivity {
         Object o;
 
         if( (o = getIntent().getSerializableExtra("PartyEntity")) != null) {
-            this._party = o instanceof  PartyEntity ? (PartyEntity) o: null;
+            this._party = o instanceof PartyEntity ? (PartyEntity) o: null;
         }
     }
 
