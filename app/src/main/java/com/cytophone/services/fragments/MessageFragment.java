@@ -1,24 +1,25 @@
 package com.cytophone.services.fragments;
 
 import com.cytophone.services.activities.adapters.MessageAdapter;
+import com.cytophone.services.entities.EventEntity;
+import com.cytophone.services.entities.IEntityBase;
+import com.cytophone.services.entities.SMSEntity;
+import com.cytophone.services.CellCommApp;
+import com.cytophone.services.R;
+
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.fragment.app.Fragment;
 
-import com.cytophone.services.entities.EventEntity;
-import com.cytophone.services.entities.IEntityBase;
-import com.cytophone.services.entities.SMSEntity;
-import com.cytophone.services.CytophoneApp;
-import com.cytophone.services.R;
+import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.view.View;
+
 import android.os.Bundle;
 import android.util.Log;
-
 import java.util.List;
 
 public class MessageFragment extends Fragment implements IFragment {
@@ -29,7 +30,7 @@ public class MessageFragment extends Fragment implements IFragment {
         View view = inflater.inflate(R.layout.fragment_message, container, false);
         RecyclerView rvw = (RecyclerView) view.findViewById(R.id.recyclerMessages);
 
-        this._messages = CytophoneApp.getInstanceDB().eventDAO().get20LastMessages();
+        this._messages = CellCommApp.getInstanceDB().eventDAO().get20LastMessages();
         this._adapter = new MessageAdapter(this._messages);
 
         rvw.setAdapter(this._adapter);
@@ -46,10 +47,11 @@ public class MessageFragment extends Fragment implements IFragment {
         if( message == null ) return;
 
         try {
+            Log.e(this.TAG + ".applyChanges","action: " + action);
             this._messages.add(((SMSEntity)message).getEventObject());
             this._adapter.notifyDataSetChanged();
         }catch (Exception e){
-            Log.e("E/CellComm", "applyChanges -> " + e.getMessage());
+            Log.e(this.TAG + ".applyChanges","error: " + e.getMessage());
         }
     }
 
@@ -59,6 +61,7 @@ public class MessageFragment extends Fragment implements IFragment {
     }
 
     // region fields declarations
+    final String TAG = "MessageFragment";
     List<EventEntity> _messages;
     MessageAdapter _adapter;
     // endregion

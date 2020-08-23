@@ -11,7 +11,7 @@ public class OngoingCall {
     static {
         _callback = new Call.Callback() {
             public void onStateChanged(@NotNull Call call, int newState) {
-                Log.d("D/Cellcom.OngoingCall", "onStateChanged");
+                Log.d("OngoingCall.onStateChanged", "");
                 if (null != call) {
                     OngoingCall.INSTANCE.getState().onNext(newState);
                 }
@@ -32,6 +32,7 @@ public class OngoingCall {
     }
 
     public final void setCall(@Nullable Call value) {
+        Log.d("OngoingCall.setCall", "");
         if (null != _call) {
             _call.unregisterCallback((Call.Callback)_callback);
         }
@@ -45,18 +46,21 @@ public class OngoingCall {
 
     public final void answer() {
         if (null != _call) {
+            Log.d("OngoingCall.answer", "");
             _call.answer(0);
         }
     }
 
     public final void hangup() {
         if (null != _call) {
+            Log.d("OngoingCall.hangup", "");
             _call.disconnect();
         }
     }
 
     public final void reject() {
         if (null != _call) {
+            Log.d("OngoingCall.reject", "");
             _call.reject(false,"ds");
         }
     }

@@ -173,7 +173,7 @@ public class ContactListitem extends AppCompatActivity {
     public void makeCall(String codedNumber) {
         if (PermissionChecker.checkSelfPermission(this,
                 "android.permission.CALL_PHONE") == 0) {
-            String number = Utils.decodeBase64(codedNumber);
+                String number = Utils.decodeBase64(codedNumber);
             Uri uri = Uri.parse("tel:" + number);
 
             this.startActivity(new Intent("android.intent.action.CALL", uri));
@@ -380,17 +380,15 @@ public class ContactListitem extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             if ( intent.getAction().equals("CELLCOM_MESSAGE_CONTACTMGMT") ) {
-            try {
-                Bundle bundle = intent.getExtras();
-
-                SMSEntity sms = (SMSEntity)intent.getSerializableExtra("data") ;
-                String action = bundle.getString("action");
-
-                _fragments.stream().forEach( f-> ((IFragment)f).applyChanges(action, sms) );
-            } catch (Exception e) {
-                Log.e("E/CellComm", "onReceive ->" + e.getMessage());
+                try {
+                    Bundle bundle = intent.getExtras();
+                    SMSEntity sms = (SMSEntity) intent.getSerializableExtra("data");
+                    String action = bundle.getString("action");
+                    _fragments.stream().forEach(f -> ((IFragment) f).applyChanges(action, sms));
+                } catch (Exception e) {
+                    Log.e("E/CellComm", "onReceive ->" + e.getMessage());
+                }
             }
-        }
         }
     };
 
@@ -416,6 +414,8 @@ public class ContactListitem extends AppCompatActivity {
     //Permissions that need to be explicitly requested from end user.
     private static final String[] REQUIRED_SDK_PERMISSIONS = new String[] {
         Manifest.permission.READ_PHONE_STATE,
+        Manifest.permission.WRITE_CALL_LOG,
+        Manifest.permission.READ_CALL_LOG,
         Manifest.permission.CALL_PHONE,
         Manifest.permission.READ_SMS,
     };

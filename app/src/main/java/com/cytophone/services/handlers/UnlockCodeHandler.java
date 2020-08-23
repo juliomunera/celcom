@@ -9,15 +9,15 @@ import java.util.Date;
 
 public class UnlockCodeHandler implements IHandler {
     public UnlockCodeHandler(Persistence db) {
-        _unlockCodeDAO = db.unlockCodeDAO();
+        this._unlockCodeDAO = db.unlockCodeDAO();
     }
 
     private EventEntity createEvent(String sourceNumber, String targetNumber, Date messageDate) {
-        return new EventEntity(sourceNumber,
-                targetNumber,
-                "SMS",
-                messageDate,
-                "unlock");
+        return new EventEntity(sourceNumber
+                ,targetNumber
+                ,"SMS"
+                ,messageDate
+                ,"unlock");
     }
 
     private UnlockCodeEntity createUnlockCode(SMSEntity message) {
@@ -25,30 +25,31 @@ public class UnlockCodeHandler implements IHandler {
             UnlockCodeEntity unLockCode = message.getUnlockCodeObject();
             return unLockCode;
         } catch (Exception e) {
-            Log.e("E/CellComm", "createUnlockCode ->" + e.getMessage());
+            Log.e(this.TAG + ".createUnlockCode", "error: " + e.getMessage());
             return null;
         }
     }
 
     private static class insertUnlockCodeAsyncTask extends AsyncTask<IEntityBase, Void, Void> {
         insertUnlockCodeAsyncTask(UnlockCodeDAO DAO) {
-            unlockCodeDAO = DAO;
+            this._unlockCodeDAO = DAO;
         }
 
         @Override
         protected Void doInBackground(final IEntityBase... entities) {
             try {
             //if(null != unlockCodeDAO.getPartByNumberAndRole(message[0].getSourceNumber())) {
-                unlockCodeDAO.add((UnlockCodeEntity) entities[0], (EventEntity) entities[1]);
+                this._unlockCodeDAO.add((UnlockCodeEntity) entities[0]
+                        ,(EventEntity) entities[1]);
             //}
             } catch (Exception e) {
-                Log.e("E/CellComm", "doInBackground ->" + e.getMessage());
-            } finally {
-                return null;
+                Log.e(this.TAG + ".doInBackground", "error: " + e.getMessage());
             }
+            return null;
         }
 
-        private UnlockCodeDAO unlockCodeDAO;
+        final String TAG = "insertUnlockCodeAsyncTask";
+        UnlockCodeDAO _unlockCodeDAO;
     }
 
     public void insertUnlockCode(SMSEntity message) {
@@ -59,9 +60,12 @@ public class UnlockCodeHandler implements IHandler {
                 new insertUnlockCodeAsyncTask(_unlockCodeDAO).execute(unLockCode, event);
             }
         } catch (Exception e) {
-            Log.e("E/CellComm", "insertUnlockCode ->" + e.getMessage());
+            Log.e( this.TAG + ".insertUnlockCode","error: " + e.getMessage());
         }
     }
 
-    private UnlockCodeDAO _unlockCodeDAO;
+    //region fields declaration
+    final String TAG = "UnlockCodeHandler";
+    UnlockCodeDAO _unlockCodeDAO;
+    //endregion
 }

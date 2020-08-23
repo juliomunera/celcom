@@ -1,7 +1,7 @@
 package com.cytophone.services.messaging;
 
 import com.cytophone.services.entities.SMSEntity;
-import com.cytophone.services.CytophoneApp;
+import com.cytophone.services.CellCommApp;
 import com.cytophone.services.handlers.*;
 
 import android.content.BroadcastReceiver;
@@ -17,9 +17,9 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         if (intent.getAction().equals(Telephony.Sms.Intents.SMS_RECEIVED_ACTION)) {
-            Log.d("D/CellComm", "SMSBroadcastReceiver.onReceiveSMS");
+            Log.d(this.TAG + ".onReceive","processing" );
             for (SmsMessage smsMessage : Telephony.Sms.Intents.getMessagesFromIntent(intent)) {
-                InternalStructure dto = new InternalStructure(smsMessage, context);
+                InternalClass dto = new InternalClass(smsMessage, context);
 
                 if(executeAction(dto.getHandler(), dto.getAction(), dto.getEntity())) {
                     notifyMessage(context, dto.getEntity());
@@ -30,36 +30,33 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
 
     private boolean executeAction(IHandler handler, String methodName, SMSEntity arguments) {
         try {
-            Log.d("D/CellComm", "SMSBroadcastReceiver.executeAction" );
+            Log.d(this.TAG + ".executeAction","" );
             Method action = handler.getClass().getMethod(methodName,
                     new Class[] { SMSEntity.class } );
             action.invoke(handler, new Object[]{ arguments });
             return true;
         } catch (Exception e) {
-            Log.e("E/CellComm", "SMSBroadcastReceiver.executeAction -> " +
-                    e.getMessage());
+            Log.e(this.TAG + ".executeAction", "error: " + e.getMessage());
             return false;
         }
     }
 
     private void notifyMessage(Context context, SMSEntity message) {
         try {
-            Log.d("D/CellComm", "SMSBroadcastReceiver.notifyMessage");
+            Log.d(this.TAG + ".notifyMessage", "");
 
             String name = message.getActionName() + message.getTypeName();
-            Intent intent = new Intent("CELLCOM_MESSAGE_CONTACTMGMT");
-
-            intent.putExtra( "action", name );
-            intent.putExtra( "data", message );
+            Intent intent = new Intent("CELLCOM_MESSAGE_CONTACTMGMT").
+                    putExtra( "action", name ).
+                    putExtra( "data", message );
             context.sendBroadcast(intent);
         } catch (Exception e) {
-            Log.e("E/CellComm", "SMSBroadcastReceiver.notifyMessage -> "
-                    + e.getMessage());
+            Log.e(this.TAG + ".notifyMessage", "error: " + e.getMessage());
         }
     }
 
-    private class InternalStructure {
-        public InternalStructure(SmsMessage message, Context context) {
+    private class InternalClass {
+        public InternalClass(SmsMessage message, Context context) {
             this._entity = new SMSEntity(message);
             this._context = context;
         }
@@ -74,7 +71,7 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
 
         public IHandler getHandler() {
             try {
-                CytophoneApp app = (CytophoneApp)this._context.getApplicationContext();
+                CellCommApp app = (CellCommApp)this._context.getApplicationContext();
                 String type = this._entity.getTypeName();
 
                 return  type.toLowerCase().equals( "authorizator" ) ||
@@ -82,13 +79,15 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
                         ? app.getPartyHandlerDB()
                         : app.getUnlockHandlerDB();
             } catch (Exception e) {
-                Log.e("E/CellComm", "SMSBroadcastReceiver.getHandler -> "
-                        + e.getMessage());
+                Log.e(this.TAG + ".getHandler", "error: " + e.getMessage());
                 return null;
             }
         }
 
-        public SMSEntity _entity;
-        public Context _context;
+        final String TAG = "SMSBroadcastReceiver.InternalClass";
+        SMSEntity _entity;
+        Context _context;
     }
+
+    final String TAG = "SMSBroadcastReceiver";
 }

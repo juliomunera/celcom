@@ -3,7 +3,7 @@ package com.cytophone.services.fragments;
 import com.cytophone.services.activities.adapters.ContactAdapter;
 import com.cytophone.services.utilities.ItemSelectListener;
 import com.cytophone.services.activities.ContactListitem;
-import com.cytophone.services.CytophoneApp;
+import com.cytophone.services.CellCommApp;
 import com.cytophone.services.entities.*;
 import com.cytophone.services.R;
 
@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
@@ -19,7 +20,6 @@ import android.view.View;
 
 import android.os.Bundle;
 import android.util.Log;
-
 import java.util.List;
 
 public class ContactsFragment extends Fragment implements IFragment {
@@ -31,7 +31,7 @@ public class ContactsFragment extends Fragment implements IFragment {
         View view = inflater.inflate(R.layout.fragment_contacts, container, false);
         RecyclerView rvw = (RecyclerView)view.findViewById(R.id.recyclerView);
 
-        this._parties = CytophoneApp.getInstanceDB().partyDAO().getAllOrderSuscribers();
+        this._parties = CellCommApp.getInstanceDB().partyDAO().getAllOrderSuscribers();
         this._adapter = new ContactAdapter(this._parties);
         this._adapter.setListener(new ItemSelectListener<PartyEntity>() {
             @Override
@@ -55,11 +55,13 @@ public class ContactsFragment extends Fragment implements IFragment {
         if( message == null ) return;
 
         try {
+            Log.e(this.TAG + ".applyChanges", "action: " + action);
+
             if ( action.contains("delete") )  this.remove((SMSEntity)message);
             else if ( action.contains("insert") ) this.add((SMSEntity)message);
             this._adapter.notifyDataSetChanged();
         }catch (Exception e){
-            Log.e("E/CellComm", "applyChanges -> " + e.getMessage());
+            Log.e(this.TAG + ".applyChanges", "error: " + e.getMessage());
         }
     }
 
@@ -85,6 +87,7 @@ public class ContactsFragment extends Fragment implements IFragment {
     // endregion
 
     // region fields declarations
+    final String TAG = "ContactsFragment";
     List<PartyEntity> _parties;
     ContactAdapter _adapter;
     // endregion

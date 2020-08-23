@@ -1,11 +1,12 @@
 package com.cytophone.services.handlers;
 
+import com.cytophone.services.utilities.Utils;
 import com.cytophone.services.dao.Persistence;
 import com.cytophone.services.dao.PartyDAO;
 import com.cytophone.services.entities.*;
-import com.cytophone.services.utilities.Utils;
 
 import androidx.lifecycle.LiveData;
+
 import android.annotation.*;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -14,7 +15,7 @@ import java.util.List;
 
 public class PartyHandler implements IHandler {
     public PartyHandler(Persistence db) {
-        _partyDAO = db.partyDAO();
+        this._partyDAO = db.partyDAO();
     }
 
     private PartyEntity createParty(SMSEntity message, Integer roleID) {
@@ -25,7 +26,7 @@ public class PartyHandler implements IHandler {
 
             return party;
         } catch (Exception e) {
-            Log.e("E/CellComm.PartyHandler", "createParty -> " + e.getMessage());
+            Log.e( this.TAG + ".createParty", "error: " + e.getMessage());
             return null;
         }
     }
@@ -35,26 +36,23 @@ public class PartyHandler implements IHandler {
             PartyEntity party = createParty(message, roleID);
             if( null != party ) {
                 EventEntity event = message.getEventObject(); //party.getNumber());
-                new mergePartyAsyncTask(action, _partyDAO).execute(party, event);
+                new mergePartyAsyncTask(action, this._partyDAO).execute(party, event);
             }
         } catch (Exception e) {
-            Log.e("E/CellComm.PartyHandler", "mergeParty -> " + e.getMessage());
+            Log.e( this.TAG + ".mergeParty", "error: " + e.getMessage());
         }
     }
 
     @SuppressLint("NewApi")
     private static class mergePartyAsyncTask extends AsyncTask<IEntityBase, Void, Void> {
         mergePartyAsyncTask(Integer action, PartyDAO DAO) {
-            cudAction = action;
-            partyDAO = DAO;
+            this._cudAction = action;
+            this._partyDAO = DAO;
         }
 
         private void execute(PartyEntity party, EventEntity event) {
-            if( cudAction == 3 ) {
-                partyDAO.delete(party, event);
-            } else if( cudAction == 1 ) {
-                partyDAO.add(party, event);
-            }
+            if( 3 == this._cudAction )  this._partyDAO.delete(party, event);
+            else if( 1 == this._cudAction )  this._partyDAO.add(party, event);
         }
 
         @Override
@@ -64,12 +62,14 @@ public class PartyHandler implements IHandler {
                 execute((PartyEntity) entities[0], (EventEntity) entities[1]);
             //}
             } catch (Exception e) {
-                Log.e("E/CellComm.PartyHandler", "doInBackground -> " + e.getMessage());
+                Log.e(this.TAG + ".doInBackground", "error: " + e.getMessage());
             }
             return null;
         }
-        private PartyDAO partyDAO;
-        private Integer cudAction;
+
+        final String TAG = "mergePartyAsyncTask";
+        PartyDAO _partyDAO;
+        Integer _cudAction;
     }
 
     public void deleteAuthorizator(SMSEntity message) {
@@ -97,6 +97,10 @@ public class PartyHandler implements IHandler {
         return _partyDAO.getPartyByName(name);
     }
 
-    private LiveData<List<PartyEntity>> _allParties;
-    private PartyDAO _partyDAO;
+    //region fields declaration
+    final String TAG = "PartyHandler";
+
+    LiveData<List<PartyEntity>> _allParties;
+    PartyDAO _partyDAO;
+    //endregion
 }
