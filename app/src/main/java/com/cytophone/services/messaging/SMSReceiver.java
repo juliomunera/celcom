@@ -13,7 +13,7 @@ import android.util.Log;
 
 import java.lang.reflect.Method;
 
-public class SMSBroadcastReceiver extends BroadcastReceiver {
+public class SMSReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         if (intent.getAction().equals(Telephony.Sms.Intents.SMS_RECEIVED_ACTION)) {

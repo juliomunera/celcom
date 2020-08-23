@@ -19,11 +19,10 @@ import android.os.Bundle;
 import android.util.Log;
 
 public class CellCommAgent extends Service {
+    @Nullable
     @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.i(this.TAG + ".onStartCommand", "");
-        super.onStartCommand(intent, flags, startId);
-        return START_STICKY;
+    public IBinder onBind(Intent intent) {
+        return null;
     }
 
     @Override
@@ -47,10 +46,11 @@ public class CellCommAgent extends Service {
         //AlarmTrigger.cancelAlarm(this, (AlarmManager) getSystemService(ALARM_SERVICE));
     }
 
-    @Nullable
     @Override
-    public IBinder onBind(Intent intent) {
-        return null;
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        Log.i(this.TAG + ".onStartCommand", "");
+        super.onStartCommand(intent, flags, startId);
+        return START_STICKY;
     }
 
     //region fields declaration

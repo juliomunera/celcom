@@ -14,7 +14,7 @@
         <!-- Start Activities -->
         <activity android:name=".activities.CallView"
             android:lockTaskMode="if_whitelisted"/>
-        <activity android:name=".activities.ContactListitem">
+        <activity android:name=".activities.ContactView">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.HOME" />
@@ -44,7 +44,7 @@
         <!-- End Activities -->
         <!-- Start BroadcastReceivers -->
         <receiver
-            android:name=".messaging.SMSBroadcastReceiver"
+            android:name=".messaging.SMSReceiver"
             android:enabled="true"
             android:exported="true"
             android:permission="android.permission.BROADCAST_SMS">
@@ -58,7 +58,7 @@
             </intent-filter>
         </receiver>
         <receiver
-            android:name=".messaging.MMSBroadcastReceiver"
+            android:name=".messaging.MMSReceiver"
             android:exported="true"
             android:permission="android.permission.BROADCAST_WAP_PUSH">
             <intent-filter android:priority="999">

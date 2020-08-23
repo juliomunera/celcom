@@ -53,14 +53,14 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-public class ContactListitem extends AppCompatActivity {
+public class ContactView extends AppCompatActivity {
     //region events methods
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contact_listitem);
 
-        this.initializeBroadcaster();
+        this.initializeReceivers();
         this.initializeFragments();
 
         this.checkPermissions();
@@ -120,7 +120,7 @@ public class ContactListitem extends AppCompatActivity {
 
         ((SecurityFragment)_fragments.get(2)).setListener( new View.OnClickListener() {
             public void onClick(View v) {
-                ContactListitem.this.stopLockTask();
+                ContactView.this.stopLockTask();
             }
         });
         showSelectedFragment(_fragments.get(0));
@@ -232,13 +232,13 @@ public class ContactListitem extends AppCompatActivity {
         startActivityForResult(intent, 123);
     }
 
-    private void initializeBroadcaster() {
+    private void initializeReceivers() {
         IntentFilter filter = new IntentFilter();
         filter.addAction("CELLCOM_MESSAGE_CONTACTMGMT");
-        registerReceiver( this._cellCommReceiver, filter );
+        registerReceiver( this._cellcommreceiver, filter );
 
         filter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
-        registerReceiver( this._batteryReceiver, filter );
+        registerReceiver( this._batteryreceiver, filter );
     }
 
     private final void offerReplacingDefaultDialer() {
@@ -272,12 +272,12 @@ public class ContactListitem extends AppCompatActivity {
             intent.addCategory(Intent.CATEGORY_HOME);
 
             this.dpm.addPersistentPreferredActivity (
-                    ContactListitem.this.adminName,
+                    ContactView.this.adminName,
                     intent,
-                    new ComponentName(getPackageName(), ContactListitem.class.getName()) );
+                    new ComponentName(getPackageName(), ContactView.class.getName()) );
         } else {
-            ContactListitem.this.dpm.clearPackagePersistentPreferredActivities (
-                    ContactListitem.this.adminName,
+            ContactView.this.dpm.clearPackagePersistentPreferredActivities (
+                    ContactView.this.adminName,
                     getPackageName() );
         }
     }
@@ -357,26 +357,22 @@ public class ContactListitem extends AppCompatActivity {
 
     private void startLockTaskDelayed () {
         final Handler handler = new Handler();
-
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
                 // start lock task mode if its not already active
                 try {
-                    if( ContactListitem.this.isLocked ) {
-                        initializePolices();
-                        //activatePackages();
-                    }
+                    if( ContactView.this.isLocked ) initializePolices();
                 } catch(IllegalArgumentException e) {
                     Log.e("E/CellComm", "Was not in foreground yet, try again.");
                     startLockTaskDelayed();
                 }
             }
-        }, 10);
+        }, 5);
     }
 
     // region fields declarations
-    private BroadcastReceiver _cellCommReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver _cellcommreceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             if ( intent.getAction().equals("CELLCOM_MESSAGE_CONTACTMGMT") ) {
@@ -384,6 +380,7 @@ public class ContactListitem extends AppCompatActivity {
                     Bundle bundle = intent.getExtras();
                     SMSEntity sms = (SMSEntity) intent.getSerializableExtra("data");
                     String action = bundle.getString("action");
+
                     _fragments.stream().forEach(f -> ((IFragment) f).applyChanges(action, sms));
                 } catch (Exception e) {
                     Log.e("E/CellComm", "onReceive ->" + e.getMessage());
@@ -392,7 +389,7 @@ public class ContactListitem extends AppCompatActivity {
         }
     };
 
-    private BroadcastReceiver _batteryReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver _batteryreceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             boolean isPresent = intent.getBooleanExtra("present", false);
@@ -406,9 +403,10 @@ public class ContactListitem extends AppCompatActivity {
                 }
                 setBatteryLevel(level);
             } else {
-                Log.i("I/CellComm.BatteryReceiver", "onReceive -> Battery not present");
+                Log.i(this.TAG + ".onReceive"," Battery not present.");
             }
         }
+        final String TAG = "BatteryReceiver";
     };
 
     //Permissions that need to be explicitly requested from end user.

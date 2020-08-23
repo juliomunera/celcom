@@ -1,10 +1,8 @@
 package com.cytophone.services.fragments;
 
 import com.cytophone.services.activities.adapters.MessageAdapter;
-import com.cytophone.services.entities.EventEntity;
-import com.cytophone.services.entities.IEntityBase;
-import com.cytophone.services.entities.SMSEntity;
 import com.cytophone.services.CellCommApp;
+import com.cytophone.services.entities.*;
 import com.cytophone.services.R;
 
 import androidx.recyclerview.widget.DividerItemDecoration;
@@ -44,13 +42,14 @@ public class MessageFragment extends Fragment implements IFragment {
 
     @Override
     public void applyChanges(String action, IEntityBase message)  {
-        if( message == null ) return;
+        if ( null == message ) return;
 
         try {
             Log.e(this.TAG + ".applyChanges","action: " + action);
+
             this._messages.add(((SMSEntity)message).getEventObject());
             this._adapter.notifyDataSetChanged();
-        }catch (Exception e){
+        } catch (Exception e) {
             Log.e(this.TAG + ".applyChanges","error: " + e.getMessage());
         }
     }

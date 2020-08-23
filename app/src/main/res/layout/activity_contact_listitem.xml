@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:background="@color/primaryDarkColor"
     android:fitsSystemWindows="false"
-    tools:context=".activities.ContactListitem" >
+    tools:context=".activities.ContactView" >
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/appbar"
         android:layout_height="wrap_content"

@@ -7,6 +7,9 @@ import com.cytophone.services.R;
 
 import androidx.fragment.app.Fragment;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.os.SystemClock;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.view.View;
@@ -28,11 +31,8 @@ public class SecurityFragment extends Fragment implements IFragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_security, container, false);
 
-        Button btn = (Button) view.findViewById(R.id.btnOK);
-        btn.setOnClickListener( _blocklistener );
-
-        btn = (Button) view.findViewById(R.id.btnCancel);
-        btn.setOnClickListener( _unblocklistener );
+        ((Button) view.findViewById(R.id.btnCancel)).setOnClickListener( _unblocklistener );
+        ((Button) view.findViewById(R.id.btnOK)).setOnClickListener( _blocklistener );
         return view;
     }
 
@@ -64,6 +64,16 @@ public class SecurityFragment extends Fragment implements IFragment {
         Intent intent = new Intent("CELLCOM_MESSAGE_UNLOCK");
         intent.putExtra( "data", entity );
         this.getView().getContext().sendBroadcast(intent);
+    }
+
+    private void sendAlarm()
+    {
+        AlarmManager mgr=(AlarmManager) this.getContext().getSystemService(
+                this.getContext().ALARM_SERVICE);
+        Intent i = null; //new Intent(this.getContext(), OnAlarmReceiver.class);
+        PendingIntent pi=PendingIntent.getBroadcast(this.getContext(), 0, i, 0);
+
+        mgr.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime(), pi);
     }
 
     private View.OnClickListener _blocklistener = new View.OnClickListener() {

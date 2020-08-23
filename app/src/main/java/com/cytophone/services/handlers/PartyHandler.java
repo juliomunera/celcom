@@ -36,6 +36,9 @@ public class PartyHandler implements IHandler {
             PartyEntity party = createParty(message, roleID);
             if( null != party ) {
                 EventEntity event = message.getEventObject(); //party.getNumber());
+                event.setAPartyNumber(Utils.encodeBase64(event.getAPartyNumber()));
+                event.setBPartyNumber(Utils.encodeBase64(event.getBPartyNumber()));
+
                 new mergePartyAsyncTask(action, this._partyDAO).execute(party, event);
             }
         } catch (Exception e) {

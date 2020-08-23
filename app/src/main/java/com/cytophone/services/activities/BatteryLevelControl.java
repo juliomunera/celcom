@@ -8,6 +8,7 @@ import android.util.Log;
 import com.cytophone.services.R;
 
 public class BatteryLevelControl extends AppCompatImageButton {
+    //region constructors declaration
     public BatteryLevelControl(Context context) {
         super(context);
         super.setImageResource(R.drawable.ic_battery_full_black_24dp);
@@ -22,9 +23,10 @@ public class BatteryLevelControl extends AppCompatImageButton {
         super(context, attributes, style);
         super.setImageResource(R.drawable.ic_battery_full_black_24dp);
     }
+    //endregion constructors methods declaration
 
     public void setLevel(Float level) {
-        Log.i("D/CellComm.BatteryLevelImage", "setLevel -> " + level);
+        Log.i(this.TAG + ".setLevel", "" + level);
 
         if (level <= 20) {
             super.setImageResource(R.drawable.ic_battery_20_black_24dp);
@@ -42,4 +44,6 @@ public class BatteryLevelControl extends AppCompatImageButton {
             super.setImageResource(R.drawable.ic_battery_full_black_24dp);
         }
     }
+
+    final String TAG = "BatteryLevelControl";
 }

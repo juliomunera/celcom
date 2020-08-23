@@ -1,8 +1,8 @@
 package com.cytophone.services.fragments;
 
+import com.cytophone.services.activities.ContactView;
 import com.cytophone.services.activities.adapters.ContactAdapter;
 import com.cytophone.services.utilities.ItemSelectListener;
-import com.cytophone.services.activities.ContactListitem;
 import com.cytophone.services.CellCommApp;
 import com.cytophone.services.entities.*;
 import com.cytophone.services.R;
@@ -36,7 +36,7 @@ public class ContactsFragment extends Fragment implements IFragment {
         this._adapter.setListener(new ItemSelectListener<PartyEntity>() {
             @Override
             public void onSelect(PartyEntity item) {
-                ((ContactListitem)ContactsFragment.this.getActivity()).
+                ((ContactView)ContactsFragment.this.getActivity()).
                         makeCall(item.getCodedNumber());
             }
         });

@@ -2,6 +2,8 @@ package com.cytophone.services.handlers;
 
 import com.cytophone.services.entities.*;
 import com.cytophone.services.dao.*;
+import com.cytophone.services.utilities.Utils;
+
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -12,17 +14,10 @@ public class UnlockCodeHandler implements IHandler {
         this._unlockCodeDAO = db.unlockCodeDAO();
     }
 
-    private EventEntity createEvent(String sourceNumber, String targetNumber, Date messageDate) {
-        return new EventEntity(sourceNumber
-                ,targetNumber
-                ,"SMS"
-                ,messageDate
-                ,"unlock");
-    }
-
     private UnlockCodeEntity createUnlockCode(SMSEntity message) {
         try {
             UnlockCodeEntity unLockCode = message.getUnlockCodeObject();
+            unLockCode.setMsisdn(Utils.encodeBase64(unLockCode.getMsisdn()));
             return unLockCode;
         } catch (Exception e) {
             Log.e(this.TAG + ".createUnlockCode", "error: " + e.getMessage());
@@ -57,7 +52,10 @@ public class UnlockCodeHandler implements IHandler {
             UnlockCodeEntity unLockCode = createUnlockCode(message);
             if (null != unLockCode) {
                 EventEntity event = message.getEventObject(); // unLockCode.getMsisdn()
-                new insertUnlockCodeAsyncTask(_unlockCodeDAO).execute(unLockCode, event);
+                event.setAPartyNumber(Utils.encodeBase64(event.getAPartyNumber()));
+                event.setBPartyNumber(Utils.encodeBase64(event.getBPartyNumber()));
+
+                new insertUnlockCodeAsyncTask(this._unlockCodeDAO).execute(unLockCode, event);
             }
         } catch (Exception e) {
             Log.e( this.TAG + ".insertUnlockCode","error: " + e.getMessage());
