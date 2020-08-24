@@ -10,7 +10,6 @@ import androidx.annotation.Nullable;
 
 import android.provider.CallLog;
 
-import android.app.AlarmManager;
 import android.app.Service;
 
 import android.os.IBinder;
@@ -28,13 +27,9 @@ public class CellCommAgent extends Service {
     @Override
     public void onCreate() {
         Log.i(this.TAG + ".onCreate", "");
-        /*
-        AlarmTrigger.scheduleExactAlarm ( DeleteCallLogService.this.getApplicationContext()
-                , (AlarmManager) getSystemService(ALARM_SERVICE)
-                , 900000 );
-        */
+
         IntentFilter filter = new IntentFilter();
-        filter.addAction(this.CELLCOM_EVENT);
+        filter.addAction(this.CELLCOMM_EVENT);
         registerReceiver(this._cleanercalls, filter);
     }
 
@@ -43,7 +38,6 @@ public class CellCommAgent extends Service {
         super.onDestroy();
         Log.i(TAG + ".onDestroy", "");
         unregisterReceiver(this._cleanercalls);
-        //AlarmTrigger.cancelAlarm(this, (AlarmManager) getSystemService(ALARM_SERVICE));
     }
 
     @Override
@@ -72,7 +66,7 @@ public class CellCommAgent extends Service {
         }
 
         private final String getNumberFromIntent(Intent filter) {
-            if (filter.getAction().equals(CELLCOM_EVENT)) {
+            if (filter.getAction().equals(CELLCOMM_EVENT)) {
                 Bundle bundle = filter.getExtras();
                 return bundle.getString("CALLER_NUMBER");
             }
@@ -82,7 +76,7 @@ public class CellCommAgent extends Service {
         final String TAG = "CellCommAgent.BroadcastReceiver";
     };
 
-    final String CELLCOM_EVENT = "CELLCOM_MESSAGE_CALLMGMT";
+    final String CELLCOMM_EVENT = "CELLCOM_MESSAGE_CALLMGMT";
     final String TAG = "CellCommAgent";
     //endregion
 }

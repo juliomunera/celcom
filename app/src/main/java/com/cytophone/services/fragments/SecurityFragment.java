@@ -1,15 +1,13 @@
 package com.cytophone.services.fragments;
 
-import com.cytophone.services.entities.UnlockCodeEntity;
-import com.cytophone.services.entities.IEntityBase;
+import com.cytophone.services.LockDeviceReceiver;
 import com.cytophone.services.CellCommApp;
+import com.cytophone.services.entities.*;
 import com.cytophone.services.R;
 
 import androidx.fragment.app.Fragment;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
-import android.os.SystemClock;
+import android.content.BroadcastReceiver;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.view.View;
@@ -21,6 +19,8 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import android.os.Bundle;
+
+import java.util.Calendar;
 import java.util.Date;
 
 public class SecurityFragment extends Fragment implements IFragment {
@@ -66,14 +66,14 @@ public class SecurityFragment extends Fragment implements IFragment {
         this.getView().getContext().sendBroadcast(intent);
     }
 
-    private void sendAlarm()
+    private void setAlarm(Date start, Date end)
     {
-        AlarmManager mgr=(AlarmManager) this.getContext().getSystemService(
-                this.getContext().ALARM_SERVICE);
-        Intent i = null; //new Intent(this.getContext(), OnAlarmReceiver.class);
-        PendingIntent pi=PendingIntent.getBroadcast(this.getContext(), 0, i, 0);
+        Bundle bundle = new Bundle();
+        long seconds = (end.getTime()-start.getTime())/1000;
 
-        mgr.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime(), pi);
+        LockDeviceReceiver receiver = new LockDeviceReceiver(this.getContext()
+                , bundle
+                , (int)seconds);
     }
 
     private View.OnClickListener _blocklistener = new View.OnClickListener() {
@@ -88,6 +88,7 @@ public class SecurityFragment extends Fragment implements IFragment {
             if (entity != null) {
                 if( entity.getEndDate().after(new Date(System.currentTimeMillis())) ) {
                     SecurityFragment.this.sendMessage(entity);
+                    SecurityFragment.this.setAlarm(entity.getCreatedDate(),entity.getEndDate());
                     SecurityFragment.this.getActivity().stopLockTask();
                     message = "Desbloqueo activado.";
                 }
@@ -99,9 +100,9 @@ public class SecurityFragment extends Fragment implements IFragment {
     private View.OnClickListener _unblocklistener = new View.OnClickListener() {
         public void onClick(View v) {
             SecurityFragment.this.getActivity().startLockTask();
-            Toast.makeText(SecurityFragment.this.getContext(),
-                    "Bloqueo activado",
-                    Toast.LENGTH_SHORT).show();
+            Toast.makeText(SecurityFragment.this.getContext()
+                    , "Bloqueo activado"
+                    , Toast.LENGTH_SHORT).show();
         }
     };
 
