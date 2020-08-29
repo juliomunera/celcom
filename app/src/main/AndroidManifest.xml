@@ -10,7 +10,7 @@
         android:roundIcon="@mipmap/icon_cytophone_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        android:testOnly="true">
+        android:testOnly="false">
         <!-- Start Activities -->
         <activity android:name=".activities.CallView"
             android:lockTaskMode="if_whitelisted"/>

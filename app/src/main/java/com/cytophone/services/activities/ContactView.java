@@ -1,5 +1,6 @@
 package com.cytophone.services.activities;
 
+import com.cytophone.services.utilities.Constants;
 import com.cytophone.services.utilities.Utils;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import org.jetbrains.annotations.NotNull;
@@ -235,10 +236,14 @@ public class ContactView extends AppCompatActivity {
     private void initializeReceivers() {
         IntentFilter filter = new IntentFilter();
         filter.addAction("CELLCOM_MESSAGE_CONTACTMGMT");
-        registerReceiver( this._cellcommreceiver, filter );
+        registerReceiver( this._smsreceiver, filter );
 
         filter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
         registerReceiver( this._batteryreceiver, filter );
+
+        filter = new IntentFilter();
+        filter.addAction("CELLCOM_MESSAGE_STOPLOCK");
+        registerReceiver( this._alarmreceiver, filter );
     }
 
     private final void offerReplacingDefaultDialer() {
@@ -287,21 +292,9 @@ public class ContactView extends AppCompatActivity {
     }
 
     private void setImmersiveMode(Boolean enable) {
-        int flags = (View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
-
-        if (enable) {
-            flags = (View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                    | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                    | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                    | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                    | View.SYSTEM_UI_FLAG_FULLSCREEN
-                    | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
-        }
-
-        View view = this.getWindow().getDecorView();
-        view.setSystemUiVisibility(flags);
+        int flags = enable ? Constants.UI_FLAGS_IMMERSE_DISABLE
+                : Constants.UI_FLAGS_IMMERSE_ENABLE;
+        this.getWindow().getDecorView().setSystemUiVisibility(flags);
     }
 
     private void setRestrictions(Boolean disallow) {
@@ -364,15 +357,16 @@ public class ContactView extends AppCompatActivity {
                 try {
                     if( ContactView.this.isLocked ) initializePolices();
                 } catch(IllegalArgumentException e) {
-                    Log.e("E/CellComm", "Was not in foreground yet, try again.");
+                    Log.e(this.TAG, "Was not in foreground yet, try again.");
                     startLockTaskDelayed();
                 }
             }
+            final String TAG = "ContactView.StartLockTaskDelayed";
         }, 5);
     }
 
     // region fields declarations
-    private BroadcastReceiver _cellcommreceiver = new BroadcastReceiver() {
+    private BroadcastReceiver _smsreceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             if ( intent.getAction().equals("CELLCOM_MESSAGE_CONTACTMGMT") ) {
@@ -383,8 +377,18 @@ public class ContactView extends AppCompatActivity {
 
                     _fragments.stream().forEach(f -> ((IFragment) f).applyChanges(action, sms));
                 } catch (Exception e) {
-                    Log.e("E/CellComm", "onReceive ->" + e.getMessage());
+                    Log.e(this.TAG, "error : " + e.getMessage());
                 }
+            }
+        }
+        final String TAG = "ContactView.SMSReceiver.onReceive";
+    };
+
+    private BroadcastReceiver _alarmreceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if ( intent.getAction().equals("CELLCOM_MESSAGE_STOPLOCK") ) {
+                ContactView.this.stopLockTask();
             }
         }
     };
@@ -397,16 +401,14 @@ public class ContactView extends AppCompatActivity {
             Integer scale = intent.getIntExtra("scale", -1);
 
             if (isPresent) {
-                Float level = 0f;
-                if (rawLevel >= 0 && scale > 0) {
-                    level = (float)((rawLevel * 100) / scale);
-                }
+                Float level = rawLevel >= 0 && scale > 0 ? 0f
+                        : (float)((rawLevel * 100) / scale);
                 setBatteryLevel(level);
             } else {
-                Log.i(this.TAG + ".onReceive"," Battery not present.");
+                Log.i(this.TAG," Battery not present.");
             }
         }
-        final String TAG = "BatteryReceiver";
+        final String TAG = "BatteryReceiver.onReceive";
     };
 
     //Permissions that need to be explicitly requested from end user.
@@ -427,6 +429,7 @@ public class ContactView extends AppCompatActivity {
     // Permissions request code.
     private final static int REQUEST_CODE_ASK_PERMISSIONS = 1;
     public static final int REQUEST_PERMISSION = 0;
+    private final String TAG = "ContactView";
 
     boolean isLocked = true, isAdmin = true;
 
