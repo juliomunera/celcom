@@ -7,14 +7,11 @@ import android.content.Context;
 import android.content.Intent;
 
 import androidx.annotation.Nullable;
-
 import android.provider.CallLog;
-
 import android.app.Service;
 
 import android.os.IBinder;
 import android.os.Bundle;
-
 import android.util.Log;
 
 public class CellCommAgent extends Service {
@@ -51,7 +48,7 @@ public class CellCommAgent extends Service {
     BroadcastReceiver _cleanercalls = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.i(this.TAG + ".onReceive", "receive message");
+            Log.i(this.TAG + ".onReceive", "receive message.");
             String number = getNumberFromIntent(intent);
             int deleted = 0;
             if (null != number) deleted = deleteCallLog(number);
@@ -61,7 +58,7 @@ public class CellCommAgent extends Service {
         private int deleteCallLog(String callerNumber) {
             ContentResolver cr = getContentResolver();
             String query = CallLog.Calls.NUMBER + " = ?";
-            String[] args = {callerNumber};
+            String[] args = { callerNumber };
             return cr.delete(CallLog.Calls.CONTENT_URI, query, args);
         }
 
@@ -76,7 +73,7 @@ public class CellCommAgent extends Service {
         final String TAG = "CellCommAgent.BroadcastReceiver";
     };
 
-    final String CELLCOMM_EVENT = "CELLCOM_MESSAGE_CALLMGMT";
+    final String CELLCOMM_EVENT = "CELLCOMM_MESSAGE_CALLMGMT";
     final String TAG = "CellCommAgent";
     //endregion
 }

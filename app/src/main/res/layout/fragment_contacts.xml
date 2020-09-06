@@ -1,13 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<TableLayout  xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".fragments.ContactsFragment">
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-
-</FrameLayout>
+    <TableRow>
+        <EditText
+            android:id="@+id/edtSearchBox"
+            style="@style/EditTextFind"
+            android:layout_above="@+id/audio_rv"
+            android:imeOptions="actionSearch"
+            android:background="@drawable/search_edit_text_style"
+            android:imeActionLabel="@string/search"
+            android:maxLength="30"
+            android:inputType="text"
+            android:layout_marginLeft="2dp"
+            android:layout_marginTop="3dp"
+            android:layout_marginRight="2dp"
+            android:layout_marginBottom="3dp"
+            android:hint="@string/search" />
+    </TableRow>
+    <TableRow>
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </TableRow>
+</TableLayout >

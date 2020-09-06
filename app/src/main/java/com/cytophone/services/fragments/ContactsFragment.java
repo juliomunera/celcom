@@ -14,12 +14,15 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import androidx.fragment.app.Fragment;
 
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.view.View;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.EditText;
+
 import java.util.List;
 
 public class ContactsFragment extends Fragment implements IFragment {
@@ -30,6 +33,15 @@ public class ContactsFragment extends Fragment implements IFragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_contacts, container, false);
         RecyclerView rvw = (RecyclerView)view.findViewById(R.id.recyclerView);
+
+        EditText edt = (EditText)view.findViewById(R.id.edtSearchBox);
+        edt.setOnKeyListener(new View.OnKeyListener() {
+            public boolean onKey(View view, int i, KeyEvent event) {
+                return  (event.getKeyCode()==KeyEvent.KEYCODE_ENTER)
+                    ? true  // Just ignore the [Enter] key
+                    : false; // Handle all other keys in the default way
+            }
+        });
 
         this._parties = CellCommApp.getInstanceDB().partyDAO().getAllOrderSuscribers();
         this._adapter = new ContactAdapter(this._parties);
@@ -49,6 +61,8 @@ public class ContactsFragment extends Fragment implements IFragment {
         rvw.setItemAnimator(new DefaultItemAnimator());
         return view;
     }
+
+
 
     @Override
     public void applyChanges(String action, IEntityBase message)  {

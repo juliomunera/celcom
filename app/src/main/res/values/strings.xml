@@ -30,7 +30,7 @@
     <string name="authorizatorinsert">Ingreso autorizador</string>
     <string name="authorizatordelete">Eliminación autorizador</string>
     <string name="unlock">Desbloqueo</string>
-    <string name="action_search">Buscar</string>
+    <string name="search">Buscar</string>
 
     <!-- Hamilton -->
     <string name="deviceOwner">Eres el administrador</string>

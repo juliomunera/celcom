@@ -2,8 +2,6 @@ package com.cytophone.services.activities;
 
 import com.cytophone.services.utilities.CallStateStringKt;
 import com.cytophone.services.telephone.OngoingCall;
-
-
 import com.cytophone.services.entities.PartyEntity;
 import com.cytophone.services.R;
 
@@ -21,18 +19,18 @@ import kotlin.text.StringsKt;
 import kotlin.Unit;
 
 import androidx.appcompat.app.AppCompatActivity;
+import android.annotation.SuppressLint;
+
+import java.util.concurrent.TimeUnit;
 
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.content.Context;
 import android.content.Intent;
 import android.view.View;
 
-import android.annotation.SuppressLint;
-import android.content.Context;
 import android.telecom.Call;
 import android.os.Bundle;
-
-import java.util.concurrent.TimeUnit;
 
 public class CallView extends AppCompatActivity {
     // Override methods declaration
@@ -43,10 +41,10 @@ public class CallView extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_call_view);
-        Object o;
+        Object party;
 
-        if( (o = getIntent().getSerializableExtra("PartyEntity")) != null) {
-            this._party = o instanceof PartyEntity ? (PartyEntity) o: null;
+        if((party = getIntent().getSerializableExtra("PartyEntity")) != null) {
+            this._party = party instanceof PartyEntity ? (PartyEntity) party: null;
         }
     }
 
@@ -88,16 +86,16 @@ public class CallView extends AppCompatActivity {
         DisposableKt.addTo(subscribers, this._disposables);
 
         subscribers = OngoingCall.INSTANCE.getState().
-                filter(i -> i.equals(Call.STATE_DISCONNECTING) ||
-                            i.equals(Call.STATE_DISCONNECTED)).
-                delay(1L, TimeUnit.SECONDS).
-                firstElement().
-                subscribe(new Consumer() {
-                    @Override
-                    public void accept(Object o) throws Exception {
-                        CallView.this.finish();
-                    }
-                });
+            filter(i -> i.equals(Call.STATE_DISCONNECTING) ||
+                        i.equals(Call.STATE_DISCONNECTED)).
+            delay(1L, TimeUnit.SECONDS).
+            firstElement().
+            subscribe(new Consumer() {
+                @Override
+                public void accept(Object o) throws Exception {
+                    CallView.this.finish();
+                }
+            });
         //STATE_DISCONNECTED
         DisposableKt.addTo(subscribers, this._disposables);
     }

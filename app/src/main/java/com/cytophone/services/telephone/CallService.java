@@ -23,6 +23,8 @@ public final class CallService extends InCallService {
             String callerNumber = call.getDetails().getHandle().getSchemeSpecificPart();
             PartyEntity party = CellCommApp.getPartyHandlerDB().searchSuscriber(callerNumber);
 
+            sendBroadCastMessage(1, callerNumber);
+
             OngoingCall.INSTANCE.setCall(call);
             CallView.start((Context) this, call, party);
         } finally {}
@@ -35,10 +37,8 @@ public final class CallService extends InCallService {
 
         try {
             String callerNumber = call.getDetails().getHandle().getSchemeSpecificPart();
-            Intent intent = new Intent(CELLCOM_EVENT).
-                    putExtra("EVENT_TYPE", 0).
-                    putExtra( "CALLER_NUMBER", callerNumber);
-            this.getApplicationContext().sendBroadcast(intent);
+
+            sendBroadCastMessage(0, callerNumber);
         } finally {}
 
         OngoingCall.INSTANCE.setCall(null);
@@ -64,6 +64,13 @@ public final class CallService extends InCallService {
         return START_STICKY;
     }
 
-    final String CELLCOM_EVENT = "CELLCOM_MESSAGE_CALLMGMT";
+    private void sendBroadCastMessage(int type, String callerNumber) {
+        Intent intent = new Intent(CELLCOMM_EVENT).
+            putExtra("EVENT_TYPE", type).
+            putExtra( "CALLER_NUMBER", callerNumber);
+        this.getApplicationContext().sendBroadcast(intent);
+    }
+
+    final String CELLCOMM_EVENT = "CELLCOMM_MESSAGE_CALLMGMT";
     final String TAG = "CallService";
 }
