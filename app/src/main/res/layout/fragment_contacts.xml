@@ -4,26 +4,40 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".fragments.ContactsFragment">
-    <TableRow>
-        <EditText
-            android:id="@+id/edtSearchBox"
-            style="@style/EditTextFind"
-            android:layout_above="@+id/audio_rv"
+    <TableRow android:weightSum="2.0">
+        <EditText android:id="@+id/edtSearchBox"
+            style="@style/SearchControls"
             android:imeOptions="actionSearch"
-            android:background="@drawable/search_edit_text_style"
+            android:background="@drawable/round_corner_style"
             android:imeActionLabel="@string/search"
             android:maxLength="30"
             android:inputType="text"
+            android:textSize="17sp"
+            android:hint="@string/search"
+            android:autofillHints=""
             android:layout_marginLeft="2dp"
             android:layout_marginTop="3dp"
             android:layout_marginRight="2dp"
             android:layout_marginBottom="3dp"
-            android:hint="@string/search" />
+            android:layout_weight="2.0"/>
+        <TextView android:id="@+id/tvwCancel"
+            android:layout_marginLeft="2dp"
+            android:layout_marginTop="3dp"
+            android:layout_marginRight="2dp"
+            android:layout_marginBottom="3dp"
+            android:text="@string/cancelCaption"
+            android:textAllCaps="false"
+            android:gravity="center"
+            android:textColor="@color/primaryButton"
+            android:textSize="17sp" />
     </TableRow>
     <TableRow>
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:layout_weight="2.0"
+            android:layout_span="2"
+            android:layout_below="@id/edtSearchBox" />
     </TableRow>
 </TableLayout >

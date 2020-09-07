@@ -32,6 +32,8 @@
     <string name="unlock">Desbloqueo</string>
     <string name="search">Buscar</string>
 
+    <string name="cancelCaption">Cancelar</string>
+
     <!-- Hamilton -->
     <string name="deviceOwner">Eres el administrador</string>
     <string name="notDeviceOwner">No eres el propietario</string>

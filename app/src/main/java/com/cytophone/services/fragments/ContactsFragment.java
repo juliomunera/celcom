@@ -1,8 +1,8 @@
 package com.cytophone.services.fragments;
 
-import com.cytophone.services.activities.ContactView;
 import com.cytophone.services.activities.adapters.ContactAdapter;
 import com.cytophone.services.utilities.ItemSelectListener;
+import com.cytophone.services.activities.ContactView;
 import com.cytophone.services.CellCommApp;
 import com.cytophone.services.entities.*;
 import com.cytophone.services.R;
@@ -11,37 +11,31 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import android.widget.EditText;
+import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
 
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
+import android.view.KeyEvent;
 import android.view.View;
+
+import android.text.TextWatcher;
+import android.text.Editable;
 
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.EditText;
-
 import java.util.List;
 
 public class ContactsFragment extends Fragment implements IFragment {
     // region events methods declarations
     @Override
-    public View onCreateView(LayoutInflater inflater,
-                             ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater
+                             , ViewGroup container
+                             , Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_contacts, container, false);
         RecyclerView rvw = (RecyclerView)view.findViewById(R.id.recyclerView);
-
-        EditText edt = (EditText)view.findViewById(R.id.edtSearchBox);
-        edt.setOnKeyListener(new View.OnKeyListener() {
-            public boolean onKey(View view, int i, KeyEvent event) {
-                return  (event.getKeyCode()==KeyEvent.KEYCODE_ENTER)
-                    ? true  // Just ignore the [Enter] key
-                    : false; // Handle all other keys in the default way
-            }
-        });
 
         this._parties = CellCommApp.getInstanceDB().partyDAO().getAllOrderSuscribers();
         this._adapter = new ContactAdapter(this._parties);
@@ -53,16 +47,45 @@ public class ContactsFragment extends Fragment implements IFragment {
             }
         });
         rvw.setAdapter(this._adapter);
-        rvw.setLayoutManager( new LinearLayoutManager(container.getContext(),
-                              LinearLayoutManager.VERTICAL,
-                        false));
-        rvw.addItemDecoration(new DividerItemDecoration(container.getContext(),
-                                    DividerItemDecoration.VERTICAL));
+        rvw.setLayoutManager( new LinearLayoutManager(container.getContext()
+                , LinearLayoutManager.VERTICAL
+                ,false));
+        rvw.addItemDecoration(new DividerItemDecoration(container.getContext()
+                , DividerItemDecoration.VERTICAL));
         rvw.setItemAnimator(new DefaultItemAnimator());
+
+        EditText edt = (EditText)view.findViewById(R.id.edtSearchBox);
+        edt.setOnKeyListener(new View.OnKeyListener() {
+            public boolean onKey(View view, int i, KeyEvent event) {
+                return  (event.getKeyCode()==KeyEvent.KEYCODE_ENTER)
+                        ? true  // Just ignore the [Enter] key
+                        : false; // Handle all other keys in the default way
+            }
+        });
+
+        edt.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                _adapter.getFilter().filter(s.toString());
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
+
+        TextView tvw = (TextView)view.findViewById(R.id.tvwCancel);
+        tvw.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if( edt != null ) edt.setText("");
+            }
+        });
+
         return view;
     }
-
-
 
     @Override
     public void applyChanges(String action, IEntityBase message)  {
