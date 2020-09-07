@@ -18,6 +18,7 @@ import android.widget.Filter;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -90,6 +91,8 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
 
         @Override
         protected void publishResults(CharSequence constraint, FilterResults results) {
+            ContactAdapter.this._contacts.clear();
+            ContactAdapter.this._contacts.addAll((Collection<PartyEntity>) results.values);
             ContactAdapter.this.notifyDataSetChanged();
         }
     }
