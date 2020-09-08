@@ -17,20 +17,29 @@ import android.widget.TextView;
 import android.widget.Filter;
 import android.widget.Toast;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 import java.util.stream.Collectors;
+import java.util.Collection;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHolder>
         implements Filterable {
     public ContactAdapter(List<PartyEntity> parties) {
+        this._allContacts = new ArrayList<PartyEntity>();
+        this._allContacts.addAll(parties);
         this._contacts = parties;
 
-        this._contactsFilter = new ArrayList<PartyEntity>();
-        this._contactsFilter.addAll(this._contacts);
-
         this._filter = new CustomFilter();
+    }
+
+    @Override
+    public int getItemCount() {
+        return this._contacts.size();
+    }
+
+    @Override
+    public Filter getFilter() {
+        return this._filter;
     }
 
     @NonNull
@@ -50,16 +59,6 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
         holder._name.setText(this._contacts.get(position).getName());
     }
 
-    @Override
-    public int getItemCount() {
-        return this._contacts.size();
-    }
-
-    @Override
-    public Filter getFilter() {
-        return this._filter;
-    }
-
     public void setListener(ItemSelectListener<PartyEntity> listener) {
         this._listener = listener;
     }
@@ -72,20 +71,20 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
         @Override
         protected FilterResults performFiltering(CharSequence constraint) {
             final FilterResults results = new FilterResults();
+            List<PartyEntity> filteredList = new ArrayList<>();
 
-            ContactAdapter.this._contactsFilter.clear();
-            if (constraint.length() == 0) {
-                ContactAdapter.this._contactsFilter.addAll(ContactAdapter.this._contacts);
+            if ( constraint == null ||  constraint.length() == 0) {
+                filteredList.addAll(ContactAdapter.this._allContacts);
             } else {
                 final String filterPattern = constraint.toString().toLowerCase().trim();
-                ContactAdapter.this._contactsFilter = ContactAdapter.this._contacts.stream().
+                filteredList = ContactAdapter.this._allContacts.stream().
                         filter(
                                 c-> c.getName().toLowerCase().contains(filterPattern)
                         ).collect(Collectors.toList());
             }
 
-            results.count =  ContactAdapter.this._contactsFilter.size();
-            results.values =  ContactAdapter.this._contactsFilter;
+            results.count =  filteredList.size();
+            results.values =  filteredList;
             return results;
         }
 
@@ -125,8 +124,7 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
 
     //region fields declaration
     private ItemSelectListener<PartyEntity> _listener;
-    private List<PartyEntity> _contactsFilter;
-    private List<PartyEntity> _contacts;
+    private List<PartyEntity> _allContacts, _contacts;
     private CustomFilter _filter;
     //endregion
 }
