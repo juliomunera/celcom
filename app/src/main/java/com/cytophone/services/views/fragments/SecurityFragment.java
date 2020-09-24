@@ -1,4 +1,4 @@
-package com.cytophone.services.fragments;
+package com.cytophone.services.views.fragments;
 
 import com.cytophone.services.LockDeviceReceiver;
 import com.cytophone.services.CellCommApp;
@@ -7,7 +7,6 @@ import com.cytophone.services.R;
 
 import androidx.fragment.app.Fragment;
 
-import android.content.BroadcastReceiver;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.view.View;
@@ -20,7 +19,6 @@ import android.widget.Toast;
 
 import android.os.Bundle;
 
-import java.util.Calendar;
 import java.util.Date;
 
 public class SecurityFragment extends Fragment implements IFragment {
@@ -61,7 +59,7 @@ public class SecurityFragment extends Fragment implements IFragment {
     }
 
     private void sendMessage(UnlockCodeEntity entity) {
-        Intent intent = new Intent("CELLCOM_MESSAGE_UNLOCK");
+        Intent intent = new Intent("CELLCOMM_MESSAGE_UNLOCK");
         intent.putExtra( "data", entity );
         this.getView().getContext().sendBroadcast(intent);
     }
@@ -86,14 +84,17 @@ public class SecurityFragment extends Fragment implements IFragment {
 
             UnlockCodeEntity entity = searchCode(number);
             if (entity != null) {
-                if( entity.getEndDate().after(new Date(System.currentTimeMillis())) ) {
+                if (entity.getEndDate().after(new Date(System.currentTimeMillis()))) {
                     SecurityFragment.this.sendMessage(entity);
-                    SecurityFragment.this.setAlarm(entity.getCreatedDate(),entity.getEndDate());
+                    SecurityFragment.this.setAlarm(entity.getCreatedDate(), entity.getEndDate());
                     SecurityFragment.this.getActivity().stopLockTask();
                     message = "Desbloqueo activado.";
                 }
             }
-            Toast.makeText(SecurityFragment.this.getContext(), message, Toast.LENGTH_SHORT).show();
+
+            Toast.makeText(SecurityFragment.this.getContext()
+                    , message
+                    , Toast.LENGTH_SHORT).show();
         }
     };
 

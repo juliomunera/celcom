@@ -11,4 +11,22 @@
         <attr name="unSelected" format="color" />
         <attr name="selected" format="color" />
     </declare-styleable>
+
+    <!-- Battery Attributes -->
+    <declare-styleable name="BatteryLevelTheme">
+        <attr name="batteryShape" format="color" />
+        <attr name="poorLevel" format="color" />
+        <attr name="lowLevel" format="color" />
+        <attr name="middleLevel" format="color" />
+        <attr name="highLevel" format="color" />
+    </declare-styleable>
+
+    <!-- Signal attributes -->
+    <declare-styleable name="SignalLevelTheme">
+        <attr name="signalShape" format="color" />
+        <attr name="weakSignal" format="color" />
+        <attr name="moderateSignal" format="color" />
+        <attr name="goodSignal" format="color" />
+        <attr name="excellentSignal" format="color" />
+    </declare-styleable>
 </resources>

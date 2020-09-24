@@ -1,6 +1,6 @@
 package com.cytophone.services;
 
-import com.cytophone.services.activities.ContactView;
+import com.cytophone.services.views.ContactView;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;

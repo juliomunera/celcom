@@ -1,0 +1,22 @@
+<?xml version="1.0" ?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="48.0"
+    android:viewportHeight="48.0">
+    <path android:name="signalShape"
+        android:fillColor="?attr/signalShape"
+        android:pathData="M4 44h40v-40z"/>
+    <path android:name="excellentSignal"
+        android:fillColor="?attr/excellentSignal"
+        android:pathData="M4 44h40v-40z"/>
+    <path android:name="goodSignal"
+        android:fillColor="?attr/goodSignal"
+        android:pathData="M4 44h34v-34z"/>
+    <path android:name="moderateSignal"
+        android:fillColor="?attr/moderateSignal"
+        android:pathData="M4 44h24v-24z"/>
+    <path android:name="weakSignal"
+        android:fillColor="?attr/weakSignal"
+        android:pathData="M4 44h13v-13z"/>
+</vector>

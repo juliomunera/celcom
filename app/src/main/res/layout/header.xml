@@ -5,8 +5,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingTop="8dp"
-    android:paddingBottom="8dp"
+    android:paddingTop="12dp"
+    android:paddingBottom="1dp"
     android:paddingRight="8dp"
     android:layout_alignParentBottom="false"
     android:layout_alignParentTop="true"
@@ -21,36 +21,29 @@
                 android:layout_weight="1.88"
                 android:gravity="center_horizontal|center_vertical"
                 android:text="" />
-            <ImageView
-                android:id="@+id/textNetworkType"
-                android:layout_height="match_parent"
-                android:layout_weight="0.02"
-                android:gravity="end|top"
-                android:textSize="11sp"
-                android:src="@drawable/ic_signal_wifi_2_bar_black_24dp" />
-            <ImageView
+            <com.cytophone.services.views.uicontrols.SignalLevelControl
+                android:drawable = "@drawable/icon_signal_level"
                 android:id="@+id/imageSignalLevel"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_weight="0.02"
+                android:background="#000000"
                 android:gravity="end"
-                android:src="@drawable/ic_signal_cellular_3_bar_black_24dp" />
-            <com.cytophone.services.activities.BatteryLevelControl
-                android:drawable="@drawable/ic_battery_full_black_24dp"
+                tools:srcCompat="@drawable/icon_signal_level" />
+            <com.cytophone.services.views.uicontrols.BatteryLevelControl
+                android:drawable="@drawable/icon_battery_level"
                 android:id="@+id/imageBatteryLevel"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_weight="0.02"
                 android:background="#000000"
                 android:gravity="end"
-                tools:src="@drawable/ic_battery_full_black_24dp" />
-            <TextView
+                tools:src="@drawable/icon_battery_level" />
+            <com.cytophone.services.views.uicontrols.TimestampControl
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingRight="6dp"
-                android:paddingLeft="20dp"
                 android:layout_weight="0.02"
-                android:gravity="center_horizontal"
+                android:gravity="center_horizontal|center_vertical"
                 android:text="@string/hourTextView"
                 android:textColor="#FFFFFF" />
         </TableRow>

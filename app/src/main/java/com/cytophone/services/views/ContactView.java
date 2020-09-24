@@ -1,11 +1,21 @@
-package com.cytophone.services.activities;
+package com.cytophone.services.views;
 
-import com.cytophone.services.utilities.Constants;
-import com.cytophone.services.utilities.Utils;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+
+import com.cytophone.services.DeviceAdministrator;
+import com.cytophone.services.utilities.Constants;
+import com.cytophone.services.entities.SMSEntity;
+import com.cytophone.services.views.uicontrols.*;
+import com.cytophone.services.utilities.Utils;
+import com.cytophone.services.views.fragments.*;
+import com.cytophone.services.R;
+
 import org.jetbrains.annotations.NotNull;
 
 import androidx.appcompat.app.AppCompatActivity;
+import android.app.admin.DevicePolicyManager;
+import android.app.admin.SystemUpdatePolicy;
+import android.app.Activity;
 
 import androidx.core.content.PermissionChecker;
 import androidx.core.content.ContextCompat;
@@ -16,43 +26,37 @@ import androidx.fragment.app.Fragment;
 import androidx.annotation.NonNull;
 
 import android.content.BroadcastReceiver;
-import android.telecom.TelecomManager;
-import android.provider.Telephony;
-import android.view.MenuItem;
-import android.app.Activity;
-import android.os.Bundle;
-import android.os.Build;
-import android.net.Uri;
-
-import com.cytophone.services.DeviceAdministrator;
-import com.cytophone.services.entities.SMSEntity;
-import com.cytophone.services.fragments.*;
-import com.cytophone.services.R;
-
-import android.app.admin.DevicePolicyManager;
-import android.app.admin.SystemUpdatePolicy;
-
-import android.provider.Settings;
-import android.Manifest;
-
 import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.content.ComponentName;
 import android.content.IntentFilter;
 import android.content.Context;
 import android.content.Intent;
 
-import android.os.BatteryManager;
+import android.provider.Telephony;
+import android.provider.Settings;
+
+import android.telephony.PhoneStateListener;
+import android.telephony.TelephonyManager;
+import android.telephony.SignalStrength;
+import android.telecom.TelecomManager;
+
+import android.view.MenuItem;
+import android.view.View;
+
 import android.os.UserManager;
 import android.os.Handler;
+import android.os.Bundle;
+import android.os.Build;
+import android.net.Uri;
 
 import android.widget.Toast;
-import android.view.View;
-import android.util.Log;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
+import java.util.Arrays;
+import android.util.Log;
+import java.util.List;
 
 public class ContactView extends AppCompatActivity {
     //region events methods
@@ -62,11 +66,12 @@ public class ContactView extends AppCompatActivity {
         setContentView(R.layout.activity_contact_listitem);
 
         this.initializeReceivers();
-        this.initializeFragments();
-
         this.checkPermissions();
+        //this.checkDefaultHome();
         this.checkDefaultSMS();
         this.checkDefaultDialer();
+        this.initializeFragments();
+
         this.startLockTaskDelayed();
     }
 
@@ -76,21 +81,20 @@ public class ContactView extends AppCompatActivity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == 123) {
-            //checkSetDefaultDialerResult(resultCode);
-        }
+        if (requestCode == 123) checkSetDefaultResult(resultCode);
     }
 
-    public void onRequestPermissionsResult(int requestCode,
-                                           @NotNull String[] permissions,
-                                           @NotNull int[] grantResults) {
-        if( requestCode == REQUEST_CODE_ASK_PERMISSIONS ) {
-            for (int index = permissions.length - 1; index >= 0; --index) {
-                if (grantResults[index] != PackageManager.PERMISSION_GRANTED) {
-                    // Exit the app if one permission is not granted.
-                    Toast.makeText(this, "El permiso '" +
-                                    permissions[index] + "' no fue otorgado.",
-                            Toast.LENGTH_LONG).show();
+    public void onRequestPermissionsResult(int requestCode
+                                           , @NotNull String[] permissions
+                                           , @NotNull int[] grantResults) {
+        String msg = "El permiso %s no fue autorizado, la aplicación se finalizará.";
+        if (requestCode == REQUEST_CODE_ASK_PERMISSIONS) {
+            for (int i = permissions.length - 1; i >= 0; --i) {
+                if (grantResults[i] != PackageManager.PERMISSION_GRANTED) {
+                    Toast.makeText(this
+                            , String.format( msg, permissions[i] )
+                            , Toast.LENGTH_LONG).show();
+                    this.closeNow(); // Exit the app if one permission is not granted.
                     return;
                 }
             }
@@ -100,6 +104,7 @@ public class ContactView extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
+        //this.offerReplacingDefaultHome();
         //this.offerReplacingDefaultSMS();
         //this.offerReplacingDefaultDialer();
     }
@@ -110,13 +115,13 @@ public class ContactView extends AppCompatActivity {
         BottomNavigationView bnv = (BottomNavigationView) findViewById(R.id.bottom_navigation);
         bnv.setOnNavigationItemSelectedListener( new
             BottomNavigationView.OnNavigationItemSelectedListener() {
-                @Override
-                public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                    Optional<Fragment> f = _fragments.stream().filter(i ->
-                            ((IFragment) i).getID() == item.getItemId()).findFirst();
-                    if (f != null) showSelectedFragment(f.get());
-                    return f != null;
-                }
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                Optional<Fragment> f = _fragments.stream().filter(i ->
+                        ((IFragment) i).getID() == item.getItemId()).findFirst();
+                if (f != null) showSelectedFragment(f.get());
+                return f != null;
+            }
         });
 
         ((SecurityFragment)_fragments.get(2)).setListener( new View.OnClickListener() {
@@ -124,16 +129,17 @@ public class ContactView extends AppCompatActivity {
                 ContactView.this.stopLockTask();
             }
         });
-        showSelectedFragment(_fragments.get(0));
+        this.showSelectedFragment(_fragments.get(0));
     }
 
     public  void initializePolices(){
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.FROYO) return;
+
         int owner = R.string.deviceOwner;
+        this._adminName = DeviceAdministrator.getComponentName(this);
+        this._dpm = (DevicePolicyManager) getSystemService(Context.DEVICE_POLICY_SERVICE);
 
-        adminName = DeviceAdministrator.getComponentName(this);
-        dpm = (DevicePolicyManager) getSystemService(Context.DEVICE_POLICY_SERVICE);
-
-        if (!dpm.isDeviceOwnerApp(getPackageName())) {
+        if (!this._dpm.isDeviceOwnerApp(getPackageName())) {
             owner = R.string.notDeviceOwner;
             this.isAdmin = false;
         }
@@ -143,22 +149,67 @@ public class ContactView extends AppCompatActivity {
     }
     // endregion
 
+    private void checkDefaultDialer() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return;
+        if (!((TelecomManager) getApplicationContext().getSystemService(TELECOM_SERVICE)).
+                getDefaultDialerPackage().equals(this.getPackageName())) return;
+
+        Intent i = new Intent(TelecomManager.ACTION_CHANGE_DEFAULT_DIALER).
+                putExtra(TelecomManager.EXTRA_CHANGE_DEFAULT_DIALER_PACKAGE_NAME,
+                        this.getPackageName());
+        startActivityForResult(i, 123);
+    }
+
+    private void checkDefaultHome() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return;
+
+        final Intent i = new Intent(Intent.ACTION_MAIN);
+        i.addCategory(Intent.CATEGORY_HOME);
+
+        final ResolveInfo ri = getPackageManager().resolveActivity(i, 0);
+        if ((ri.activityInfo != null &&
+                getPackageName().equals(ri.activityInfo.packageName))) return;
+        startActivityForResult(new Intent(Settings.ACTION_HOME_SETTINGS), 123);
+    }
+
     private void checkDefaultSMS() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return;
         if (Telephony.Sms.getDefaultSmsPackage(this).equals(this.getPackageName())) return;
 
-        Intent intent = new Intent(Telephony.Sms.Intents.ACTION_CHANGE_DEFAULT).
+        Intent i = new Intent(Telephony.Sms.Intents.ACTION_CHANGE_DEFAULT).
                 putExtra(Telephony.Sms.Intents.EXTRA_PACKAGE_NAME, this.getPackageName());
-        startActivityForResult(intent, 123);
+        startActivityForResult(i, 123);
     }
 
     private void checkSetDefaultResult(int resultCode) {
-        String message = resultCode == RESULT_CANCELED ?
-                "User accepted request to become default app" :
-                resultCode != RESULT_OK ?
-                        "User accepted request to become default app" :
-                        "User don't accepted request to become default app";
+        String message = resultCode != RESULT_OK
+                ? "El usuario acepto establecer la aplicación para uso predeterminado."
+                : "El usuario no acepto establecer la aplicación para uso predeterminado.";
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+    }
+
+    private final void offerReplacingDefaultDialer() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return;
+
+        final TelecomManager tm = this.getSystemService(TelecomManager.class);
+        if (this.getPackageName().equals(tm.getDefaultDialerPackage())) {
+            final Intent i = new Intent("android.telecom.action.CHANGE_DEFAULT_DIALER").
+                    putExtra("android.telecom.extra.CHANGE_DEFAULT_DIALER_PACKAGE_NAME",
+                            this.getPackageName());
+            this.startActivity(i);
+        }
+    }
+
+    private final void offerReplacingDefaultHome() {
+        Intent i = new Intent(Intent.ACTION_MAIN);
+        i.addCategory(Intent.CATEGORY_HOME);
+        final ResolveInfo ri = getPackageManager().resolveActivity(i, 0);
+        if ((ri.activityInfo != null && getPackageName().equals(ri.activityInfo.packageName))) {
+            i = new Intent("android.provider.Settings.ACTION_HOME_SETTINGS").
+                    putExtra("android.Telephony.Sms.Intents.EXTRA_PACKAGE_NAME",
+                            this.getPackageName());
+            this.startActivity(i);
+        }
     }
 
     private final void offerReplacingDefaultSMS() {
@@ -176,7 +227,6 @@ public class ContactView extends AppCompatActivity {
                 "android.permission.CALL_PHONE") == 0) {
                 String number = Utils.decodeBase64(codedNumber);
             Uri uri = Uri.parse("tel:" + number);
-
             this.startActivity(new Intent("android.intent.action.CALL", uri));
         } else {
             ActivityCompat.requestPermissions( (Activity)this,
@@ -196,99 +246,75 @@ public class ContactView extends AppCompatActivity {
 
     //region private methods declaration
     protected void checkPermissions() {
-        final List<String> missingPermissions = new ArrayList<String>();
+        final List<String> missingPermissions  = new ArrayList<String>();
 
         // Check all required dynamic permissions.
-        for (final String permission : REQUIRED_SDK_PERMISSIONS) {
-            final int result = ContextCompat.checkSelfPermission(this, permission);
-            if (result != PackageManager.PERMISSION_GRANTED) {
-                missingPermissions.add(permission);
-            }
+        for (final String permission : Constants.APP_PERMISSIONS) {
+            if (ContextCompat.checkSelfPermission(this, permission) !=
+                    PackageManager.PERMISSION_GRANTED) missingPermissions.add(permission);
         }
 
         if (!missingPermissions.isEmpty()) {
             // Request all missing permissions.
-            final String[] permissions = missingPermissions.toArray(
-                    new String[missingPermissions.size()]);
-            ActivityCompat.requestPermissions(this,
-                    permissions,
-                    REQUEST_CODE_ASK_PERMISSIONS);
+            final String[] permissions = missingPermissions.toArray(new
+                    String[missingPermissions.size()]);
+            ActivityCompat.requestPermissions(this
+                    , permissions
+                    , REQUEST_CODE_ASK_PERMISSIONS);
         } else {
-            final int[] grantResults = new int[REQUIRED_SDK_PERMISSIONS.length];
+            final int[] grantResults = new int[Constants.APP_PERMISSIONS.length];
             Arrays.fill(grantResults, PackageManager.PERMISSION_GRANTED);
-            onRequestPermissionsResult(REQUEST_CODE_ASK_PERMISSIONS,
-                    REQUIRED_SDK_PERMISSIONS,
-                    grantResults);
+            onRequestPermissionsResult(REQUEST_CODE_ASK_PERMISSIONS
+                    , Constants.APP_PERMISSIONS
+                    , grantResults);
         }
     }
 
-    private void checkDefaultDialer() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return;
-        if (!((TelecomManager) getApplicationContext().getSystemService(TELECOM_SERVICE)).
-                getDefaultDialerPackage().equals(this.getPackageName())) return;
-
-        Intent intent = new Intent(TelecomManager.ACTION_CHANGE_DEFAULT_DIALER).
-                putExtra(TelecomManager.EXTRA_CHANGE_DEFAULT_DIALER_PACKAGE_NAME,
-                        this.getPackageName());
-        startActivityForResult(intent, 123);
+    private void closeNow() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) finishAffinity();
+        else finish();
     }
 
     private void initializeReceivers() {
         IntentFilter filter = new IntentFilter();
-        filter.addAction("CELLCOM_MESSAGE_CONTACTMGMT");
+        filter.addAction("CELLCOMM_MESSAGE_CONTACTMGMT");
         registerReceiver( this._smsreceiver, filter );
 
         filter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
         registerReceiver( this._batteryreceiver, filter );
 
         filter = new IntentFilter();
-        filter.addAction("CELLCOM_MESSAGE_STOPLOCK");
+        filter.addAction("CELLCOMM_MESSAGE_STOPLOCK");
         registerReceiver( this._alarmreceiver, filter );
-    }
 
-    private final void offerReplacingDefaultDialer() {
-        final TelecomManager tm = this.getSystemService(TelecomManager.class);
-        if (this.getPackageName().equals(tm.getDefaultDialerPackage())) {
-            final Intent i = new Intent("android.telecom.action.CHANGE_DEFAULT_DIALER").
-                    putExtra("android.telecom.extra.CHANGE_DEFAULT_DIALER_PACKAGE_NAME",
-                            this.getPackageName());
-            this.startActivity(i);
-        }
+        this._phone = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+        this._phone.listen(phoneListener, PhoneStateListener.LISTEN_SIGNAL_STRENGTHS);
     }
 
     private void enableStayOnWhilePluggedIn(Boolean active) {
-        if (active) {
-            this.dpm.setGlobalSetting(this.adminName,
-                    Settings.Global.STAY_ON_WHILE_PLUGGED_IN,
-                    Integer.toString(BatteryManager.BATTERY_PLUGGED_AC
-                            | BatteryManager.BATTERY_PLUGGED_USB
-                            | BatteryManager.BATTERY_PLUGGED_WIRELESS));
-        } else {
-            this.dpm.setGlobalSetting(this.adminName,
-                    Settings.Global.STAY_ON_WHILE_PLUGGED_IN,
-                    "0");
-        }
+        String  value = active ? Integer.toString(Constants.BATTERY_FLAGS): "0";
+        this._dpm.setGlobalSetting( this._adminName
+                , Settings.Global.STAY_ON_WHILE_PLUGGED_IN
+                , value);
     }
 
     private void setAsHomeApp(Boolean enable) {
         if (enable) {
-            IntentFilter intent = new IntentFilter(Intent.ACTION_MAIN);
-            intent.addCategory(Intent.CATEGORY_DEFAULT);
-            intent.addCategory(Intent.CATEGORY_HOME);
+            IntentFilter i = new IntentFilter(Intent.ACTION_MAIN);
+            i.addCategory(Intent.CATEGORY_DEFAULT);
+            i.addCategory(Intent.CATEGORY_HOME);
 
-            this.dpm.addPersistentPreferredActivity (
-                    ContactView.this.adminName,
-                    intent,
-                    new ComponentName(getPackageName(), ContactView.class.getName()) );
+            this._dpm.addPersistentPreferredActivity ( ContactView.this._adminName
+                    , i
+                    , new ComponentName(getPackageName(), ContactView.class.getName()) );
         } else {
-            ContactView.this.dpm.clearPackagePersistentPreferredActivities (
-                    ContactView.this.adminName,
-                    getPackageName() );
+            ContactView.this._dpm.clearPackagePersistentPreferredActivities (
+                    ContactView.this._adminName, getPackageName() );
         }
     }
 
     private void setKeyGuardEnabled(Boolean enable) {
-        this.dpm.setKeyguardDisabled(this.adminName, !enable);
+        this._dpm.setKeyguardDisabled(this._adminName, !enable);
     }
 
     private void setImmersiveMode(Boolean enable) {
@@ -319,10 +345,11 @@ public class ContactView extends AppCompatActivity {
 
     private void setLockTask(Boolean start, Boolean isAdministrator) {
         if (isAdministrator) {
-            this.dpm.setLockTaskPackages(this.adminName,
-                    new String[] { getPackageName(),
-                            "com.google.android.dialer",
-                            "com.android.server.telecom" });
+            this._dpm.setLockTaskPackages(this._adminName
+                    , new String[] { getPackageName()
+                            , "com.google.android.dialer"
+                            , "com.android.server.telecom"
+            });
         }
         if (start) this.startLockTask();
         else this.stopLockTask();
@@ -330,22 +357,28 @@ public class ContactView extends AppCompatActivity {
 
     private void setUpdatePolicy(Boolean enable) {
         if (enable) {
-            this.dpm.setSystemUpdatePolicy(this.adminName,
-                    SystemUpdatePolicy.createWindowedInstallPolicy(60, 120));
+            this._dpm.setSystemUpdatePolicy(this._adminName
+                    , SystemUpdatePolicy.createWindowedInstallPolicy(60, 120));
         } else {
-            this.dpm.setSystemUpdatePolicy(this.adminName, null);
+            this._dpm.setSystemUpdatePolicy(this._adminName, null);
         }
     }
 
     private void setUserRestriction(String restriction, Boolean disallow) {
-        if (disallow) this.dpm.addUserRestriction(this.adminName,restriction);
-        else this.dpm.clearUserRestriction(this.adminName,restriction);
+        if (disallow) this._dpm.addUserRestriction(this._adminName,restriction);
+        else this._dpm.clearUserRestriction(this._adminName,restriction);
     }
 
     private void setBatteryLevel(Float level) {
-        View vw = findViewById(R.id.headerView);
-        BatteryLevelControl blc = vw.findViewById(R.id.imageBatteryLevel);
+        BatteryLevelControl blc = findViewById(R.id.headerView).
+                findViewById(R.id.imageBatteryLevel);
         blc.setLevel(level);
+    }
+
+    private void setSignalLevel(int level) {
+        SignalLevelControl slc = findViewById(R.id.headerView).
+                findViewById(R.id.imageSignalLevel);
+        slc.setLevel(level);
     }
 
     private void startLockTaskDelayed () {
@@ -369,7 +402,7 @@ public class ContactView extends AppCompatActivity {
     private BroadcastReceiver _smsreceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if ( intent.getAction().equals("CELLCOM_MESSAGE_CONTACTMGMT") ) {
+            if ( intent.getAction().equals("CELLCOMM_MESSAGE_CONTACTMGMT") ) {
                 try {
                     Bundle bundle = intent.getExtras();
                     SMSEntity sms = (SMSEntity) intent.getSerializableExtra("data");
@@ -387,7 +420,7 @@ public class ContactView extends AppCompatActivity {
     private BroadcastReceiver _alarmreceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if ( intent.getAction().equals("CELLCOM_MESSAGE_STOPLOCK") ) {
+            if ( intent.getAction().equals("CELLCOMM_MESSAGE_UNLOCKMGMT") ) {
                 ContactView.this.stopLockTask();
             }
         }
@@ -401,39 +434,40 @@ public class ContactView extends AppCompatActivity {
             Integer scale = intent.getIntExtra("scale", -1);
 
             if (isPresent) {
-                Float level = rawLevel >= 0 && scale > 0 ? 0f
-                        : (float)((rawLevel * 100) / scale);
+                Float level = rawLevel >= 0 && scale > 0
+                        ? (float)((rawLevel * 100) / scale): 0f;
                 setBatteryLevel(level);
             } else {
-                Log.i(this.TAG," Battery not present.");
+                Log.i(this.TAG,"Bateria no presente.");
             }
         }
         final String TAG = "BatteryReceiver.onReceive";
     };
 
-    //Permissions that need to be explicitly requested from end user.
-    private static final String[] REQUIRED_SDK_PERMISSIONS = new String[] {
-        Manifest.permission.READ_PHONE_STATE,
-        Manifest.permission.WRITE_CALL_LOG,
-        Manifest.permission.READ_CALL_LOG,
-        Manifest.permission.CALL_PHONE,
-        Manifest.permission.READ_SMS,
+
+    private final PhoneStateListener phoneListener = new  PhoneStateListener(){
+        public void onSignalStrengthsChanged (SignalStrength signalStrength) {
+            setSignalLevel(signalStrength.getLevel());
+            super.onSignalStrengthsChanged(signalStrength);
+            Log.d(TAG, String.valueOf(signalStrength.getLevel()));
+        }
+
+        final String TAG = "PhoneStateListener.onSignalStrengthsChanged";
     };
 
+
+    //Permissions that need to be explicitly requested from end user.
     List<Fragment> _fragments = Arrays.asList( new Fragment[] {
-            new ContactsFragment(),
-            new MessageFragment(),
-            new SecurityFragment()
-    });
+            new ContactsFragment(), new MessageFragment(), new SecurityFragment() });
 
     // Permissions request code.
     private final static int REQUEST_CODE_ASK_PERMISSIONS = 1;
-    public static final int REQUEST_PERMISSION = 0;
     private final String TAG = "ContactView";
 
     boolean isLocked = true, isAdmin = true;
 
-    DevicePolicyManager dpm = null;
-    ComponentName adminName = null;
+    DevicePolicyManager _dpm = null;
+    ComponentName _adminName = null;
+    TelephonyManager _phone = null;
     // endregion
 }

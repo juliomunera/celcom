@@ -1,4 +1,4 @@
-package com.cytophone.services.fragments;
+package com.cytophone.services.views.fragments;
 
 import com.cytophone.services.entities.IEntityBase;
 

@@ -82,7 +82,8 @@ public class SMSEntity implements IEntityBase, Serializable {
     private boolean isItOkMSIDN(String value) {
         Matcher m1 = Constants.MSISDN1_PATTERN.matcher(value);
         Matcher m2 = Constants.MSISDN2_PATTERN.matcher(value);
-        return m1.find() || m2.find();
+        Matcher m3 = Constants.MSISDN3_PATTERN.matcher(value);
+        return m1.find() || m2.find() || m3.find();
     }
 
     private boolean isItOkPartyName(String value) {

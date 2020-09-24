@@ -18,4 +18,14 @@
     <color name="solidContact">#AA827D7D</color>
     <color name="focusIcon">#E8A35F</color>
     <color name="bottomNavigation">#1B1B1C</color>
+
+
+    <color name="blue1">#03A9F4</color>
+    <color name="black1">#000000</color>
+    <color name="gray1">#424242</color>
+    <color name="orange1">#FF7F00</color>
+    <color name="orange2">#FFB100</color>
+    <color name="orange3">#E65100</color>
+    <color name="white1">#FFFFFF</color>
+    <color name="red1">#D50000</color>
 </resources>

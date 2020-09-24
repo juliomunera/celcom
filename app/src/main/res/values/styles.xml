@@ -16,5 +16,72 @@
         <item name="android:textColorHint">@color/primaryTextColor</item>
         <item name="android:textAllCaps">false</item>
     </style>
+
+    <!-- Battery styles -->
+    <style name="poorLevelScene" parent="defaultBatteryLevelScene">>
+        <item name="batteryShape">@color/white1</item>
+        <item name="poorLevel">@color/red1</item>
+        <item name="lowLevel">@color/black1</item>
+        <item name="middleLevel">@color/black1</item>
+        <item name="highLevel">@color/black1</item>
+    </style>
+    <style name="lowLevelScene" parent="defaultBatteryLevelScene">
+        <item name="batteryShape">@color/white1</item>
+        <item name="poorLevel">@color/orange3</item>
+        <item name="lowLevel">@color/orange3</item>
+        <item name="middleLevel">@color/black1</item>
+        <item name="highLevel">@color/black1</item>
+    </style>
+    <style name="middleLevelScene" parent="defaultBatteryLevelScene">
+        <item name="batteryShape">@color/white1</item>
+        <item name="poorLevel">@color/orange2</item>
+        <item name="lowLevel">@color/orange2</item>
+        <item name="middleLevel">@color/orange2</item>
+        <item name="highLevel">@color/black1</item>
+    </style>
+    <style name="defaultBatteryLevelScene">
+        <item name="batteryShape">@color/white1</item>
+        <item name="poorLevel">@color/blue1</item>
+        <item name="lowLevel">@color/blue1</item>
+        <item name="middleLevel">@color/blue1</item>
+        <item name="highLevel">@color/blue1</item>
+    </style>
+
+    <!-- Signal styles -->
+    <style name="unKnowSignalLevelScene" parent="defaultSignalLevelScene">
+        <item name="signalShape">@color/gray1</item>
+        <item name="weakSignal">@color/gray1</item>
+        <item name="moderateSignal">@color/gray1</item>
+        <item name="goodSignal">@color/gray1</item>
+        <item name="excellentSignal">@color/gray1</item>
+    </style>
+    <style name="weakSignalLevelScene" parent="defaultSignalLevelScene">
+        <item name="signalShape">@color/gray1</item>
+        <item name="weakSignal">@color/blue1</item>
+        <item name="moderateSignal">@color/gray1</item>
+        <item name="goodSignal">@color/gray1</item>
+        <item name="excellentSignal">@color/gray1</item>
+    </style>
+    <style name="moderateSignalLevelScene" parent="defaultSignalLevelScene">
+        <item name="signalShape">@color/gray1</item>
+        <item name="weakSignal">@color/blue1</item>
+        <item name="moderateSignal">@color/blue1</item>
+        <item name="goodSignal">@color/gray1</item>
+        <item name="excellentSignal">@color/gray1</item>
+    </style>
+    <style name="goodSignalLevelScene" parent="defaultSignalLevelScene">
+        <item name="signalShape">@color/gray1</item>
+        <item name="weakSignal">@color/blue1</item>
+        <item name="moderateSignal">@color/blue1</item>
+        <item name="goodSignal">@color/blue1</item>
+        <item name="excellentSignal">@color/gray1</item>
+    </style>
+    <style name="defaultSignalLevelScene">
+        <item name="signalShape">@color/white1</item>
+        <item name="weakSignal">@color/blue1</item>
+        <item name="moderateSignal">@color/blue1</item>
+        <item name="goodSignal">@color/blue1</item>
+        <item name="excellentSignal">@color/blue1</item>
+    </style>
 </resources>
 

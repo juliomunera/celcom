@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragments.ContactsFragment">
+    tools:context=".views.fragments.ContactsFragment">
     <TableRow android:weightSum="2.0">
         <EditText android:id="@+id/edtSearchBox"
             style="@style/SearchControls"
@@ -38,6 +38,7 @@
             android:layout_height="match_parent"
             android:layout_weight="2.0"
             android:layout_span="2"
+            android:paddingBottom="40dp"
             android:layout_below="@id/edtSearchBox" />
     </TableRow>
 </TableLayout >

@@ -7,13 +7,13 @@
     android:layout_height="match_parent"
     android:background="@color/primaryDarkColor"
     android:fitsSystemWindows="false"
-    tools:context=".activities.ContactView" >
+    tools:context=".views.ContactView" >
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/appbar"
         android:layout_height="wrap_content"
         android:layout_width="wrap_content"
         app:title="@string/app_name"
-        android:elevation="4dp"
+        android:elevation="6dp"
         android:background="@color/primaryDarkColor"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light" >
         <include android:id="@+id/headerView"
@@ -37,8 +37,7 @@
         app:itemTextColor="@color/focusIcon"
         android:elevation="70dp"
         app:itemIconTint="@drawable/child_selector"
-        android:background="@color/bottomNavigation"
-        />
+        android:background="@color/bottomNavigation" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
 

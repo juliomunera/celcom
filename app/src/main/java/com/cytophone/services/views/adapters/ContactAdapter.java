@@ -1,4 +1,4 @@
-package com.cytophone.services.activities.adapters;
+package com.cytophone.services.views.adapters;
 
 import com.cytophone.services.utilities.ItemSelectListener;
 import com.cytophone.services.entities.PartyEntity;
@@ -47,9 +47,7 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
         View view = layoutInflater.inflate(R.layout.row_item, parent, false);
-        ViewHolder viewHolder = new ViewHolder(view);
-
-        return viewHolder;
+        return  new ViewHolder(view);
     }
 
     @Override
@@ -83,8 +81,8 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
                         ).collect(Collectors.toList());
             }
 
-            results.count =  filteredList.size();
-            results.values =  filteredList;
+            results.count = filteredList.size();
+            results.values = filteredList;
             return results;
         }
 
@@ -110,10 +108,10 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
 
         @Override
         public void onClick(View view) {
-            PartyEntity party = _contacts.get(getAdapterPosition());
+            PartyEntity party = ContactAdapter.this._contacts.get(getAdapterPosition());
             Toast.makeText(view.getContext(), party.getName(), Toast.LENGTH_SHORT).show();
 
-            if( ContactAdapter.this._listener != null) {
+            if( null != ContactAdapter.this._listener ) {
                 ContactAdapter.this._listener.onSelect(party);
             }
         }

@@ -1,8 +1,8 @@
-package com.cytophone.services.fragments;
+package com.cytophone.services.views.fragments;
 
-import com.cytophone.services.activities.adapters.ContactAdapter;
+import com.cytophone.services.views.adapters.ContactAdapter;
 import com.cytophone.services.utilities.ItemSelectListener;
-import com.cytophone.services.activities.ContactView;
+import com.cytophone.services.views.ContactView;
 import com.cytophone.services.CellCommApp;
 import com.cytophone.services.entities.*;
 import com.cytophone.services.R;
@@ -65,7 +65,8 @@ public class ContactsFragment extends Fragment implements IFragment {
 
         edt.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            public void beforeTextChanged(CharSequence s, int start, int count, int after)
+            {}
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -96,6 +97,7 @@ public class ContactsFragment extends Fragment implements IFragment {
 
             if ( action.contains("delete") )  this.remove((SMSEntity)message);
             else if ( action.contains("insert") ) this.add((SMSEntity)message);
+
             this._adapter.notifyDataSetChanged();
         }catch (Exception e){
             Log.e(this.TAG + ".applyChanges", "error: " + e.getMessage());
@@ -111,8 +113,8 @@ public class ContactsFragment extends Fragment implements IFragment {
 
     // region public methods
     private void add(SMSEntity message) throws Exception {
-        PartyEntity party = message.getPartyObject();
-        this._parties.add(party);
+        this.remove(message);
+        this._parties.add(message.getPartyObject());
     }
 
     private void remove(SMSEntity message) throws Exception {

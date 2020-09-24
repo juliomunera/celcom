@@ -1,6 +1,6 @@
-package com.cytophone.services.fragments;
+package com.cytophone.services.views.fragments;
 
-import com.cytophone.services.activities.adapters.MessageAdapter;
+import com.cytophone.services.views.adapters.MessageAdapter;
 import com.cytophone.services.CellCommApp;
 import com.cytophone.services.entities.*;
 import com.cytophone.services.R;

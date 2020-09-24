@@ -1,7 +1,7 @@
 package com.cytophone.services.telephone;
 
 import com.cytophone.services.entities.PartyEntity;
-import com.cytophone.services.activities.CallView;
+import com.cytophone.services.views.CallView;
 import com.cytophone.services.CellCommApp;
 
 import org.jetbrains.annotations.NotNull;
@@ -37,7 +37,6 @@ public final class CallService extends InCallService {
 
         try {
             String callerNumber = call.getDetails().getHandle().getSchemeSpecificPart();
-
             sendBroadCastMessage(0, callerNumber);
         } finally {}
 
@@ -67,7 +66,7 @@ public final class CallService extends InCallService {
     private void sendBroadCastMessage(int type, String callerNumber) {
         Intent intent = new Intent(CELLCOMM_EVENT).
             putExtra("EVENT_TYPE", type).
-            putExtra( "CALLER_NUMBER", callerNumber);
+            putExtra( "NUMBER", callerNumber);
         this.getApplicationContext().sendBroadcast(intent);
     }
 

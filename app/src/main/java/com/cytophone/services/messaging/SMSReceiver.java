@@ -46,7 +46,7 @@ public class SMSReceiver extends BroadcastReceiver {
             Log.d(this.TAG + ".notifyMessage", "");
 
             String name = message.getActionName() + message.getTypeName();
-            Intent intent = new Intent("CELLCOM_MESSAGE_CONTACTMGMT").
+            Intent intent = new Intent("CELLCOMM_MESSAGE_CONTACTMGMT").
                     putExtra( "action", name ).
                     putExtra( "data", message );
             context.sendBroadcast(intent);

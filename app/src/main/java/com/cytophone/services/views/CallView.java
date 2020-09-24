@@ -1,4 +1,4 @@
-package com.cytophone.services.activities;
+package com.cytophone.services.views;
 
 import com.cytophone.services.utilities.CallStateStringKt;
 import com.cytophone.services.telephone.OngoingCall;
@@ -43,7 +43,7 @@ public class CallView extends AppCompatActivity {
         setContentView(R.layout.activity_call_view);
         Object party;
 
-        if((party = getIntent().getSerializableExtra("PartyEntity")) != null) {
+        if(null != (party = getIntent().getSerializableExtra("PartyEntity"))) {
             this._party = party instanceof PartyEntity ? (PartyEntity) party: null;
         }
     }
@@ -52,21 +52,7 @@ public class CallView extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
-        ImageView answer = findViewById(R.id.iv_answer);
-        answer.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                OngoingCall.INSTANCE.answer();
-            }
-        });
-
-        ImageView hangup = findViewById(R.id.iv_hangout);
-        hangup.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                OngoingCall.INSTANCE.hangup();
-            }
-        });
+        this.initializeUIControls();
 
         BehaviorSubject states = OngoingCall.INSTANCE.getState();
         Function1<Integer, Unit> updateUI = new Function1<Integer, Unit>() {
@@ -86,8 +72,7 @@ public class CallView extends AppCompatActivity {
         DisposableKt.addTo(subscribers, this._disposables);
 
         subscribers = OngoingCall.INSTANCE.getState().
-            filter(i -> i.equals(Call.STATE_DISCONNECTING) ||
-                        i.equals(Call.STATE_DISCONNECTED)).
+            filter(i -> i.equals(Call.STATE_DISCONNECTING) || i.equals(Call.STATE_DISCONNECTED)).
             delay(1L, TimeUnit.SECONDS).
             firstElement().
             subscribe(new Consumer() {
@@ -98,6 +83,25 @@ public class CallView extends AppCompatActivity {
             });
         //STATE_DISCONNECTED
         DisposableKt.addTo(subscribers, this._disposables);
+    }
+
+    private final void initializeUIControls()
+    {
+        ImageView answer = findViewById(R.id.iv_answer);
+        answer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                OngoingCall.INSTANCE.answer();
+            }
+        });
+
+        ImageView hangup = findViewById(R.id.iv_hangout);
+        hangup.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                OngoingCall.INSTANCE.hangup();
+            }
+        });
     }
 
     // Private and protected methods declaration
@@ -132,9 +136,9 @@ public class CallView extends AppCompatActivity {
         private final Function1 _func;
     }
 
-    public static void start(@NotNull Context context,
-                             @NotNull Call call,
-                             PartyEntity party) {
+    public static void start(@NotNull Context context
+                             ,@NotNull Call call
+                             ,PartyEntity party) {
         @SuppressLint("WrongConstant")
         Intent i = new Intent(context, CallView.class).setFlags(268435456);
         i.putExtra("PartyEntity", party);

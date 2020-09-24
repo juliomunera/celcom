@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="19dp"
+    android:height="19dp"
+    android:viewportWidth="400"
+    android:viewportHeight="400">
+    <path android:name="batteryShape"
+        android:fillColor="?attr/batteryShape"
+        android:pathData="M269.522,36.163h-11V20c0-11.028-8.972-20-20-20h-97.85c-11.028,0-20,8.972-20,20v16.163H97.5 c-16.542,0-30,13.458-30,30v280.858c0,16.542,13.458,30,30,30h182.022c16.542,0,30-13.458,30-30V66.163 C309.522,49.621,296.064,36.163,279.522,36.163z M97.5,347.021V66.163h182.022l0.003,280.858H97.5z" />
+    <path android:name="poorLevel"
+        android:fillColor="?attr/poorLevel"
+        android:pathData="M 122.586 296.5 H 254.436 V 326.293 H 122.586 V 296.5 Z" />
+    <path android:name="lowLevel"
+        android:fillColor="?attr/lowLevel"
+        android:pathData="M 122.586 226.5 H 254.436 V 256.293 H 122.586 V 226.5 Z" />
+    <path android:name="middleLevel"
+        android:fillColor="?attr/middleLevel"
+        android:pathData="M 122.586 156.5 H 254.436 V 186.293 H 122.586 V 156.5 Z" />
+    <path android:name="highLevel"
+        android:fillColor="?attr/highLevel"
+        android:pathData="M 122.586 86.5 H 254.436 V 116.293 H 122.586 V 86.5 Z" />
+</vector>

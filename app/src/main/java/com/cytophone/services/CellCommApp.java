@@ -15,12 +15,12 @@ public class CellCommApp extends Application {
         return _instanceDB;
     }
 
-    public static UnlockCodeHandler getUnlockHandlerDB() {
-        return _unlockHandlerDB;
-    }
-
     public static PartyHandler getPartyHandlerDB() {
         return _partyHandlerDB;
+    }
+
+    public static UnlockCodeHandler getUnlockHandlerDB() {
+        return _unlockHandlerDB;
     }
     // endregion
 
@@ -52,7 +52,8 @@ public class CellCommApp extends Application {
         startService(i);
     }
 
-    private void setSMSDefaultApp() {}
+    private void setSMSDefaultApp() {
+    }
 
     //region fields declaration
     private static UnlockCodeHandler _unlockHandlerDB;

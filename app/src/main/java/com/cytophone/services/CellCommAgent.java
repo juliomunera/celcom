@@ -51,6 +51,7 @@ public class CellCommAgent extends Service {
             Log.i(this.TAG + ".onReceive", "receive message.");
             String number = getNumberFromIntent(intent);
             int deleted = 0;
+
             if (null != number) deleted = deleteCallLog(number);
             Log.i(this.TAG + ".onReceive", "total calls deleted: " + deleted);
         }
@@ -59,13 +60,14 @@ public class CellCommAgent extends Service {
             ContentResolver cr = getContentResolver();
             String query = CallLog.Calls.NUMBER + " = ?";
             String[] args = { callerNumber };
+
             return cr.delete(CallLog.Calls.CONTENT_URI, query, args);
         }
 
         private final String getNumberFromIntent(Intent filter) {
             if (filter.getAction().equals(CELLCOMM_EVENT)) {
                 Bundle bundle = filter.getExtras();
-                return bundle.getString("CALLER_NUMBER");
+                return bundle.getString("NUMBER");
             }
             return null;
         }

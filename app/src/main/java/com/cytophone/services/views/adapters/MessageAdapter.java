@@ -1,4 +1,4 @@
-package com.cytophone.services.activities.adapters;
+package com.cytophone.services.views.adapters;
 
 import com.cytophone.services.entities.EventEntity;
 import com.cytophone.services.R;
