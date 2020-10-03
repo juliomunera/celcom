@@ -67,6 +67,6 @@ public class OngoingCall {
 
     @NotNull private static BehaviorSubject<Integer> _state;
     private static Call.Callback _callback;
-    public static OngoingCall INSTANCE;
     @Nullable private static Call _call;
+    public static OngoingCall INSTANCE;
 }

@@ -87,7 +87,7 @@ public class Utils {
         return s1;
     }
 
-    public static Date getTime(String timeZoneId) {
+    public static Date getCurrentTime(String timeZoneId) {
         Calendar calTZ = new GregorianCalendar(TimeZone.getTimeZone(timeZoneId));
         calTZ.setTimeInMillis(new Date().getTime());
 
@@ -101,5 +101,13 @@ public class Utils {
         calendar.set(Calendar.MILLISECOND, calTZ.get(Calendar.MILLISECOND));
 
         return calendar.getTime();
+    }
+
+    public static Date addSeconds(Date period, int seconds) {
+        Calendar clnd = Calendar.getInstance();
+        clnd.setTime(period);
+        clnd.add(Calendar.SECOND, seconds);
+
+        return clnd.getTime();
     }
 }

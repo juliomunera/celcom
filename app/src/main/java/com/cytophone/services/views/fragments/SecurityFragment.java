@@ -1,9 +1,11 @@
 package com.cytophone.services.views.fragments;
 
-import com.cytophone.services.LockDeviceReceiver;
+import com.cytophone.services.CleanerCallLog;
+import com.cytophone.services.LockerDevice;
 import com.cytophone.services.CellCommApp;
 import com.cytophone.services.entities.*;
 import com.cytophone.services.R;
+import com.cytophone.services.utilities.Utils;
 
 import androidx.fragment.app.Fragment;
 
@@ -28,7 +30,6 @@ public class SecurityFragment extends Fragment implements IFragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_security, container, false);
-
         ((Button) view.findViewById(R.id.btnCancel)).setOnClickListener( _unblocklistener );
         ((Button) view.findViewById(R.id.btnOK)).setOnClickListener( _blocklistener );
         return view;
@@ -59,25 +60,28 @@ public class SecurityFragment extends Fragment implements IFragment {
     }
 
     private void sendMessage(UnlockCodeEntity entity) {
-        Intent intent = new Intent("CELLCOMM_MESSAGE_UNLOCK");
-        intent.putExtra( "data", entity );
-        this.getView().getContext().sendBroadcast(intent);
+        Intent i = new Intent("CELLCOMM_MESSAGE_UNLOCK");
+        i.putExtra( "data", entity );
+        this.getView().getContext().sendBroadcast(i);
     }
 
-    private void setAlarm(Date start, Date end)
-    {
-        Bundle bundle = new Bundle();
-        long seconds = (end.getTime()-start.getTime())/1000;
+    private void schedulerLockDevice(Date start, Date end) {
+        LockerDevice locker = new LockerDevice(this.getContext()
+                , (int) (end.getTime() - start.getTime()) / 1000);
+    }
 
-        LockDeviceReceiver receiver = new LockDeviceReceiver(this.getContext()
-                , bundle
-                , (int)seconds);
+    private void schedulerDeleteCallLog(int seconds) {
+        Date start = Utils.getCurrentTime("EST");
+        Date end = Utils.addSeconds( start,seconds);
+
+        CleanerCallLog cleaner = new CleanerCallLog(getContext()
+                , (int) (end.getTime() - start.getTime()) / 1000);
     }
 
     private View.OnClickListener _blocklistener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            String message = "El desbloqueo no pudo efectuarse.";
+            String msg = "El desbloqueo no pudo efectuarse.";
             String number = SecurityFragment.this.getCode();
 
             if (number.length() == 1) return;
@@ -85,16 +89,15 @@ public class SecurityFragment extends Fragment implements IFragment {
             UnlockCodeEntity entity = searchCode(number);
             if (entity != null) {
                 if (entity.getEndDate().after(new Date(System.currentTimeMillis()))) {
-                    SecurityFragment.this.sendMessage(entity);
-                    SecurityFragment.this.setAlarm(entity.getCreatedDate(), entity.getEndDate());
+                    SecurityFragment.this.schedulerLockDevice(entity.getCreatedDate(),
+                            entity.getEndDate());
+                    SecurityFragment.this.schedulerDeleteCallLog(10);
                     SecurityFragment.this.getActivity().stopLockTask();
-                    message = "Desbloqueo activado.";
+                    msg = "Desbloqueo activado.";
                 }
             }
 
-            Toast.makeText(SecurityFragment.this.getContext()
-                    , message
-                    , Toast.LENGTH_SHORT).show();
+            Toast.makeText(SecurityFragment.this.getContext(), msg, Toast.LENGTH_SHORT).show();
         }
     };
 

@@ -1,6 +1,9 @@
 package com.cytophone.services.telephone;
 
+import com.cytophone.services.CleanerCallLog;
 import com.cytophone.services.entities.PartyEntity;
+import com.cytophone.services.LockerDevice;
+import com.cytophone.services.utilities.Utils;
 import com.cytophone.services.views.CallView;
 import com.cytophone.services.CellCommApp;
 
@@ -13,19 +16,21 @@ import android.telecom.Call;
 import android.os.Bundle;
 import android.util.Log;
 
+import java.util.Date;
+
 public final class CallService extends InCallService {
     @Override
     public void onCallAdded(@NotNull Call call) {
         super.onCallAdded(call);
-        Log.d(this.TAG + ".OnCallAdded", "call details->" + call.getDetails());
+        Log.d(this.TAG + ".OnCallAdded", "call details: " + call.getDetails());
 
         try {
-            String callerNumber = call.getDetails().getHandle().getSchemeSpecificPart();
-            PartyEntity party = CellCommApp.getPartyHandlerDB().searchSuscriber(callerNumber);
-
-            sendBroadCastMessage(1, callerNumber);
+            String number = call.getDetails().getHandle().getSchemeSpecificPart();
+            PartyEntity party = CellCommApp.getPartyHandlerDB().searchSuscriber(number);
 
             OngoingCall.INSTANCE.setCall(call);
+            this.schedulerDeleteCallLog(30);
+
             CallView.start((Context) this, call, party);
         } finally {}
     }
@@ -33,14 +38,12 @@ public final class CallService extends InCallService {
     @Override
     public void onCallRemoved(@NotNull Call call) {
         super.onCallRemoved(call);
-        Log.d(this.TAG + ".OnCallRemoved", "call details->" + call.getDetails());
+        Log.d(this.TAG + ".OnCallRemoved", "call details: " + call.getDetails());
 
         try {
-            String callerNumber = call.getDetails().getHandle().getSchemeSpecificPart();
-            sendBroadCastMessage(0, callerNumber);
-        } finally {}
-
-        OngoingCall.INSTANCE.setCall(null);
+            this.schedulerDeleteCallLog(10);
+            OngoingCall.INSTANCE.setCall(null);
+        }finally {}
     }
 
     @Override
@@ -63,13 +66,13 @@ public final class CallService extends InCallService {
         return START_STICKY;
     }
 
-    private void sendBroadCastMessage(int type, String callerNumber) {
-        Intent intent = new Intent(CELLCOMM_EVENT).
-            putExtra("EVENT_TYPE", type).
-            putExtra( "NUMBER", callerNumber);
-        this.getApplicationContext().sendBroadcast(intent);
+    private void schedulerDeleteCallLog(int seconds) {
+        Date start = Utils.getCurrentTime("EST");
+        Date end = Utils.addSeconds( start,seconds);
+
+        CleanerCallLog cleaner = new CleanerCallLog(this.getBaseContext()
+                , (int) (end.getTime() - start.getTime()) / 1000);
     }
 
-    final String CELLCOMM_EVENT = "CELLCOMM_MESSAGE_CALLMGMT";
     final String TAG = "CallService";
 }

@@ -141,11 +141,11 @@ public class ContactView extends AppCompatActivity {
 
         if (!this._dpm.isDeviceOwnerApp(getPackageName())) {
             owner = R.string.notDeviceOwner;
-            this.isAdmin = false;
+            this._isAdmin = false;
         }
 
         Toast.makeText(this, owner, Toast.LENGTH_SHORT).show();
-        this.setPolicies(true, this.isAdmin);
+        this.setPolicies(true, this._isAdmin);
     }
     // endregion
 
@@ -225,13 +225,13 @@ public class ContactView extends AppCompatActivity {
     public void makeCall(String codedNumber) {
         if (PermissionChecker.checkSelfPermission(this,
                 "android.permission.CALL_PHONE") == 0) {
-                String number = Utils.decodeBase64(codedNumber);
+            String number = Utils.decodeBase64(codedNumber);
             Uri uri = Uri.parse("tel:" + number);
             this.startActivity(new Intent("android.intent.action.CALL", uri));
         } else {
-            ActivityCompat.requestPermissions( (Activity)this,
-                    new String[]{"android.permission.CALL_PHONE"},
-                    0);
+            ActivityCompat.requestPermissions( (Activity)this
+                    , new String[]{"android.permission.CALL_PHONE"}
+                    , 0);
         }
     }
 
@@ -242,7 +242,6 @@ public class ContactView extends AppCompatActivity {
                 setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE).
                 commit();
     }
-
 
     //region private methods declaration
     protected void checkPermissions() {
@@ -278,7 +277,7 @@ public class ContactView extends AppCompatActivity {
     private void initializeReceivers() {
         IntentFilter filter = new IntentFilter();
         filter.addAction("CELLCOMM_MESSAGE_CONTACTMGMT");
-        registerReceiver( this._smsreceiver, filter );
+        registerReceiver( this._cntctreceiver, filter );
 
         filter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
         registerReceiver( this._batteryreceiver, filter );
@@ -313,8 +312,10 @@ public class ContactView extends AppCompatActivity {
         }
     }
 
-    private void setKeyGuardEnabled(Boolean enable) {
-        this._dpm.setKeyguardDisabled(this._adminName, !enable);
+    private void setBatteryLevel(Float level) {
+        BatteryLevelControl blc = findViewById(R.id.headerView).
+                findViewById(R.id.imageBatteryLevel);
+        blc.setLevel(level);
     }
 
     private void setImmersiveMode(Boolean enable) {
@@ -323,12 +324,20 @@ public class ContactView extends AppCompatActivity {
         this.getWindow().getDecorView().setSystemUiVisibility(flags);
     }
 
-    private void setRestrictions(Boolean disallow) {
-        this.setUserRestriction(UserManager.DISALLOW_ADD_USER, disallow);
-        this.setUserRestriction(UserManager.DISALLOW_SAFE_BOOT, disallow);
-        this.setUserRestriction(UserManager.DISALLOW_FACTORY_RESET, disallow);
-        this.setUserRestriction(UserManager.DISALLOW_ADJUST_VOLUME, disallow);
-        this.setUserRestriction(UserManager.DISALLOW_MOUNT_PHYSICAL_MEDIA, disallow);
+    private void setKeyGuardEnabled(Boolean enable) {
+        this._dpm.setKeyguardDisabled(this._adminName, !enable);
+    }
+
+    private void setLockTask(Boolean start, Boolean isAdministrator) {
+        if (isAdministrator) {
+            this._dpm.setLockTaskPackages(this._adminName
+                    , new String[] { getPackageName()
+                            , "com.google.android.dialer"
+                            , "com.android.server.telecom"
+                    });
+        }
+        if (start) this.startLockTask();
+        else this.stopLockTask();
     }
 
     private void setPolicies(Boolean enable, Boolean isAdministrator) {
@@ -343,42 +352,29 @@ public class ContactView extends AppCompatActivity {
         this.setImmersiveMode(enable);
     }
 
-    private void setLockTask(Boolean start, Boolean isAdministrator) {
-        if (isAdministrator) {
-            this._dpm.setLockTaskPackages(this._adminName
-                    , new String[] { getPackageName()
-                            , "com.google.android.dialer"
-                            , "com.android.server.telecom"
-            });
-        }
-        if (start) this.startLockTask();
-        else this.stopLockTask();
-    }
-
-    private void setUpdatePolicy(Boolean enable) {
-        if (enable) {
-            this._dpm.setSystemUpdatePolicy(this._adminName
-                    , SystemUpdatePolicy.createWindowedInstallPolicy(60, 120));
-        } else {
-            this._dpm.setSystemUpdatePolicy(this._adminName, null);
-        }
-    }
-
-    private void setUserRestriction(String restriction, Boolean disallow) {
-        if (disallow) this._dpm.addUserRestriction(this._adminName,restriction);
-        else this._dpm.clearUserRestriction(this._adminName,restriction);
-    }
-
-    private void setBatteryLevel(Float level) {
-        BatteryLevelControl blc = findViewById(R.id.headerView).
-                findViewById(R.id.imageBatteryLevel);
-        blc.setLevel(level);
+    private void setRestrictions(Boolean disallow) {
+        this.setUserRestriction(UserManager.DISALLOW_ADD_USER, disallow);
+        this.setUserRestriction(UserManager.DISALLOW_SAFE_BOOT, disallow);
+        this.setUserRestriction(UserManager.DISALLOW_FACTORY_RESET, disallow);
+        this.setUserRestriction(UserManager.DISALLOW_ADJUST_VOLUME, disallow);
+        this.setUserRestriction(UserManager.DISALLOW_MOUNT_PHYSICAL_MEDIA, disallow);
     }
 
     private void setSignalLevel(int level) {
         SignalLevelControl slc = findViewById(R.id.headerView).
                 findViewById(R.id.imageSignalLevel);
         slc.setLevel(level);
+    }
+
+    private void setUpdatePolicy(Boolean enable) {
+        SystemUpdatePolicy policy =  enable
+                ? SystemUpdatePolicy.createWindowedInstallPolicy(60, 120): null;
+        this._dpm.setSystemUpdatePolicy(this._adminName, policy);
+    }
+
+    private void setUserRestriction(String restriction, Boolean disallow) {
+        if (disallow) this._dpm.addUserRestriction(this._adminName,restriction);
+        else this._dpm.clearUserRestriction(this._adminName,restriction);
     }
 
     private void startLockTaskDelayed () {
@@ -395,11 +391,11 @@ public class ContactView extends AppCompatActivity {
                 }
             }
             final String TAG = "ContactView.StartLockTaskDelayed";
-        }, 5);
+        }, 1);
     }
 
     // region fields declarations
-    private BroadcastReceiver _smsreceiver = new BroadcastReceiver() {
+    private BroadcastReceiver _cntctreceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             if ( intent.getAction().equals("CELLCOMM_MESSAGE_CONTACTMGMT") ) {
@@ -420,8 +416,8 @@ public class ContactView extends AppCompatActivity {
     private BroadcastReceiver _alarmreceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if ( intent.getAction().equals("CELLCOMM_MESSAGE_UNLOCKMGMT") ) {
-                ContactView.this.stopLockTask();
+            if ( intent.getAction().equals("CELLCOMM_MESSAGE_ALARM") ) {
+                ContactView.this.startLockTaskDelayed();
             }
         }
     };
@@ -444,14 +440,12 @@ public class ContactView extends AppCompatActivity {
         final String TAG = "BatteryReceiver.onReceive";
     };
 
-
     private final PhoneStateListener phoneListener = new  PhoneStateListener(){
         public void onSignalStrengthsChanged (SignalStrength signalStrength) {
             setSignalLevel(signalStrength.getLevel());
             super.onSignalStrengthsChanged(signalStrength);
             Log.d(TAG, String.valueOf(signalStrength.getLevel()));
         }
-
         final String TAG = "PhoneStateListener.onSignalStrengthsChanged";
     };
 
@@ -464,10 +458,10 @@ public class ContactView extends AppCompatActivity {
     private final static int REQUEST_CODE_ASK_PERMISSIONS = 1;
     private final String TAG = "ContactView";
 
-    boolean isLocked = true, isAdmin = true;
+    boolean isLocked = true, _isAdmin = true;
 
     DevicePolicyManager _dpm = null;
     ComponentName _adminName = null;
-    TelephonyManager _phone = null;
+    TelephonyManager _phone  = null;
     // endregion
 }
