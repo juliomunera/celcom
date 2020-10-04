@@ -12,9 +12,7 @@
         android:theme="@style/AppTheme"
         android:testOnly="false">
         <!-- Start Activities -->
-        <activity android:name=".views.CallView"
-            android:lockTaskMode="if_whitelisted"/>
-        <activity android:name=".views.ContactView">
+x        <activity android:name=".views.ContactView">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.HOME" />
@@ -41,6 +39,7 @@
                 <data android:scheme="mmsto" />
             </intent-filter>
         </activity>
+
         <!-- End Activities -->
         <!-- Start BroadcastReceivers -->
         <receiver
