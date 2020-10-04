@@ -20,7 +20,7 @@ public class Constants {
             "\\u00f1\\u00d1\\s0-9.*_-]{1,25})$");
 
     public static final Pattern MSISDN1_PATTERN = compile("^573[0-9]{9}$");
-    public static final Pattern MSISDN2_PATTERN = compile("^034[0-9]{7}$");
+    public static final Pattern MSISDN2_PATTERN = compile("^03[0-9]{8}$");
     public static final Pattern MSISDN3_PATTERN = compile("^3[0-9]{9}$");
 
     public static final Pattern PLACEID_PATTERN = compile("^[0-9]{6}$");
