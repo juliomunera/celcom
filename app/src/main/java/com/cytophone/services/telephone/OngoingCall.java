@@ -4,8 +4,13 @@ import io.reactivex.subjects.BehaviorSubject;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.NotNull;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.telecom.Call;
 import android.util.Log;
+
+import com.cytophone.services.CellCommApp;
+import com.cytophone.services.utilities.Utils;
 
 public class OngoingCall {
     static {
@@ -63,6 +68,14 @@ public class OngoingCall {
             Log.d("OngoingCall.reject", "");
             _call.reject(false,"ds");
         }
+    }
+
+    public final void dial(String phoneNumber){
+        Uri uri = Uri.parse("tel:" + phoneNumber);
+
+        CellCommApp.getInstanceApp().getApplicationContext().startActivity (
+                new Intent("android.intent.action.CALL"
+                , uri));
     }
 
     @NotNull private static BehaviorSubject<Integer> _state;

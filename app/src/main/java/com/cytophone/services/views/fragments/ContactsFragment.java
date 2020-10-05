@@ -1,8 +1,9 @@
 package com.cytophone.services.views.fragments;
 
 import com.cytophone.services.views.adapters.ContactAdapter;
-import com.cytophone.services.utilities.ItemSelectListener;
 import com.cytophone.services.views.ContactView;
+
+import com.cytophone.services.utilities.ItemSelectListener;
 import com.cytophone.services.CellCommApp;
 import com.cytophone.services.entities.*;
 import com.cytophone.services.R;
@@ -11,15 +12,17 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import android.widget.EditText;
-import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
+
 
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.view.KeyEvent;
 import android.view.View;
+
+import android.widget.EditText;
+import android.widget.TextView;
 
 import android.text.TextWatcher;
 import android.text.Editable;
@@ -42,8 +45,7 @@ public class ContactsFragment extends Fragment implements IFragment {
         this._adapter.setListener(new ItemSelectListener<PartyEntity>() {
             @Override
             public void onSelect(PartyEntity item) {
-                ((ContactView)ContactsFragment.this.getActivity()).
-                        makeCall(item.getCodedNumber());
+                ((ContactView)ContactsFragment.this.getActivity()).dial(item.getCodedNumber());
             }
         });
         rvw.setAdapter(this._adapter);
@@ -127,6 +129,7 @@ public class ContactsFragment extends Fragment implements IFragment {
 
     // region fields declarations
     final String TAG = "ContactsFragment";
+
     List<PartyEntity> _parties;
     ContactAdapter _adapter;
     // endregion

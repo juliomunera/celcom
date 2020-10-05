@@ -1,6 +1,9 @@
 package com.cytophone.services.views;
 
+import com.cytophone.services.CellCommApp;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+
+import com.cytophone.services.telephone.OngoingCall;
 
 import com.cytophone.services.DeviceAdministrator;
 import com.cytophone.services.utilities.Constants;
@@ -33,6 +36,7 @@ import android.content.IntentFilter;
 import android.content.Context;
 import android.content.Intent;
 
+import android.net.Uri;
 import android.provider.Telephony;
 import android.provider.Settings;
 
@@ -48,7 +52,6 @@ import android.os.UserManager;
 import android.os.Handler;
 import android.os.Bundle;
 import android.os.Build;
-import android.net.Uri;
 
 import android.widget.Toast;
 
@@ -222,12 +225,12 @@ public class ContactView extends AppCompatActivity {
         }
     }
 
-    public void makeCall(String codedNumber) {
+    public void dial(String codedNumber) {
         if (PermissionChecker.checkSelfPermission(this,
                 "android.permission.CALL_PHONE") == 0) {
             String number = Utils.decodeBase64(codedNumber);
             Uri uri = Uri.parse("tel:" + number);
-            this.startActivity(new Intent("android.intent.action.CALL", uri));
+            this.startActivity (new Intent("android.intent.action.CALL", uri));
         } else {
             ActivityCompat.requestPermissions( (Activity)this
                     , new String[]{"android.permission.CALL_PHONE"}
