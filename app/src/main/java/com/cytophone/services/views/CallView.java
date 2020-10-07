@@ -58,8 +58,8 @@ public class CallView extends AppCompatActivity {
         Function1<Integer, Unit> updateUI = new Function1<Integer, Unit>() {
             @Override
             public Unit invoke(Integer state) {
-               if( null == CallView.this._party &&
-                   OngoingCall.isCallActive() ) { // End call
+                // && OngoingCall.isCallActive()
+                if( null == CallView.this._party ) { // End call
                     OngoingCall.INSTANCE.reject();
                     OngoingCall.INSTANCE.hangup();
                 } else {  // Accept call and show caller info
