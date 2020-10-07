@@ -4,13 +4,8 @@ import io.reactivex.subjects.BehaviorSubject;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.NotNull;
 
-import android.content.Intent;
-import android.net.Uri;
 import android.telecom.Call;
 import android.util.Log;
-
-import com.cytophone.services.CellCommApp;
-import com.cytophone.services.utilities.Utils;
 
 public class OngoingCall {
     static {
@@ -24,6 +19,7 @@ public class OngoingCall {
         };
         _state = BehaviorSubject.create();
         INSTANCE = new OngoingCall();
+        _callActive = false;
     }
 
     @NotNull
@@ -70,16 +66,17 @@ public class OngoingCall {
         }
     }
 
-    public final void dial(String phoneNumber){
-        Uri uri = Uri.parse("tel:" + phoneNumber);
+    public static boolean isCallActive() {
+        return _callActive;
+    }
 
-        CellCommApp.getInstanceApp().getApplicationContext().startActivity (
-                new Intent("android.intent.action.CALL"
-                , uri));
+    public static void setCallActive(boolean value) {
+        _callActive = value;
     }
 
     @NotNull private static BehaviorSubject<Integer> _state;
     private static Call.Callback _callback;
     @Nullable private static Call _call;
     public static OngoingCall INSTANCE;
+    public static boolean _callActive;
 }

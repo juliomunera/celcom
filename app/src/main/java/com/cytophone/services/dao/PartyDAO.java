@@ -34,7 +34,7 @@ public abstract class PartyDAO implements IDAO {
     @Transaction()
     public int delete(PartyEntity party, EventEntity event) {
         add(event);
-        return delete(party.getNumber(), party.getRoleID());
+        return delete(party.getCodedNumber(), party.getRoleID());
     }
     //endregion
 

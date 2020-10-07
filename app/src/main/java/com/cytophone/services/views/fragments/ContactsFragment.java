@@ -1,5 +1,6 @@
 package com.cytophone.services.views.fragments;
 
+import com.cytophone.services.utilities.Utils;
 import com.cytophone.services.views.adapters.ContactAdapter;
 import com.cytophone.services.views.ContactView;
 
@@ -122,7 +123,7 @@ public class ContactsFragment extends Fragment implements IFragment {
     private void remove(SMSEntity message) throws Exception {
         PartyEntity party = message.getPartyObject();
         this._parties.removeIf(p -> {
-            return p.getNumber().equals(party.getNumber());
+            return p.getCodedNumber().equals(party.getCodedNumber());
         });
     }
     // endregion
