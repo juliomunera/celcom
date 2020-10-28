@@ -1,9 +1,8 @@
 package com.cytophone.services.telephone;
 
-import com.cytophone.services.CleanerCallLog;
 import com.cytophone.services.entities.PartyEntity;
-import com.cytophone.services.LockerDevice;
 import com.cytophone.services.utilities.Utils;
+import com.cytophone.services.CleanerCallLog;
 import com.cytophone.services.views.CallView;
 import com.cytophone.services.CellCommApp;
 
@@ -28,11 +27,16 @@ public final class CallService extends InCallService {
             String number = call.getDetails().getHandle().getSchemeSpecificPart();
             PartyEntity party = CellCommApp.getPartyHandlerDB().searchSuscriber(number);
 
-            OngoingCall.INSTANCE.setCall(call);
+            if (null == party  || getCalls().size() > 1 ) {
+                call.reject(false, "");
+                call.disconnect();
+            } else {
+                OngoingCall.INSTANCE.setCall(call);
+                CallView.start((Context) this, call, party);
+            }
+        } finally {
             this.schedulerDeleteCallLog(30);
-
-            CallView.start((Context) this, call, party);
-        } finally {}
+        }
     }
 
     @Override
@@ -41,9 +45,12 @@ public final class CallService extends InCallService {
         Log.d(this.TAG + ".OnCallRemoved", "call details: " + call.getDetails());
 
         try {
+            if( OngoingCall.INSTANCE.getCall().equals(call) ) {
+                OngoingCall.INSTANCE.setCall(null);
+            }
+        } finally {
             this.schedulerDeleteCallLog(10);
-            OngoingCall.INSTANCE.setCall(null);
-        }finally {}
+        }
     }
 
     @Override

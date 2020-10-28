@@ -1,6 +1,5 @@
 package com.cytophone.services;
 
-
 import androidx.annotation.Nullable;
 import android.content.Intent;
 import android.app.Service;

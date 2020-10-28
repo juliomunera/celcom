@@ -19,7 +19,6 @@ public class OngoingCall {
         };
         _state = BehaviorSubject.create();
         INSTANCE = new OngoingCall();
-        _callActive = false;
     }
 
     @NotNull
@@ -62,21 +61,12 @@ public class OngoingCall {
     public final void reject() {
         if (null != _call) {
             Log.d("OngoingCall.reject", "");
-            _call.reject(false,"ds");
+            _call.reject(false,"");
         }
-    }
-
-    public static boolean isCallActive() {
-        return _callActive;
-    }
-
-    public static void setCallActive(boolean value) {
-        _callActive = value;
     }
 
     @NotNull private static BehaviorSubject<Integer> _state;
     private static Call.Callback _callback;
     @Nullable private static Call _call;
     public static OngoingCall INSTANCE;
-    public static boolean _callActive;
 }

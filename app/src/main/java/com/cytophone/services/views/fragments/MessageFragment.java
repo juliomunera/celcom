@@ -26,17 +26,20 @@ public class MessageFragment extends Fragment implements IFragment {
                              ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_message, container, false);
-        RecyclerView rvw = (RecyclerView) view.findViewById(R.id.recyclerMessages);
 
-        this._messages = CellCommApp.getInstanceDB().eventDAO().get20LastMessages();
-        this._adapter = new MessageAdapter(this._messages);
+        if (container != null) {
+            if (container.getContext() != null) {
+                RecyclerView rvw = (RecyclerView) view.findViewById(R.id.recyclerMessages);
+                this._messages = CellCommApp.getInstanceDB().eventDAO().get20LastMessages();
+                this._adapter = new MessageAdapter(this._messages);
 
-        rvw.setAdapter(this._adapter);
-        rvw.setLayoutManager(new LinearLayoutManager(container.getContext()));
-        rvw.addItemDecoration(new DividerItemDecoration(container.getContext(),
-                DividerItemDecoration.VERTICAL));
-        rvw.setItemAnimator(new DefaultItemAnimator());
-
+                rvw.setAdapter(this._adapter);
+                rvw.setLayoutManager(new LinearLayoutManager(container.getContext()));
+                rvw.addItemDecoration(new DividerItemDecoration(container.getContext(),
+                        DividerItemDecoration.VERTICAL));
+                rvw.setItemAnimator(new DefaultItemAnimator());
+            }
+        }
         return view;
     }
 

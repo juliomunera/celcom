@@ -6,9 +6,6 @@ import com.cytophone.services.entities.PartyEntity;
 import com.cytophone.services.R;
 
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.subjects.BehaviorSubject;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.rxkotlin.DisposableKt;
 import io.reactivex.functions.Consumer;
 
 import org.jetbrains.annotations.NotNull;
@@ -16,13 +13,16 @@ import org.jetbrains.annotations.NotNull;
 import kotlin.collections.CollectionsKt;
 import kotlin.jvm.functions.Function1;
 import kotlin.text.StringsKt;
-import kotlin.Unit;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import android.view.animation.LinearInterpolator;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.content.Context;
@@ -52,44 +52,28 @@ public class CallView extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
-        this.initializeUIControls();
+        this.configAnswerButton();
+        this.configHangUpButton();
 
-        BehaviorSubject states = OngoingCall.INSTANCE.getState();
-        Function1<Integer, Unit> updateUI = new Function1<Integer, Unit>() {
+        this.configAcceptCall();
+        this.configFinishCall();
+    }
+
+    private final void configAcceptCall() {
+        _disposables.add( OngoingCall.INSTANCE.getState().subscribe( new Consumer<Integer>() {
             @Override
-            public Unit invoke(Integer state) {
-                // && OngoingCall.isCallActive()
+            public void accept(Integer value) throws Exception {
                 if( null == CallView.this._party ) { // End call
                     OngoingCall.INSTANCE.reject();
                     OngoingCall.INSTANCE.hangup();
                 } else {  // Accept call and show caller info
-                    CallView.this.updateUI(state);
-                    OngoingCall.setCallActive(true);
+                    updateUI(value);
                 }
-                return null;
             }
-        };
-
-        Disposable subscribers = states.subscribe(new CustomerConsumer(updateUI));
-        DisposableKt.addTo(subscribers, this._disposables);
-
-        subscribers = OngoingCall.INSTANCE.getState().
-            filter(i -> i.equals(Call.STATE_DISCONNECTING) || i.equals(Call.STATE_DISCONNECTED)).
-            delay(1L, TimeUnit.SECONDS).
-            firstElement().
-            subscribe(new Consumer() {
-                @Override
-                public void accept(Object o) throws Exception {
-                    OngoingCall.setCallActive(false);
-                    CallView.this.finish();
-                }
-            });
-        //STATE_DISCONNECTED
-        DisposableKt.addTo(subscribers, this._disposables);
+        }));
     }
 
-    private final void initializeUIControls()
-    {
+    private final void configAnswerButton() {
         ImageView answer = findViewById(R.id.iv_answer);
         answer.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -97,8 +81,24 @@ public class CallView extends AppCompatActivity {
                 OngoingCall.INSTANCE.answer();
             }
         });
+    }
 
-        ImageView hangup = findViewById(R.id.iv_hangout);
+    private final void configFinishCall() {
+        _disposables.add(OngoingCall.INSTANCE.getState()
+                .filter(i -> i.equals(Call.STATE_DISCONNECTING) ||
+                        i.equals(Call.STATE_DISCONNECTED))
+                .delay(1, TimeUnit.SECONDS)
+                .firstElement()
+                .subscribe(new Consumer<Integer>() {
+                    @Override
+                    public void accept(Integer integer) throws Exception {
+                        CallView.this.finish();
+                    }
+                }));
+    }
+
+    private final void configHangUpButton() {
+        ImageView hangup = findViewById(R.id.iv_hangup);
         hangup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -109,9 +109,10 @@ public class CallView extends AppCompatActivity {
 
     // Private and protected methods declaration
     @SuppressLint({"SetTextI18n"})
-    private final void updateUI(int state) {
+    private Consumer<? super Integer> updateUI(Integer state) {
         TextView tvw = (TextView)CallView.this.findViewById(R.id.tv_name);
         tvw.setText(this._party.getName());
+        tvw.setSelected(true);
 
         tvw = (TextView)this.findViewById(R.id.tv_action);
         String text = StringsKt.capitalize(CallStateStringKt.asString(state).toLowerCase());
@@ -119,11 +120,12 @@ public class CallView extends AppCompatActivity {
 
         Boolean flag = state == 2;
         ImageView btn = (ImageView)this.findViewById(R.id.iv_answer);
-        btn.setVisibility( flag ? View.VISIBLE: 8);
+        btn.setVisibility( flag ? View.VISIBLE: View.GONE);
 
         flag = CollectionsKt.listOf(new Integer[] { 1, 2, 4 }).contains(state);
-        btn = (ImageView)this.findViewById(R.id.iv_hangout);
-        btn.setVisibility( flag ? View.VISIBLE: 8);
+        btn = (ImageView)this.findViewById(R.id.iv_hangup);
+        btn.setVisibility( flag ? View.VISIBLE: View.GONE);
+        return null;
     }
 
     protected void onStop() {
@@ -131,17 +133,9 @@ public class CallView extends AppCompatActivity {
         this._disposables.clear();
     }
 
-    private final class CustomerConsumer implements Consumer {
-        public CustomerConsumer(Function1 func) { this._func = func; }
-
-        @Override
-        public void accept(Object o) throws Exception { this._func.invoke(o); }
-        private final Function1 _func;
-    }
-
     public static void start(@NotNull Context context
-                             ,@NotNull Call call
-                             ,PartyEntity party) {
+            ,@NotNull Call call
+            ,PartyEntity party) {
         @SuppressLint("WrongConstant")
         Intent i = new Intent(context, CallView.class).setFlags(268435456);
         i.putExtra("PartyEntity", party);
