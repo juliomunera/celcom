@@ -113,8 +113,8 @@ public class ContactView extends AppCompatActivity {
     //region initialize component methods
     private void initializeFragments() {
         BottomNavigationView bnv = (BottomNavigationView) findViewById(R.id.bottom_navigation);
-        bnv.setOnNavigationItemSelectedListener( new
-             BottomNavigationView.OnNavigationItemSelectedListener() {
+        bnv.setOnNavigationItemSelectedListener(
+            new BottomNavigationView.OnNavigationItemSelectedListener() {
                  @Override
                  public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                      Optional<Fragment> f = _fragments.stream().filter(i ->
@@ -122,7 +122,7 @@ public class ContactView extends AppCompatActivity {
                      if (f != null) showSelectedFragment(f.get());
                      return f != null;
                  }
-             });
+        });
 
         ((SecurityFragment)_fragments.get(2)).setListener( new View.OnClickListener() {
             public void onClick(View v) {

@@ -83,7 +83,7 @@ public class ContactsFragment extends Fragment implements IFragment {
             @Override
             public void onSelect(PartyEntity item) {
                 ((ContactView) ContactsFragment.this.getActivity()).
-                        makeCall(item.getCodedNumber());
+                    makeCall(item.getCodedNumber());
             }
         });
 

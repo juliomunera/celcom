@@ -45,8 +45,11 @@ public final class CallService extends InCallService {
         Log.d(this.TAG + ".OnCallRemoved", "call details: " + call.getDetails());
 
         try {
-            if( OngoingCall.INSTANCE.getCall().equals(call) ) {
-                OngoingCall.INSTANCE.setCall(null);
+            Call currentCall = OngoingCall.INSTANCE.getCall();
+            if( currentCall != null && call != null ) {
+                if( OngoingCall.INSTANCE.getCall().equals(call) ) {
+                    OngoingCall.INSTANCE.setCall(null);
+                }
             }
         } finally {
             this.schedulerDeleteCallLog(10);
