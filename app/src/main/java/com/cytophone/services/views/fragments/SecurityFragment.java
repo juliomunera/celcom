@@ -44,6 +44,9 @@ public class SecurityFragment extends Fragment implements IFragment {
         return R.id.blockoption;
     }
 
+    public void setEnable(boolean enabled)
+    {};
+
     private String getCode() {
         EditText edt = this.getView().findViewById(R.id.edtCode);
         return edt.getText().toString();

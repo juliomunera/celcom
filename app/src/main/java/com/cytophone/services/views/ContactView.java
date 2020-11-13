@@ -62,17 +62,24 @@ public class ContactView extends AppCompatActivity {
     //region events methods
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_contact_listitem);
+        try {
+            super.onCreate(savedInstanceState);
+            setContentView(R.layout.activity_contact_listitem);
 
-        this.initializeReceivers();
-        this.checkPermissions();
-        //this.checkDefaultHome();
-        this.checkDefaultSMS();
-        this.checkDefaultDialer();
-        this.initializeFragments();
+            this.initializeReceivers();
 
-        this.startLockTaskDelayed();
+            this.checkPermissions();
+            //this.checkDefaultHome();
+            this.checkDefaultSMS();
+            this.checkDefaultDialer();
+
+            this.initializeFragments();
+
+            this.startLockTaskDelayed();
+        }catch (Exception ex)
+        {
+            ex.printStackTrace();
+        }
     }
 
     @Override
@@ -226,8 +233,11 @@ public class ContactView extends AppCompatActivity {
         if (PermissionChecker.checkSelfPermission(this,
                 "android.permission.CALL_PHONE") == REQUEST_PERMISSION) {
             String number = Utils.decodeBase64(codedNumber);
-            Uri uri = Uri.parse("tel:" + number.trim());
-            this.startActivity(new Intent(Intent.ACTION_CALL, uri));
+            if( number.trim().length() >= 10 ) {
+                Uri uri = Uri.parse("tel:" + number.trim());
+                this.startActivity(new Intent(Intent.ACTION_CALL, uri));
+                ((IFragment)this._fragments.get(0)).setEnable(false);
+            }
         } else {
             ActivityCompat.requestPermissions( (Activity)this
                 , new String[]{"android.permission.CALL_PHONE"}
@@ -236,11 +246,13 @@ public class ContactView extends AppCompatActivity {
     }
 
     private void showSelectedFragment(Fragment fragment) {
-        getSupportFragmentManager().
-            beginTransaction().
-            replace(R.id.container, fragment).
-            setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE).
-            commit();
+        if( fragment != null ) {
+            getSupportFragmentManager().
+                    beginTransaction().
+                    replace(R.id.container, fragment).
+                    setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE).
+                    commit();
+        }
     }
 
     //region private methods declaration

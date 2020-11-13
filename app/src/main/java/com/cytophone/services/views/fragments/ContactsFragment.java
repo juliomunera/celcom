@@ -38,7 +38,7 @@ public class ContactsFragment extends Fragment implements IFragment {
             , ViewGroup container
             , Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_contacts, container, false);
-        if (container != null) {
+        if (container != null && view != null) {
             if (container.getContext() != null) {
                 initializeAdapter(view, container);
                 initializeSearchControls(view);
@@ -67,6 +67,12 @@ public class ContactsFragment extends Fragment implements IFragment {
     public int getID() {
         return R.id.contactdevice;
     }
+
+    public void setEnable(boolean enabled)
+    {
+        RecyclerView rvw = (RecyclerView) this.getView().findViewById(R.id.recyclerView);
+        rvw.setEnabled(enabled);
+    }
     // endregion
 
 
@@ -78,23 +84,27 @@ public class ContactsFragment extends Fragment implements IFragment {
 
     private void initializeAdapter(View view, ViewGroup container) {
         this._parties = CellCommApp.getInstanceDB().partyDAO().getAllOrderSuscribers();
-        this._adapter = new ContactAdapter(this._parties);
-        this._adapter.setListener(new ItemSelectListener<PartyEntity>() {
-            @Override
-            public void onSelect(PartyEntity item) {
-                ((ContactView) ContactsFragment.this.getActivity()).
-                    makeCall(item.getCodedNumber());
-            }
-        });
+        if( this._parties != null ) {
+            this._adapter = new ContactAdapter(this._parties);
+            if (this._adapter != null) {
+                this._adapter.setListener(new ItemSelectListener<PartyEntity>() {
+                    @Override
+                    public void onSelect(PartyEntity item) {
+                        ((ContactView) ContactsFragment.this.getActivity()).
+                                makeCall(item.getCodedNumber());
+                    }
+                });
 
-        RecyclerView rvw = (RecyclerView) view.findViewById(R.id.recyclerView);
-        rvw.setAdapter(this._adapter);
-        rvw.setLayoutManager(new LinearLayoutManager(container.getContext()
-                , LinearLayoutManager.VERTICAL
-                , false));
-        rvw.addItemDecoration(new DividerItemDecoration(container.getContext()
-                , DividerItemDecoration.VERTICAL));
-        rvw.setItemAnimator(new DefaultItemAnimator());
+                RecyclerView rvw = (RecyclerView) view.findViewById(R.id.recyclerView);
+                rvw.setAdapter(this._adapter);
+                rvw.setLayoutManager(new LinearLayoutManager(container.getContext()
+                        , LinearLayoutManager.VERTICAL
+                        , false));
+                rvw.addItemDecoration(new DividerItemDecoration(container.getContext()
+                        , DividerItemDecoration.VERTICAL));
+                rvw.setItemAnimator(new DefaultItemAnimator());
+            }
+        }
     }
 
     private void initializeSearchControls(View view) {

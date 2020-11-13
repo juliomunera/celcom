@@ -4,7 +4,11 @@ import android.app.admin.DeviceAdminReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.util.Log;
+
+import com.cytophone.services.views.ContactView;
 
 public class DeviceAdministrator extends DeviceAdminReceiver {
     @Override
@@ -16,6 +20,11 @@ public class DeviceAdministrator extends DeviceAdminReceiver {
     @Override
     public void onLockTaskModeExiting(Context context, Intent intent) {
         super.onLockTaskModeExiting(context, intent);
+
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+        context.startActivity(new Intent(context, ContactView.class).
+                setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+
         Log.d(this.TAG + ".onLockTaskModeExiting","");
     }
 

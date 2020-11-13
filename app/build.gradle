@@ -8,7 +8,7 @@ if (keystorePropertiesFile.exists()) {
 
 android {
     compileSdkVersion 29
-    // buildToolsVersion '28.0.1'
+    // buildToolsVersion                          '28.0.1'
 
     lintOptions {
         checkReleaseBuilds false
