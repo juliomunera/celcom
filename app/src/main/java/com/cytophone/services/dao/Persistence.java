@@ -8,7 +8,7 @@ import androidx.room.RoomDatabase;
 import androidx.room.Database;
 import androidx.room.Room;
 
-@Database(entities = {PartyEntity.class, EventEntity.class, UnlockCodeEntity.class}, version = 6)
+@Database(entities = {PartyEntity.class, EventEntity.class, UnlockCodeEntity.class}, version = 7)
 @TypeConverters({DateConverter.class})
 public abstract class Persistence extends RoomDatabase {
     public static Persistence getInstance(Context context) {

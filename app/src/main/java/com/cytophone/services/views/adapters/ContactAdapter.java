@@ -53,7 +53,7 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         holder._number.setText(this._contacts.get(position).getCodedNumber());
-        holder._placeID.setText(this._contacts.get(position).getPlaceID());
+        //holder._placeID.setText(this._contacts.get(position).getPlaceID());
         holder._name.setText(this._contacts.get(position).getName());
     }
 
@@ -98,7 +98,7 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
 
-            _placeID = itemView.findViewById(R.id.rowCountTextView);
+            //_placeID = itemView.findViewById(R.id.rowCountTextView);
             _number = itemView.findViewById(R.id.tv_number);
             _item = itemView.findViewById(R.id.imageView);
             _name = itemView.findViewById(R.id.textView);
@@ -116,7 +116,7 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
             }
         }
 
-        TextView _placeID, _number, _name;
+        TextView  _number, _name; //_placeID
         ImageView _item;
     }
 

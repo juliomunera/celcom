@@ -12,7 +12,8 @@ import java.io.Serializable;
 import java.util.Date;
 
 @Entity(tableName = "Party",
-        primaryKeys = { "number", "placeID", "roleID" }
+        //primaryKeys = { "number", "placeID", "roleID" }
+        primaryKeys = { "number", "roleID" }
         /*,indices = {
         @Index(value = { "id" },
         name = "UX_Party_ID",
@@ -40,10 +41,10 @@ public class PartyEntity implements IEntityBase, Serializable  {
         return this._number;
     }
 
-    @NonNull
+    /*@NonNull
     public String getPlaceID() {
         return this._placeID;
-    }
+    }*/
 
     @NonNull
     public Integer getRoleID() {
@@ -72,9 +73,11 @@ public class PartyEntity implements IEntityBase, Serializable  {
         this._number = number;
     }
 
+    /*
     public void setPlaceID(@NonNull String placeID) {
         this._placeID = placeID;
     }
+    */
 
     public void setRoleID(@NonNull Integer roleID) {
         this._roleID = roleID;
@@ -95,12 +98,12 @@ public class PartyEntity implements IEntityBase, Serializable  {
     }
 
     public PartyEntity(@NonNull String number
-            , @NonNull String placeId
+            //, @NonNull String placeId
             , @NonNull String name
             , @NonNull Integer roleID) {
         this();
 
-        this._placeID = placeId;
+        //this._placeID = placeId;
         this._roleID = roleID;
         this._number = number;
         this._name = name;
@@ -123,9 +126,9 @@ public class PartyEntity implements IEntityBase, Serializable  {
     @Ignore
     private String _number;
 
-    @ColumnInfo(name="placeID")
+    /*@ColumnInfo(name="placeID")
     @NonNull
-    private String _placeID;
+    private String _placeID;*/
 
     @ColumnInfo(name="roleID")
     @NonNull

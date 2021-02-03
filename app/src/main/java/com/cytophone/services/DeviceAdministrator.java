@@ -1,11 +1,13 @@
 package com.cytophone.services;
 
 import android.app.admin.DeviceAdminReceiver;
+import android.preference.PreferenceManager;
+
+import android.content.SharedPreferences;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
+
 import android.util.Log;
 
 import com.cytophone.services.views.ContactView;

@@ -24,9 +24,12 @@ public class SMSEntity implements IEntityBase, Serializable {
 
     private String getActionID() {
         String[] msgParts = this._decodeMessage.split("[|]");
-        if( msgParts.length >= 4 ) {
+        if( msgParts.length >= 3 ) {
             if (isItOkAction(msgParts[0])) return msgParts[0];
         }
+        /*if( msgParts.length >= 4 ) {
+            if (isItOkAction(msgParts[0])) return msgParts[0];
+        }*/
         return "";
     }
 
@@ -80,10 +83,14 @@ public class SMSEntity implements IEntityBase, Serializable {
     }
 
     private boolean isItOkMSIDN(String value) {
+        /*
         Matcher m1 = Constants.MSISDN1_PATTERN.matcher(value);
         Matcher m2 = Constants.MSISDN2_PATTERN.matcher(value);
         Matcher m3 = Constants.MSISDN3_PATTERN.matcher(value);
         return m1.find() || m2.find() || m3.find();
+        */
+        Matcher m = Constants.MSISDN_PATTERN.matcher(value);
+        return m.find();
     }
 
     private boolean isItOkPartyName(String value) {
@@ -103,11 +110,16 @@ public class SMSEntity implements IEntityBase, Serializable {
 
     private boolean isItOkPartyMgmtMsg(String[] messageParts)
     {
-        return 4 == messageParts.length &
+        return 3 == messageParts.length &
+                isItOkAction(messageParts[0]) &
+                isItOkMSIDN(messageParts[1]) &
+                isItOkPartyName(messageParts[2]);
+
+        /*return 4 == messageParts.length &
                 isItOkAction(messageParts[0]) &
                 isItOkPlaceID(messageParts[1]) &
                 isItOkMSIDN(messageParts[2]) &
-                isItOkPartyName(messageParts[3]);
+                isItOkPartyName(messageParts[3]);*/
     }
 
     private boolean isItOkUnlockMsg(String[] messageParts) {
@@ -136,7 +148,9 @@ public class SMSEntity implements IEntityBase, Serializable {
         if( !isItOkPartyMgmtMsg(msgParts) ) {
             throw new Exception("El mensaje para el registro de un suscriptor/autorizador no es válido.");
         }
-        return new PartyEntity(msgParts[2], msgParts[1], msgParts[3], this.getRole());
+
+        //return new PartyEntity(msgParts[2], msgParts[1], msgParts[3], this.getRole());
+        return new PartyEntity(msgParts[2], msgParts[1], this.getRole());
     }
 
     public EventEntity getEventObject() throws Exception {
