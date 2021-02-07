@@ -2,7 +2,10 @@
     <string name="app_name">Celcom</string>
     <string name="message_label">Mensajes</string>
     <string name="title_activity_view_list_messages"> </string>
+
     <string name="accept_button">Aceptar</string>
+
+
 
     <string name="buttonUnlock">Unlock Button </string>
     <string name="buttonRecentCalls">Recent Calls Button</string>
@@ -22,13 +25,23 @@
 
     <string name="codeLabel">Ingrese el código de desbloqueo</string>
     <string name="mobileLabel">Ingrese un número móvil autorizado</string>
+
     <string name="acceptButton">Desbloquear</string>
     <string name="cancelButton">Bloquear</string>
+
+    <string name="registrationTextLabel">
+     Para usar la aplicación deberá solicitar el código de activación, el cual será notificado
+     via SMS. Una  vez  este  haya  sido reportado podrá comenzar a usarla para lo cual deberá
+     presionar el botón [Activar].
+    </string>
+    <string name="requestRegistrationButton">Solicitar activación</string>
+    <string name="enableAppButton">Activar</string>
 
     <string name="suscriberinsert">Ingreso residente</string>
     <string name="suscriberdelete">Eliminación residente</string>
     <string name="authorizatorinsert">Ingreso autorizador</string>
     <string name="authorizatordelete">Eliminación autorizador</string>
+
     <string name="unlock">Desbloqueo</string>
     <string name="search">Buscar</string>
 
