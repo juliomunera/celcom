@@ -5,9 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/primaryColor"
-    >
-
+    android:background="@color/primaryColor">
     <ImageView
         android:id="@+id/myImageView"
         android:layout_width="48sp"
@@ -22,7 +20,6 @@
         app:layout_constraintVertical_bias="0.0"
         app:srcCompat="@drawable/ic_person"
         tools:ignore="VectorDrawableCompat" />
-
     <TextView
         android:id="@+id/myText1"
         android:layout_width="0dp"
@@ -40,7 +37,6 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toEndOf="@+id/myImageView"
         app:layout_constraintTop_toTopOf="parent" />
-
     <TextView
         android:id="@+id/myText2"
         android:layout_width="0dp"

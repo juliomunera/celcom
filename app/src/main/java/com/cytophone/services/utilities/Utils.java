@@ -87,6 +87,19 @@ public class Utils {
         return s1;
     }
 
+    public static String convertStringToHex(String value) {
+        final char[] HEX_CHARS = "0123456789abcdef".toCharArray();
+        byte[] buffer =  value.getBytes();
+
+        char[] chars = new char[2 * buffer.length];
+        for (int i = 0; i < buffer.length; ++i)
+        {
+            chars[2 * i] = HEX_CHARS[(buffer[i] & 0xF0) >>> 4];
+            chars[2 * i + 1] = HEX_CHARS[buffer[i] & 0x0F];
+        }
+        return new String(chars);
+    }
+
     public static Date getCurrentTime(String timeZoneId) {
         Calendar calTZ = new GregorianCalendar(TimeZone.getTimeZone(timeZoneId));
         calTZ.setTimeInMillis(new Date().getTime());

@@ -5,8 +5,6 @@
 
     <string name="accept_button">Aceptar</string>
 
-
-
     <string name="buttonUnlock">Unlock Button </string>
     <string name="buttonRecentCalls">Recent Calls Button</string>
     <string name="buttonDialPad">Dial Pad Button</string>
@@ -18,6 +16,7 @@
     <string name="percentLevelPart2">0</string>
     <string name="percentLevelPart3">0</string>
     <string name="percent">%</string>
+
     <string name="title_activity_main_bottom">MainActivityBottom</string>
     <string name="title_home">Home</string>
     <string name="title_dashboard">Dashboard</string>
@@ -29,13 +28,9 @@
     <string name="acceptButton">Desbloquear</string>
     <string name="cancelButton">Bloquear</string>
 
-    <string name="registrationTextLabel">
-     Para usar la aplicación deberá solicitar el código de activación, el cual será notificado
-     via SMS. Una  vez  este  haya  sido reportado podrá comenzar a usarla para lo cual deberá
-     presionar el botón [Activar].
-    </string>
-    <string name="requestRegistrationButton">Solicitar activación</string>
-    <string name="enableAppButton">Activar</string>
+    <string name="activationLabel">Para el funcionamiento de la aplicación debe solicitar un código de activación. Después de ingresar el número móvil autorizado, presione el botón [Enviar Solicitud] y espere a que la aplicación  reciba y procese el mensaje para su activación.</string>
+
+    <string name="requestActivationButton">Enviar Solicitud</string>
 
     <string name="suscriberinsert">Ingreso residente</string>
     <string name="suscriberdelete">Eliminación residente</string>
@@ -45,10 +40,9 @@
     <string name="unlock">Desbloqueo</string>
     <string name="search">Buscar</string>
 
-    <string name="cancelCaption">Cancelar</string>
+    <string name="cancelLabel"><u>Cancelar</u></string>
 
     <!-- Hamilton -->
     <string name="deviceOwner">Eres el administrador</string>
     <string name="notDeviceOwner">No eres el propietario</string>
-
 </resources>

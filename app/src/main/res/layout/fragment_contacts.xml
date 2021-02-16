@@ -4,30 +4,38 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".views.fragments.ContactsFragment">
-    <TableRow android:weightSum="2.0">
-        <EditText android:id="@+id/edtSearchBox"
+    <TableRow android:id="@+id/trContainer"
+        android:layout_marginLeft="2dp"
+        android:layout_marginTop="3dp"
+        android:layout_marginRight="2dp"
+        android:layout_marginBottom="3dp"
+        android:weightSum="100">
+        <EditText
+            android:id="@+id/edtSearchBox"
             style="@style/SearchControls"
-            android:imeOptions="actionSearch"
-            android:background="@drawable/round_corner_style"
-            android:imeActionLabel="@string/search"
-            android:maxLength="30"
-            android:inputType="text"
-            android:textSize="17sp"
-            android:hint="@string/search"
+            android:layout_weight="90"
+            android:layout_marginLeft="2dp"
+            android:layout_marginTop="3dp"
+            android:layout_marginRight="2dp"
+            android:layout_marginBottom="3dp"
             android:autofillHints=""
+            android:background="@drawable/round_corner_style"
+            android:hint="@string/search"
+            android:imeActionLabel="@string/search"
+            android:imeOptions="actionSearch"
+            android:inputType="text"
+            android:maxLength="30"
+            android:textSize="17sp" />
+        <TextView
+            android:id="@+id/tvwCancel"
+            android:layout_weight="10"
             android:layout_marginLeft="2dp"
             android:layout_marginTop="3dp"
             android:layout_marginRight="2dp"
             android:layout_marginBottom="3dp"
-            android:layout_weight="2.0"/>
-        <TextView android:id="@+id/tvwCancel"
-            android:layout_marginLeft="2dp"
-            android:layout_marginTop="3dp"
-            android:layout_marginRight="2dp"
-            android:layout_marginBottom="3dp"
-            android:text="@string/cancelCaption"
-            android:textAllCaps="false"
             android:gravity="center"
+            android:text="@string/cancelLabel"
+            android:textAllCaps="false"
             android:textColor="@color/primaryButton"
             android:textSize="17sp" />
     </TableRow>
@@ -36,9 +44,7 @@
             android:id="@+id/recyclerView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="2.0"
-            android:layout_span="2"
-            android:paddingBottom="40dp"
-            android:layout_below="@id/edtSearchBox" />
+            android:layout_weight="100"
+            android:paddingBottom="40dp" />
     </TableRow>
 </TableLayout >

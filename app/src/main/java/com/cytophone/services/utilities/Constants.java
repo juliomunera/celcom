@@ -28,7 +28,7 @@ public class Constants {
     */
     public static final Pattern PLACEID_PATTERN = compile("^[0-9]{6}$");
 
-    public static final Pattern ACTION_PATTERN = compile("^[1|3|4|6|7]$");
+    public static final Pattern ACTION_PATTERN = compile("^[1|3|4|6|7|8|9|10]$");
     public static final Pattern CODE_PATTERN = compile("^[0-9]{4}$");
 
     public static final String TIME_STAMP_FORMAT = "yyyy-MM-dd HH:mm:ss";

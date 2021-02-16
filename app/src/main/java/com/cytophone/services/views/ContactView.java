@@ -1,5 +1,7 @@
 package com.cytophone.services.views;
 
+import com.cytophone.services.CellCommApp;
+import com.cytophone.services.entities.CodeEntity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import com.cytophone.services.DeviceAdministrator;
@@ -113,6 +115,7 @@ public class ContactView extends AppCompatActivity {
 
         //this.offerReplacingDefaultHome();
         //this.offerReplacingDefaultSMS();
+
         this.offerReplacingDefaultDialer();
     }
     //endregion
@@ -124,22 +127,27 @@ public class ContactView extends AppCompatActivity {
             new BottomNavigationView.OnNavigationItemSelectedListener() {
                  @Override
                  public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                     Optional<Fragment> f = _fragments.stream().filter(i ->
+                     Optional<Fragment> of = _fragments.stream().filter(i ->
                              ((IFragment) i).getID() == item.getItemId()).findFirst();
-                     if (f != null) showSelectedFragment(f.get());
-                     return f != null;
-                 }
+                     if (of != null) {
+                         if( ((IFragment)of.get()).getID() == R.id.contactdevice) {
+                            showSelectedFragment(getPrincipalFragment());
+                         } else {
+                             showSelectedFragment(of.get());
+                         }
+                     }
+                     return of != null;
+                }
         });
 
         ((SecurityFragment)_fragments.get(2)).setListener( new View.OnClickListener() {
-            public void onClick(View v) {
-                ContactView.this.stopLockTask();
-            }
+            public void onClick(View v) { ContactView.this.stopLockTask(); }
         });
-        this.showSelectedFragment(_fragments.get(0));
+
+        this.showSelectedFragment( getPrincipalFragment() );
     }
 
-    public  void initializePolices(){
+    public  void initializePolices() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.FROYO) return;
 
         int owner = R.string.deviceOwner;
@@ -199,6 +207,7 @@ public class ContactView extends AppCompatActivity {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return;
 
         final TelecomManager tm = this.getSystemService(TelecomManager.class);
+
         if (this.getPackageName().equals(tm.getDefaultDialerPackage())) {
             final Intent i = new Intent("android.telecom.action.CHANGE_DEFAULT_DIALER").
                 putExtra("android.telecom.extra.CHANGE_DEFAULT_DIALER_PACKAGE_NAME",
@@ -211,6 +220,7 @@ public class ContactView extends AppCompatActivity {
         Intent i = new Intent(Intent.ACTION_MAIN);
         i.addCategory(Intent.CATEGORY_HOME);
         final ResolveInfo ri = getPackageManager().resolveActivity(i, 0);
+
         if ((ri.activityInfo != null && getPackageName().equals(ri.activityInfo.packageName))) {
             i = new Intent("android.provider.Settings.ACTION_HOME_SETTINGS").
                 putExtra("android.Telephony.Sms.Intents.EXTRA_PACKAGE_NAME",
@@ -245,18 +255,19 @@ public class ContactView extends AppCompatActivity {
         }
     }
 
-    private void showSelectedFragment(Fragment fragment) {
-        if( fragment != null ) {
-            getSupportFragmentManager().
-                    beginTransaction().
-                    replace(R.id.container, fragment).
-                    setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE).
-                    commit();
+    //region private methods declaration
+    private Fragment getPrincipalFragment() {
+        try {
+            CodeEntity code = CellCommApp.getInstanceDB().codeDAO().getActivationCode();
+            if ( code == null ) return new ActivationFragment();
+            else return _fragments.get(0);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return _fragments.get(0);
         }
     }
 
-    //region private methods declaration
-    protected void checkPermissions() {
+    private void checkPermissions() {
         final List<String> missingPermissions  = new ArrayList<String>();
 
         // Check all required dynamic permissions.
@@ -319,8 +330,9 @@ public class ContactView extends AppCompatActivity {
                 , i
                 , new ComponentName(getPackageName(), ContactView.class.getName()) );
         } else {
-            ContactView.this._dpm.clearPackagePersistentPreferredActivities (
-                    ContactView.this._adminName, getPackageName() );
+            ContactView.this._dpm.clearPackagePersistentPreferredActivities(
+                    ContactView.this._adminName
+                    , getPackageName());
         }
     }
 
@@ -389,6 +401,16 @@ public class ContactView extends AppCompatActivity {
         else this._dpm.clearUserRestriction(this._adminName,restriction);
     }
 
+    private void showSelectedFragment(Fragment fragment) {
+        if( fragment != null ) {
+            getSupportFragmentManager().
+                    beginTransaction().
+                    replace(R.id.container, fragment).
+                    setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE).
+                    commit();
+        }
+    }
+
     private void startLockTaskDelayed () {
         final Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
@@ -428,7 +450,7 @@ public class ContactView extends AppCompatActivity {
     private BroadcastReceiver _alarmreceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if ( intent.getAction().equals("CELLCOMM_MESSAGE_ALARM") ) {
+            if (intent.getAction().equals("CELLCOMM_MESSAGE_ALARM")) {
                 ContactView.this.startLockTaskDelayed();
             }
         }
@@ -461,15 +483,15 @@ public class ContactView extends AppCompatActivity {
         final String TAG = "PhoneStateListener.onSignalStrengthsChanged";
     };
 
-
     //Permissions that need to be explicitly requested from end user.
-    List<Fragment> _fragments = Arrays.asList( new Fragment[] {
-        new ContactsFragment(), new MessageFragment(), new SecurityFragment() });
+    List<Fragment> _fragments = Arrays.asList( new Fragment[]{new ContactsFragment()
+            , new MessageFragment()
+            , new SecurityFragment()
+    });
 
     // Permissions request code.
     private final static int REQUEST_CODE_ASK_PERMISSIONS = 1;
     private final static int REQUEST_PERMISSION = 0;
-
     private final String TAG = "ContactView";
 
     boolean isLocked = true, _isAdmin = true;

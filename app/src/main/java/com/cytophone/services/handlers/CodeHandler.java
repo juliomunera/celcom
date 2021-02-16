@@ -9,14 +9,14 @@ import android.util.Log;
 
 import java.util.Date;
 
-public class UnlockCodeHandler implements IHandler {
-    public UnlockCodeHandler(Persistence db) {
-        this._unlockCodeDAO = db.unlockCodeDAO();
+public class CodeHandler implements IHandler {
+    public CodeHandler(Persistence db) {
+        this._codeDAO = db.codeDAO();
     }
 
-    private UnlockCodeEntity createUnlockCode(SMSEntity message) {
+    private CodeEntity createUnlockCode(SMSEntity message) {
         try {
-            UnlockCodeEntity unLockCode = message.getUnlockCodeObject();
+            CodeEntity unLockCode = message.getCodeObject();
             unLockCode.setMsisdn(Utils.encodeBase64(unLockCode.getMsisdn()));
             return unLockCode;
         } catch (Exception e) {
@@ -26,15 +26,15 @@ public class UnlockCodeHandler implements IHandler {
     }
 
     private static class insertUnlockCodeAsyncTask extends AsyncTask<IEntityBase, Void, Void> {
-        insertUnlockCodeAsyncTask(UnlockCodeDAO DAO) {
-            this._unlockCodeDAO = DAO;
+        insertUnlockCodeAsyncTask(CodeDAO DAO) {
+            this._codeDAO = DAO;
         }
 
         @Override
         protected Void doInBackground(final IEntityBase... entities) {
             try {
             //if(null != unlockCodeDAO.getPartByNumberAndRole(message[0].getSourceNumber())) {
-                this._unlockCodeDAO.add((UnlockCodeEntity) entities[0]
+                this._codeDAO.add((CodeEntity) entities[0]
                         ,(EventEntity) entities[1]);
             //}
             } catch (Exception e) {
@@ -44,18 +44,18 @@ public class UnlockCodeHandler implements IHandler {
         }
 
         final String TAG = "insertUnlockCodeAsyncTask";
-        UnlockCodeDAO _unlockCodeDAO;
+        CodeDAO _codeDAO;
     }
 
     public void insertUnlockCode(SMSEntity message) {
         try {
-            UnlockCodeEntity unLockCode = createUnlockCode(message);
+            CodeEntity unLockCode = createUnlockCode(message);
             if (null != unLockCode) {
                 EventEntity event = message.getEventObject(); // unLockCode.getMsisdn()
                 event.setAPartyNumber(Utils.encodeBase64(event.getAPartyNumber()));
                 event.setBPartyNumber(Utils.encodeBase64(event.getBPartyNumber()));
 
-                new insertUnlockCodeAsyncTask(this._unlockCodeDAO).execute(unLockCode, event);
+                new insertUnlockCodeAsyncTask(this._codeDAO).execute(unLockCode, event);
             }
         } catch (Exception e) {
             Log.e( this.TAG + ".insertUnlockCode","error: " + e.getMessage());
@@ -64,6 +64,6 @@ public class UnlockCodeHandler implements IHandler {
 
     //region fields declaration
     final String TAG = "UnlockCodeHandler";
-    UnlockCodeDAO _unlockCodeDAO;
+    CodeDAO _codeDAO;
     //endregion
 }

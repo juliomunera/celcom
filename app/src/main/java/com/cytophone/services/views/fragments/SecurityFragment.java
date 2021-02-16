@@ -1,11 +1,11 @@
 package com.cytophone.services.views.fragments;
 
+import com.cytophone.services.utilities.Utils;
 import com.cytophone.services.CleanerCallLog;
 import com.cytophone.services.LockerDevice;
 import com.cytophone.services.CellCommApp;
 import com.cytophone.services.entities.*;
 import com.cytophone.services.R;
-import com.cytophone.services.utilities.Utils;
 
 import androidx.fragment.app.Fragment;
 
@@ -52,17 +52,22 @@ public class SecurityFragment extends Fragment implements IFragment {
         return edt.getText().toString();
     }
 
-    private UnlockCodeEntity searchCode(String number) {
-        UnlockCodeEntity entity = CellCommApp.getInstanceDB().unlockCodeDAO().
-                getUnLockCodeByCode(number);
-        return entity != null ? entity : null;
+    private CodeEntity searchCode(String number) {
+        try {
+            CodeEntity entity = CellCommApp.getInstanceDB().codeDAO().
+                    getLastUnLockCodeByCodeNumber(number);
+            return entity != null ? entity : null;
+        } catch(Exception ex) {
+            ex.printStackTrace();
+            return null;
+        }
     }
 
     public void setListener(View.OnClickListener listener) {
         this._listener = listener;
     }
 
-    private void sendMessage(UnlockCodeEntity entity) {
+    private void sendMessage(CodeEntity entity) {
         Intent i = new Intent("CELLCOMM_MESSAGE_UNLOCK");
         i.putExtra( "data", entity );
         this.getView().getContext().sendBroadcast(i);
@@ -77,7 +82,7 @@ public class SecurityFragment extends Fragment implements IFragment {
         Date start = Utils.getCurrentTime("EST");
         Date end = Utils.addSeconds( start,seconds);
 
-        CleanerCallLog cleaner = new CleanerCallLog(getContext()
+        CleanerCallLog cleaner = new CleanerCallLog(this.getContext()
                 , (int) (end.getTime() - start.getTime()) / 1000);
     }
 
@@ -89,7 +94,7 @@ public class SecurityFragment extends Fragment implements IFragment {
 
             if (number.length() == 1) return;
 
-            UnlockCodeEntity entity = searchCode(number);
+            CodeEntity entity = searchCode(number);
             if (entity != null) {
                 if (entity.getEndDate().after(new Date(System.currentTimeMillis()))) {
                     SecurityFragment.this.schedulerLockDevice(entity.getCreatedDate(),
@@ -99,7 +104,6 @@ public class SecurityFragment extends Fragment implements IFragment {
                     msg = "Desbloqueo activado.";
                 }
             }
-
             Toast.makeText(SecurityFragment.this.getContext(), msg, Toast.LENGTH_SHORT).show();
         }
     };

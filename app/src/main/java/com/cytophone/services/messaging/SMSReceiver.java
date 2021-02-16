@@ -77,7 +77,7 @@ public class SMSReceiver extends BroadcastReceiver {
                 return  type.toLowerCase().equals( "authorizator" ) ||
                         type.toLowerCase().equals( "suscriber")
                         ? app.getPartyHandlerDB()
-                        : app.getUnlockHandlerDB();
+                        : app.getCodeHandlerDB();
             } catch (Exception e) {
                 Log.e(this.TAG + ".getHandler", "error: " + e.getMessage());
                 return null;

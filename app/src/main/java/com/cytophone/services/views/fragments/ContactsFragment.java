@@ -13,7 +13,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -75,7 +77,6 @@ public class ContactsFragment extends Fragment implements IFragment {
     }
     // endregion
 
-
     // region public methods
     private void add(SMSEntity message) throws Exception {
         this.remove(message);
@@ -129,6 +130,7 @@ public class ContactsFragment extends Fragment implements IFragment {
             @Override
             public void afterTextChanged(Editable s) {}
         });
+
 
         TextView tvw = (TextView) view.findViewById(R.id.tvwCancel);
         tvw.setOnClickListener(new View.OnClickListener() {

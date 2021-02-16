@@ -1,7 +1,10 @@
 package com.cytophone.services;
 
 import com.cytophone.services.dao.Persistence;
+import com.cytophone.services.entities.CodeEntity;
 import com.cytophone.services.handlers.*;
+import com.cytophone.services.views.ContactView;
+
 import android.app.Application;
 import android.content.Intent;
 
@@ -19,8 +22,8 @@ public class CellCommApp extends Application {
         return _partyHandlerDB;
     }
 
-    public static UnlockCodeHandler getUnlockHandlerDB() {
-        return _unlockHandlerDB;
+    public static CodeHandler getCodeHandlerDB() {
+        return _codeHandlerDB;
     }
     // endregion
 
@@ -30,8 +33,6 @@ public class CellCommApp extends Application {
 
         initializeHandlers();
         initializeServices();
-
-        setSMSDefaultApp();
     }
 
     //Private methods declaration
@@ -39,8 +40,8 @@ public class CellCommApp extends Application {
         try {
             _instanceDB = Persistence.getInstance(this);
 
-            _unlockHandlerDB = new UnlockCodeHandler(_instanceDB);
             _partyHandlerDB = new PartyHandler(_instanceDB);
+            _codeHandlerDB = new CodeHandler(_instanceDB);
             _instanceApp = this;
         } catch (Exception e) {
             e.printStackTrace();
@@ -52,12 +53,10 @@ public class CellCommApp extends Application {
         startService(i);
     }
 
-    private void setSMSDefaultApp() {
-    }
-
     //region fields declaration
-    private static UnlockCodeHandler _unlockHandlerDB;
     private static PartyHandler _partyHandlerDB;
+    private static CodeHandler _codeHandlerDB;
+
     private static CellCommApp _instanceApp;
     private static Persistence _instanceDB;
     //endregion
