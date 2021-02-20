@@ -44,12 +44,16 @@ public class SMSReceiver extends BroadcastReceiver {
     private void notifyMessage(Context context, SMSEntity message) {
         try {
             Log.d(this.TAG + ".notifyMessage", "");
+            String name = message.getActionName() + message.getTypeName(), msgType;
+            Intent i;
 
-            String name = message.getActionName() + message.getTypeName();
-            Intent intent = new Intent("CELLCOMM_MESSAGE_CONTACTMGMT").
-                    putExtra( "action", name ).
-                    putExtra( "data", message );
-            context.sendBroadcast(intent);
+            if( name.contains("Suscriber") || name.contains("Authorizator") ) {
+                 i = new Intent("CELLCOMM_MESSAGE_CONTACTMGMT");
+            } else {
+                 i = new Intent("CELLCOMM_MESSAGE_CODEMGMT");
+            }
+            i.putExtra("action", name).putExtra("data", message);
+            context.sendBroadcast(i);
         } catch (Exception e) {
             Log.e(this.TAG + ".notifyMessage", "error: " + e.getMessage());
         }

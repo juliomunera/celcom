@@ -107,7 +107,6 @@ public class ActivationFragment extends Fragment implements IFragment {
     private void sendSMS(String phoneNumber) {
         try {
             SmsManager smsManager = SmsManager.getDefault();
-
             String smsMsg = "8|" + getDeviceIMEI();
             smsMsg = Utils.encodeBase64(smsMsg);
             smsMsg = Utils.convertStringToHex(smsMsg);

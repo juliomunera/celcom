@@ -28,17 +28,18 @@
     <string name="acceptButton">Desbloquear</string>
     <string name="cancelButton">Bloquear</string>
 
-    <string name="activationLabel">Para el funcionamiento de la aplicación debe solicitar un código de activación. Después de ingresar el número móvil autorizado, presione el botón [Enviar Solicitud] y espere a que la aplicación  reciba y procese el mensaje para su activación.</string>
-
-    <string name="requestActivationButton">Enviar Solicitud</string>
-
-    <string name="suscriberinsert">Ingreso residente</string>
-    <string name="suscriberdelete">Eliminación residente</string>
-    <string name="authorizatorinsert">Ingreso autorizador</string>
+    <!-- ActivationFragment -->
+    <string name="activationLabel">Para el funcionamiento de la aplicación debe solicitar un código de activación. Después de ingresar el número móvil autorizado, presione el botón [Enviar Solicitud] y espere a que la aplicación reciba y procese el mensaje de respuesta para su activación.</string>
     <string name="authorizatordelete">Eliminación autorizador</string>
-
+    <string name="requestActivationButton">Enviar Solicitud</string>
+    <string name="authorizatorinsert">Ingreso autorizador</string>
+    <string name="suscriberdelete">Eliminación residente</string>
+    <string name="suscriberinsert">Ingreso residente</string>
+    <string name="deactivationcode">Desactivación</string>
+    <string name="activationcode">Activación</string>
     <string name="unlock">Desbloqueo</string>
     <string name="search">Buscar</string>
+
 
     <string name="cancelLabel"><u>Cancelar</u></string>
 

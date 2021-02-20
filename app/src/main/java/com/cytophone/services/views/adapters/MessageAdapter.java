@@ -37,24 +37,30 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewMess
             .replace("suscriberdelete", this._context.getString(R.string.suscriberdelete))
             .replace("authorizatorinsert", this._context.getString(R.string.authorizatorinsert))
             .replace("authorizatordelete", this._context.getString(R.string.authorizatordelete))
-            .replace("unlockcodeinsert", this._context.getString(R.string.unlock));
+            .replace("unlockcodeinsert", this._context.getString(R.string.unlock))
+            .replace("activationcodeinsert", this._context.getString(R.string.activationcode))
+            .replace("deactivationcodeinsert", this._context.getString(R.string.deactivationcode));
 
         holder._text1.setText(text);
         holder._text2.setText(String.format("%tY-%<tm-%<td %<tH:%<tM:%<tS",
                 _messages.get(position).getCreatedDate()));
 
         String actionType = this._messages.get(position).getAction().toLowerCase();
-        if(actionType.contains(("suscriber"))){
-            if(actionType.contains(("insert")))
+        if (actionType.contains(("suscriber"))){
+            if (actionType.contains(("insert"))) {
                 holder._image.setImageResource(R.drawable.ic_playlist_add_black_24dp);
-            else if(actionType.contains(("delete")))
+            } else if (actionType.contains(("delete"))) {
                 holder._image.setImageResource(R.drawable.ic_clear_black_24dp);
-        }else if(actionType.contains(("authorizator"))){
-            if(actionType.contains(("insert")))
+            }
+        }else if (actionType.contains(("authorizator"))){
+            if (actionType.contains(("insert"))) {
                 holder._image.setImageResource(R.drawable.ic_playlist_add_black_24dp);
-            else if(actionType.contains(("delete")))
+            } else if(actionType.contains(("delete"))) {
                 holder._image.setImageResource(R.drawable.ic_clear_black_24dp);
-        }else if(actionType.contains(("unlock"))){
+            }
+        } else if( actionType.contains(("unlock")) ||
+                actionType.contains(("activation")) ||
+                actionType.contains(("deactivation")) ) {
             holder._image.setImageResource(R.drawable.ic_baseline_lock_open_24);
         }
     }

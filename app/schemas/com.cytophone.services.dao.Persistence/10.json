@@ -1,0 +1,204 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 10,
+    "identityHash": "d80720ed1537ffd8217a63feda829b0e",
+    "entities": [
+      {
+        "tableName": "Party",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`createdDate` TEXT, `number` TEXT NOT NULL, `name` TEXT NOT NULL, `placeID` TEXT NOT NULL, `roleID` INTEGER NOT NULL, `updatedDate` TEXT, PRIMARY KEY(`number`, `placeID`, `roleID`))",
+        "fields": [
+          {
+            "fieldPath": "_createdDate",
+            "columnName": "createdDate",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "_codedNumber",
+            "columnName": "number",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "_name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "_placeID",
+            "columnName": "placeID",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "_roleID",
+            "columnName": "roleID",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "_updatedDate",
+            "columnName": "updatedDate",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "number",
+            "placeID",
+            "roleID"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "IX_Party_Name",
+            "unique": false,
+            "columnNames": [
+              "name"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `IX_Party_Name` ON `${TABLE_NAME}` (`name`)"
+          },
+          {
+            "name": "IX_Party_PlaceID",
+            "unique": false,
+            "columnNames": [
+              "placeID"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `IX_Party_PlaceID` ON `${TABLE_NAME}` (`placeID`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "EventLog",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`aPartyNumber` TEXT NOT NULL, `bPartyNumber` TEXT NOT NULL, `createdDate` TEXT NOT NULL, `eventType` TEXT NOT NULL, `endDateTime` TEXT, `id` TEXT NOT NULL, `startDateTime` TEXT, `action` TEXT NOT NULL, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "_aPartyNumber",
+            "columnName": "aPartyNumber",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "_bPartyNumber",
+            "columnName": "bPartyNumber",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "_createdDate",
+            "columnName": "createdDate",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "_eventType",
+            "columnName": "eventType",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "_endDateTime",
+            "columnName": "endDateTime",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "_id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "_startDateTime",
+            "columnName": "startDateTime",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "_action",
+            "columnName": "action",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "IX_EventLog_createdDate",
+            "unique": false,
+            "columnNames": [
+              "createdDate"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `IX_EventLog_createdDate` ON `${TABLE_NAME}` (`createdDate`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "Codes",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`createdDate` TEXT, `code` TEXT NOT NULL, `endDate` TEXT, `id` TEXT NOT NULL, `msisdn` TEXT NOT NULL, `type` TEXT NOT NULL, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "_createdDate",
+            "columnName": "createdDate",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "_code",
+            "columnName": "code",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "_endDate",
+            "columnName": "endDate",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "_id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "_msisdn",
+            "columnName": "msisdn",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "_type",
+            "columnName": "type",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'd80720ed1537ffd8217a63feda829b0e')"
+    ]
+  }
+}

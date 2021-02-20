@@ -14,19 +14,19 @@ public class CodeHandler implements IHandler {
         this._codeDAO = db.codeDAO();
     }
 
-    private CodeEntity createUnlockCode(SMSEntity message) {
+    private CodeEntity createCode(SMSEntity message) {
         try {
-            CodeEntity unLockCode = message.getCodeObject();
-            unLockCode.setMsisdn(Utils.encodeBase64(unLockCode.getMsisdn()));
-            return unLockCode;
+            CodeEntity code = message.getCodeObject();
+            code.setMsisdn(Utils.encodeBase64(code.getMsisdn()));
+            return code;
         } catch (Exception e) {
-            Log.e(this.TAG + ".createUnlockCode", "error: " + e.getMessage());
+            Log.e(this.TAG + ".createCode", "error: " + e.getMessage());
             return null;
         }
     }
 
-    private static class insertUnlockCodeAsyncTask extends AsyncTask<IEntityBase, Void, Void> {
-        insertUnlockCodeAsyncTask(CodeDAO DAO) {
+    private static class insertCodeAsyncTask extends AsyncTask<IEntityBase, Void, Void> {
+        insertCodeAsyncTask(CodeDAO DAO) {
             this._codeDAO = DAO;
         }
 
@@ -43,27 +43,31 @@ public class CodeHandler implements IHandler {
             return null;
         }
 
-        final String TAG = "insertUnlockCodeAsyncTask";
+        final String TAG = "insertCodeAsyncTask";
         CodeDAO _codeDAO;
     }
 
-    public void insertUnlockCode(SMSEntity message) {
+    private void insertCode(SMSEntity message) {
         try {
-            CodeEntity unLockCode = createUnlockCode(message);
-            if (null != unLockCode) {
+            CodeEntity code = createCode(message);
+            if (null != code) {
                 EventEntity event = message.getEventObject(); // unLockCode.getMsisdn()
                 event.setAPartyNumber(Utils.encodeBase64(event.getAPartyNumber()));
                 event.setBPartyNumber(Utils.encodeBase64(event.getBPartyNumber()));
-
-                new insertUnlockCodeAsyncTask(this._codeDAO).execute(unLockCode, event);
+                new insertCodeAsyncTask(this._codeDAO).execute(code, event);
             }
         } catch (Exception e) {
             Log.e( this.TAG + ".insertUnlockCode","error: " + e.getMessage());
         }
     }
 
+    public void insertActivationCode(SMSEntity message) { insertCode(message); }
+    public void insertDeactivationCode(SMSEntity message) { insertCode(message); }
+    public void insertSuspendCode(SMSEntity message) { insertCode(message); }
+    public void insertUnlockCode(SMSEntity message) { insertCode(message); }
+
     //region fields declaration
-    final String TAG = "UnlockCodeHandler";
+    final String TAG = "CodeHandler";
     CodeDAO _codeDAO;
     //endregion
 }

@@ -124,7 +124,7 @@ public class ContactView extends AppCompatActivity {
     private void initializeFragments() {
         BottomNavigationView bnv = (BottomNavigationView) findViewById(R.id.bottom_navigation);
         bnv.setOnNavigationItemSelectedListener(
-            new BottomNavigationView.OnNavigationItemSelectedListener() {
+                new BottomNavigationView.OnNavigationItemSelectedListener() {
                  @Override
                  public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                      Optional<Fragment> of = _fragments.stream().filter(i ->
@@ -300,6 +300,7 @@ public class ContactView extends AppCompatActivity {
     private void initializeReceivers() {
         IntentFilter filter = new IntentFilter();
         filter.addAction("CELLCOMM_MESSAGE_CONTACTMGMT");
+        filter.addAction("CELLCOMM_MESSAGE_CODEMGMT");
         registerReceiver( this._cntctreceiver, filter );
 
         filter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
@@ -432,18 +433,36 @@ public class ContactView extends AppCompatActivity {
     private BroadcastReceiver _cntctreceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if ( intent.getAction().equals("CELLCOMM_MESSAGE_CONTACTMGMT") ) {
-                try {
-                    Bundle bundle = intent.getExtras();
-                    SMSEntity sms = (SMSEntity) intent.getSerializableExtra("data");
-                    String action = bundle.getString("action");
-
-                    _fragments.stream().forEach(f -> ((IFragment) f).applyChanges(action, sms));
-                } catch (Exception e) {
-                    Log.e(this.TAG, "error : " + e.getMessage());
-                }
+            if (intent.getAction().equals("CELLCOMM_MESSAGE_CONTACTMGMT")) {
+                updateFragment(intent);
+            } else if (intent.getAction().equals("CELLCOMM_MESSAGE_CODEMGMT")) {
+                lockApp(intent);
             }
         }
+
+        private void updateFragment(Intent intent) {
+            try {
+                SMSEntity sms = (SMSEntity) intent.getSerializableExtra("data");
+                Bundle bundle = intent.getExtras();
+                //if( "U" == sms.getCodeObject().getType() ) {
+                String action = bundle.getString("action");
+                _fragments.stream().forEach(f -> ((IFragment) f).applyChanges(action, sms));
+                //}
+            } catch (Exception e) {
+                Log.e(this.TAG, "error : " + e.getMessage());
+            }
+        }
+
+        private void lockApp(Intent intent) {
+            try {
+                SMSEntity sms = (SMSEntity) intent.getSerializableExtra("data");
+                CodeEntity code = sms.getCodeObject();
+                showSelectedFragment(getPrincipalFragment());
+            } catch (Exception e) {
+                Log.e(this.TAG, "error : " + e.getMessage());
+            }
+        }
+
         final String TAG = "ContactView.SMSReceiver.onReceive";
     };
 
@@ -485,8 +504,8 @@ public class ContactView extends AppCompatActivity {
 
     //Permissions that need to be explicitly requested from end user.
     List<Fragment> _fragments = Arrays.asList( new Fragment[]{new ContactsFragment()
-            , new MessageFragment()
-            , new SecurityFragment()
+        , new MessageFragment()
+        , new SecurityFragment()
     });
 
     // Permissions request code.

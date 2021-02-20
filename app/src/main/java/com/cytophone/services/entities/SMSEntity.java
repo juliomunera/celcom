@@ -65,8 +65,8 @@ public class SMSEntity implements IEntityBase, Serializable {
         return s.contains("Code")
                ? this.getCodeObject().getMsisdn()
                : s.contains("Authorizator") || s.contains("Suscriber")
-                ? this.getPartyObject().getNumber()
-                : null;
+                    ? this.getPartyObject().getNumber()
+                    : null;
     }
 
     private boolean isItOkAction(String value) {
@@ -146,7 +146,6 @@ public class SMSEntity implements IEntityBase, Serializable {
 
     public EventEntity getEventObject() throws Exception {
         String number = this.getNumberByObjectType();
-
         return new EventEntity(
                 this.getSourceNumber(),
                 number,
@@ -171,7 +170,7 @@ public class SMSEntity implements IEntityBase, Serializable {
         }
 
         int t = Integer.parseInt(msgParts[0]);
-        char type = t == 7 ? 'U': t == 8 ? 'A': t == 9 ? 'D': 'S';
+        String type = t == 7 ? "U" : t == 8 ? "A" : "D";
         return new CodeEntity(msgParts[2], msgParts[1], Integer.parseInt(msgParts[3]), type);
     }
 
@@ -193,16 +192,15 @@ public class SMSEntity implements IEntityBase, Serializable {
     // Actions by type message.
     private final String[][] ACTIONS = {
             { "none", "none", null },
-            { "Authorizator", "insert", "1" }, //1
-            { "Authorizator", "update", "1" }, //2
-            { "Authorizator", "delete", "1" }, //3
-            { "Suscriber", "insert", "2" }, //4
-            { "Suscriber", "update", "2" }, //5
-            { "Suscriber", "delete", "2" }, //6
-            { "UnlockCode", "insert", null }, //7
-            { "ActivationCode", "insert", null }, //8
-            { "DeactivationCode", "update", null }, //9
-            { "SuspendCode", "update", null } //10
+            { "Authorizator", "insert", "1" },      //1
+            { "Authorizator", "update", "1" },      //2
+            { "Authorizator", "delete", "1" },      //3
+            { "Suscriber", "insert", "2" },         //4
+            { "Suscriber", "update", "2" },         //5
+            { "Suscriber", "delete", "2" },         //6
+            { "UnlockCode", "insert", null },       //7
+            { "ActivationCode", "insert", null },   //8
+            { "DeactivationCode", "insert", null }  //9
     };
 
     private String _decodeMessage;

@@ -13,7 +13,7 @@
         <EditText
             android:id="@+id/edtSearchBox"
             style="@style/SearchControls"
-            android:layout_weight="90"
+            android:layout_weight="70"
             android:layout_marginLeft="2dp"
             android:layout_marginTop="3dp"
             android:layout_marginRight="2dp"
@@ -25,15 +25,15 @@
             android:imeOptions="actionSearch"
             android:inputType="text"
             android:maxLength="30"
-            android:textSize="17sp" />
+            android:textSize="15sp" />
         <TextView
             android:id="@+id/tvwCancel"
-            android:layout_weight="10"
+            android:layout_weight="30"
             android:layout_marginLeft="2dp"
             android:layout_marginTop="3dp"
             android:layout_marginRight="2dp"
             android:layout_marginBottom="3dp"
-            android:gravity="center"
+            android:layout_gravity="center_vertical|left"
             android:text="@string/cancelLabel"
             android:textAllCaps="false"
             android:textColor="@color/primaryButton"

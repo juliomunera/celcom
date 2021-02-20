@@ -18,9 +18,13 @@ public abstract class CodeDAO implements IDAO{
 
     @Transaction()
     public void add(CodeEntity code, EventEntity event){
+        if ( code.getType() != "U" ) delete(code.getMsisdn());
         add(code);
         add(event);
     }
+
+    @Query("DELETE FROM codes WHERE msisdn = :number AND type in ( 'A','D' )")
+    abstract int delete(String number);
 
     @Query("SELECT * " +
         "FROM " +
@@ -40,22 +44,4 @@ public abstract class CodeDAO implements IDAO{
             "ORDER BY createdDate DESC " +
             "LIMIT 1")
     public abstract CodeEntity getActivationCode();
-
-    @Query("SELECT * " +
-            "FROM " +
-            " Codes " +
-            "WHERE " +
-            " type = 'D' " +
-            "ORDER BY createdDate DESC " +
-            "LIMIT 1")
-    public abstract CodeEntity getDeactivationCode();
-
-    @Query("SELECT * " +
-            "FROM " +
-            " Codes " +
-            "WHERE " +
-            " type = 'S' " +
-            "ORDER BY createdDate DESC " +
-            "LIMIT 1")
-    public abstract CodeEntity getSuspendCode();
 }

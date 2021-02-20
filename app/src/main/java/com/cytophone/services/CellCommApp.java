@@ -30,7 +30,6 @@ public class CellCommApp extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-
         initializeHandlers();
         initializeServices();
     }

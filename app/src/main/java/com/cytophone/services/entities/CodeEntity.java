@@ -41,7 +41,7 @@ public class CodeEntity implements IEntityBase, Serializable {
     }
 
     @NonNull
-    public char getType() {
+    public String getType() {
         return this._type;
     }
 
@@ -66,7 +66,7 @@ public class CodeEntity implements IEntityBase, Serializable {
         this._msisdn = msisdn;
     }
 
-    public void setType(@NonNull char type) {
+    public void setType(@NonNull String type) {
         this._type = type;
     }
 
@@ -76,7 +76,7 @@ public class CodeEntity implements IEntityBase, Serializable {
         this._id = UUID.randomUUID().toString();
     }
 
-    public CodeEntity(String code, String MSISDN, long seconds, char type){
+    public CodeEntity(String code, String MSISDN, long seconds, String type){
         this();
 
         this._endDate = new Date( System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(seconds));
@@ -109,5 +109,5 @@ public class CodeEntity implements IEntityBase, Serializable {
 
     @ColumnInfo(name = "type")
     @NonNull
-    private char _type;
+    private String _type;
 }
