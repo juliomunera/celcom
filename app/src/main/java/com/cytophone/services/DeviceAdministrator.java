@@ -1,6 +1,8 @@
 package com.cytophone.services;
 
 import android.app.admin.DeviceAdminReceiver;
+import android.app.admin.DevicePolicyManager;
+import android.os.UserManager;
 import android.preference.PreferenceManager;
 
 import android.content.SharedPreferences;
@@ -16,6 +18,12 @@ public class DeviceAdministrator extends DeviceAdminReceiver {
     @Override
     public void onLockTaskModeEntering(Context context, Intent intent, String pkg) {
         super.onLockTaskModeEntering(context, intent, pkg);
+
+        //DevicePolicyManager dpm = (DevicePolicyManager) context.getSystemService(
+        //        Context.DEVICE_POLICY_SERVICE);
+        //ComponentName admin = DeviceAdministrator.getComponentName(context);
+        //dpm.addUserRestriction(admin, UserManager.DISALLOW_CREATE_WINDOWS);
+
         Log.d(this.TAG + ".onLockTaskModeEntering", "");
     }
 
@@ -25,8 +33,7 @@ public class DeviceAdministrator extends DeviceAdminReceiver {
 
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
         context.startActivity(new Intent(context, ContactView.class).
-                setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
-
+                    setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
         Log.d(this.TAG + ".onLockTaskModeExiting","");
     }
 

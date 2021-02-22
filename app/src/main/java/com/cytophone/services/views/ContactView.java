@@ -52,6 +52,7 @@ import android.os.Bundle;
 import android.os.Build;
 import android.net.Uri;
 
+import android.view.WindowManager;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -78,8 +79,7 @@ public class ContactView extends AppCompatActivity {
             this.initializeFragments();
 
             this.startLockTaskDelayed();
-        }catch (Exception ex)
-        {
+        }catch (Exception ex) {
             ex.printStackTrace();
         }
     }
@@ -108,14 +108,18 @@ public class ContactView extends AppCompatActivity {
                 }
             }
         }
+
     }
+
+    //@Override
+    //protected void onResume(){
+    //    super.onResume();
+    //}
 
     protected void onStart() {
         super.onStart();
-
         //this.offerReplacingDefaultHome();
         //this.offerReplacingDefaultSMS();
-
         this.offerReplacingDefaultDialer();
     }
     //endregion

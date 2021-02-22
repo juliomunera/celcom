@@ -17,10 +17,13 @@ public class Constants {
     public static final Pattern TIME_ELAPSED_PATTERN = compile("^[0-9]{4}$");
 
     public static final Pattern PARTY_NAME_PATTERN = compile("^([A-Za-zÀ-ÿ" +
-            "\\u00f1\\u00d1\\s0-9.*_-]{1,25})$");
+            "\\u00f1\\u00d1\\s0-9.*_-]{1,30})$");
+
+    public static final Pattern COUNTRYCODE_PATTERN = compile("^(?!0)(?!9)" +
+            "(?!00)(?!99)(?!000)(?!999)([0-9]{1,3}$)");
 
     public static final Pattern MSISDN_PATTERN = compile("^(?!000000000000)" +
-            "(?!999999999999)([0-9]{12}$)");
+            "(?!999999999999)([0-9]{5,13}$)");
     /*
     public static final Pattern MSISDN1_PATTERN = compile("^573[0-9]{9}$");
     public static final Pattern MSISDN2_PATTERN = compile("^03[0-9]{8}$");

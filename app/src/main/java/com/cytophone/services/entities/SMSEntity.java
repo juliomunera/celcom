@@ -11,13 +11,16 @@ import java.util.Date;
 public class SMSEntity implements IEntityBase, Serializable {
     // region private methods declaration
     private String decodedMessage(String Message) {
-        if (Utils.isHexadecimal(Message)) {
+        /*if (Utils.isHexadecimal(Message)) {
             String hexMsg = Utils.convertHexToString(Message);
             if (hexMsg.length() > 0) {
                 if (Utils.isBase64Encode(hexMsg)) {
                     return Utils.decodeBase64(hexMsg);
                 }
             }
+        }*/
+        if (Utils.isBase64Encode(Message)) {
+            return Utils.decodeBase64(Message);
         }
         return "";
     }
@@ -74,6 +77,11 @@ public class SMSEntity implements IEntityBase, Serializable {
         return m.find();
     }
 
+    private boolean isItOkCountryCode(String value) {
+        Matcher m = Constants.COUNTRYCODE_PATTERN.matcher(value);
+        return m.find();
+    }
+
     private boolean isItOkPlaceID(String value) {
         Matcher m = Constants.PLACEID_PATTERN.matcher(value);
         return m.find();
@@ -107,19 +115,21 @@ public class SMSEntity implements IEntityBase, Serializable {
 
     private boolean isItOkParty(String[] messageParts)
     {
-        return 4 == messageParts.length &
-                isItOkAction(messageParts[0]) &
-                isItOkPlaceID(messageParts[1]) &
+        Boolean isItOK = isItOkAction(messageParts[0]) &
+                isItOkCountryCode(messageParts[1]) &
                 isItOkMSIDN(messageParts[2]) &
-                isItOkPartyName(messageParts[3]);
+                isItOkPlaceID(messageParts[3]) &
+                isItOkPartyName(messageParts[4]);
+        return 5 == messageParts.length & isItOK;
     }
 
     private boolean isItOkCode(String[] messageParts) {
-        return 4 == messageParts.length &
-                isItOkAction(messageParts[0]) &
-                isItOkMSIDN(messageParts[1]) &
-                isItOkCode(messageParts[2]) &
-                isItOkTimeElapsed(messageParts[3]);
+        Boolean isItOK = isItOkAction(messageParts[0]) &
+                isItOkCountryCode(messageParts[1]) &
+                isItOkMSIDN(messageParts[2]) &
+                isItOkCode(messageParts[3]) &
+                isItOkTimeElapsed(messageParts[4]);
+        return 5 == messageParts.length & isItOK;
     }
 
     // Public methods declaration
@@ -141,11 +151,17 @@ public class SMSEntity implements IEntityBase, Serializable {
             throw new Exception("El mensaje para el registro de un suscriptor/autorizador " +
                     "no es válido.");
         }
-        return new PartyEntity(msgParts[2], msgParts[1], msgParts[3], this.getRole());
+
+        return new PartyEntity(msgParts[1],
+                msgParts[2],
+                msgParts[3],
+                msgParts[4],
+                this.getRole());
     }
 
     public EventEntity getEventObject() throws Exception {
         String number = this.getNumberByObjectType();
+
         return new EventEntity(
                 this.getSourceNumber(),
                 number,
@@ -171,7 +187,10 @@ public class SMSEntity implements IEntityBase, Serializable {
 
         int t = Integer.parseInt(msgParts[0]);
         String type = t == 7 ? "U" : t == 8 ? "A" : "D";
-        return new CodeEntity(msgParts[2], msgParts[1], Integer.parseInt(msgParts[3]), type);
+        return new CodeEntity(msgParts[1],
+                msgParts[3],
+                msgParts[2],
+                Integer.parseInt(msgParts[4]), type);
     }
 
     public String getSourceNumber() {

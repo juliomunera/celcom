@@ -45,7 +45,7 @@ public abstract class PartyDAO implements IDAO {
     @Query("SELECT * FROM party WHERE name = :name")
     public abstract PartyEntity getPartyByName(String name);
 
-    @Query("SELECT * FROM party WHERE number = :number AND roleID = :roleID")
+    @Query("SELECT * FROM party WHERE number = :number AND roleID = :roleID LIMIT 1")
     public abstract PartyEntity getPartByNumberAndRole(String number, Integer roleID);
 
     /*

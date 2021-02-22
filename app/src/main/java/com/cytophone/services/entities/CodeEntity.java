@@ -22,6 +22,11 @@ public class CodeEntity implements IEntityBase, Serializable {
     }
 
     @NonNull
+    public String getCountryCode() {
+        return this._countryCode;
+    }
+
+    @NonNull
     public String getCode() {
         return this._code;
     }
@@ -54,6 +59,10 @@ public class CodeEntity implements IEntityBase, Serializable {
         this._code = code;
     }
 
+    public void setCountryCode(@NonNull String countryCode) {
+        this._countryCode =  countryCode;
+    }
+
     public void setEndDate(@NonNull Date endDate) {
         this._endDate = endDate;
     }
@@ -76,10 +85,11 @@ public class CodeEntity implements IEntityBase, Serializable {
         this._id = UUID.randomUUID().toString();
     }
 
-    public CodeEntity(String code, String MSISDN, long seconds, String type){
+    public CodeEntity(String countryCode, String code, String MSISDN, long seconds, String type){
         this();
 
         this._endDate = new Date( System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(seconds));
+        this._countryCode = countryCode;
         this._msisdn = MSISDN;
         this._code = code;
         this._type = type;
@@ -93,6 +103,10 @@ public class CodeEntity implements IEntityBase, Serializable {
     @ColumnInfo(name = "code")
     @NonNull
     private String _code;
+
+    @ColumnInfo(name = "countryCode")
+    @NonNull
+    private String _countryCode;
 
     @ColumnInfo(name="endDate")
     @TypeConverters(TimestampConverter.class)
