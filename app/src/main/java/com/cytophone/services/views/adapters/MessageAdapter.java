@@ -26,6 +26,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewMess
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         View view = inflater.inflate(R.layout.row_message_list, parent, false);
         this._context = view.getContext();
+
         return new ViewMessageHolder(view);
     }
 
