@@ -131,22 +131,26 @@ public class ContactsFragment extends Fragment implements IFragment {
             public void afterTextChanged(Editable s) {}
         });
 
-
         TextView tvw = (TextView) view.findViewById(R.id.tvwCancel);
         tvw.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (edt != null) {
                     edt.setText("");
-                    InputMethodManager imm = (InputMethodManager) getContext().getSystemService
-                            (Context.INPUT_METHOD_SERVICE);
-                    imm.hideSoftInputFromWindow(edt.getWindowToken(), 0);
+                    hideKB(edt);
                 }
             }
         });
+
         tvw.requestFocus();
+        hideKB(edt);
     }
 
+    private void hideKB(EditText editText) {
+        InputMethodManager imm = (InputMethodManager) getContext().getSystemService
+                (Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(editText.getWindowToken(), 0);
+    }
     private void remove(SMSEntity message) throws Exception {
         PartyEntity party = message.getPartyObject();
         this._parties.removeIf(p -> {

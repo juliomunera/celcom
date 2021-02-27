@@ -21,7 +21,7 @@ public final class CallService extends InCallService {
     @Override
     public void onCallAdded(@NotNull Call call) {
         super.onCallAdded(call);
-        Log.d(this.TAG + ".OnCallAdded", "call details: " + call.getDetails());
+        Log.d(this.TAG + ".OnCallAdded", "call details: " + call.getDetails() );
 
         try {
             String number = call.getDetails().getHandle().getSchemeSpecificPart();
@@ -42,7 +42,7 @@ public final class CallService extends InCallService {
     @Override
     public void onCallRemoved(@NotNull Call call) {
         super.onCallRemoved(call);
-        Log.d(this.TAG + ".OnCallRemoved", "call details: " + call.getDetails());
+        Log.d(this.TAG + ".OnCallRemoved", "call details: " + call.getDetails() );
 
         try {
             Call currentCall = OngoingCall.INSTANCE.getCall();

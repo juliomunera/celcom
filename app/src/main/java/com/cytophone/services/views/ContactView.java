@@ -67,6 +67,8 @@ public class ContactView extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         try {
             super.onCreate(savedInstanceState);
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD |
+                    WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
             setContentView(R.layout.activity_contact_listitem);
 
             this.initializeReceivers();
@@ -247,11 +249,11 @@ public class ContactView extends AppCompatActivity {
         if (PermissionChecker.checkSelfPermission(this,
                 "android.permission.CALL_PHONE") == REQUEST_PERMISSION) {
             String number = Utils.decodeBase64(codedNumber);
-            if( number.trim().length() >= 10 ) {
+            //if( number.trim().length() >= 10 ) {
                 Uri uri = Uri.parse("tel:" + number.trim());
                 this.startActivity(new Intent(Intent.ACTION_CALL, uri));
                 ((IFragment)this._fragments.get(0)).setEnable(false);
-            }
+            //}
         } else {
             ActivityCompat.requestPermissions( (Activity)this
                 , new String[]{"android.permission.CALL_PHONE"}
@@ -363,6 +365,7 @@ public class ContactView extends AppCompatActivity {
                 , new String[] { getPackageName()
                     , "com.google.android.dialer"
                     , "com.android.server.telecom"
+                    , "com.android.inputdevices"
                 });
         }
         if (start) this.startLockTask();

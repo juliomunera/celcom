@@ -9,12 +9,14 @@ import com.cytophone.services.R;
 
 import androidx.fragment.app.Fragment;
 
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.view.View;
 
 import android.content.Intent;
 
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.Button;
 import android.widget.Toast;
@@ -32,6 +34,15 @@ public class SecurityFragment extends Fragment implements IFragment {
         View view = inflater.inflate(R.layout.fragment_security, container, false);
         ((Button) view.findViewById(R.id.btnCancel)).setOnClickListener( _unblocklistener );
         ((Button) view.findViewById(R.id.btnOK)).setOnClickListener( _blocklistener );
+        ((EditText) view.findViewById(R.id.edtCode)).setOnFocusChangeListener(
+                new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean hasFocus) {
+                InputMethodManager imm = (InputMethodManager) getContext().
+                        getSystemService(getContext().INPUT_METHOD_SERVICE);
+                imm.showSoftInput(((EditText) view.findViewById(R.id.edtCode)),0);
+            }
+        });
         return view;
     }
 
@@ -92,7 +103,10 @@ public class SecurityFragment extends Fragment implements IFragment {
             String msg = "El desbloqueo no pudo efectuarse.";
             String number = SecurityFragment.this.getCode();
 
-            if (number.length() == 1) return;
+            if (number.length() == 0) {
+                ((EditText) view.findViewById(R.id.edtCode)).requestFocus();
+                return;
+            }
 
             CodeEntity entity = searchCode(number);
             if (entity != null) {
