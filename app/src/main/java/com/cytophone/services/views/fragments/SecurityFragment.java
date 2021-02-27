@@ -9,6 +9,7 @@ import com.cytophone.services.R;
 
 import androidx.fragment.app.Fragment;
 
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
@@ -34,15 +35,6 @@ public class SecurityFragment extends Fragment implements IFragment {
         View view = inflater.inflate(R.layout.fragment_security, container, false);
         ((Button) view.findViewById(R.id.btnCancel)).setOnClickListener( _unblocklistener );
         ((Button) view.findViewById(R.id.btnOK)).setOnClickListener( _blocklistener );
-        ((EditText) view.findViewById(R.id.edtCode)).setOnFocusChangeListener(
-                new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View view, boolean hasFocus) {
-                InputMethodManager imm = (InputMethodManager) getContext().
-                        getSystemService(getContext().INPUT_METHOD_SERVICE);
-                imm.showSoftInput(((EditText) view.findViewById(R.id.edtCode)),0);
-            }
-        });
         return view;
     }
 
@@ -103,31 +95,33 @@ public class SecurityFragment extends Fragment implements IFragment {
             String msg = "El desbloqueo no pudo efectuarse.";
             String number = SecurityFragment.this.getCode();
 
-            if (number.length() == 0) {
-                ((EditText) view.findViewById(R.id.edtCode)).requestFocus();
-                return;
-            }
-
-            CodeEntity entity = searchCode(number);
-            if (entity != null) {
-                if (entity.getEndDate().after(new Date(System.currentTimeMillis()))) {
-                    SecurityFragment.this.schedulerLockDevice(entity.getCreatedDate(),
-                            entity.getEndDate());
-                    SecurityFragment.this.schedulerDeleteCallLog(10);
-                    SecurityFragment.this.getActivity().stopLockTask();
-                    msg = "Desbloqueo activado.";
+            if (number.length() > 0) {
+                CodeEntity entity = searchCode(number);
+                if (entity != null) {
+                    if (entity.getEndDate().after(new Date(System.currentTimeMillis()))) {
+                        SecurityFragment.this.schedulerLockDevice(entity.getCreatedDate(),
+                                entity.getEndDate());
+                        SecurityFragment.this.schedulerDeleteCallLog(10);
+                        SecurityFragment.this.getActivity().stopLockTask();
+                        msg = "Desbloqueo activado.";
+                    }
                 }
             }
-            Toast.makeText(SecurityFragment.this.getContext(), msg, Toast.LENGTH_SHORT).show();
+
+            Toast t = Toast.makeText(SecurityFragment.this.getContext(), msg, Toast.LENGTH_SHORT);
+            t.setGravity(Gravity.TOP,0,0);
+            t.show();
         }
     };
 
     private View.OnClickListener _unblocklistener = new View.OnClickListener() {
         public void onClick(View v) {
             SecurityFragment.this.getActivity().startLockTask();
-            Toast.makeText(SecurityFragment.this.getContext()
-                    , "Bloqueo activado"
-                    , Toast.LENGTH_SHORT).show();
+            Toast t = Toast.makeText(SecurityFragment.this.getContext(),
+                    "Bloqueo activado",
+                    Toast.LENGTH_SHORT);
+            t.setGravity(Gravity.TOP,0,0);
+            t.show();
         }
     };
 
