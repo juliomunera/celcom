@@ -37,8 +37,11 @@
     <string name="suscriberinsert">Ingreso residente</string>
     <string name="deactivationcode">Desactivación</string>
     <string name="activationcode">Activación</string>
+
     <string name="unlock">Desbloqueo</string>
     <string name="search">Buscar</string>
+    <string name="countryCode">País</string>
+    <string name="mobileNumber">Número móvil</string>
 
     <string name="cancelLabel"><u>Cancelar</u></string>
 

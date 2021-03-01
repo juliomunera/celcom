@@ -10,8 +10,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical|center_horizontal"
-        android:orientation="vertical"
-        android:paddingBottom="20dp">
+        android:orientation="vertical">
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -21,21 +20,67 @@
             android:textColor="@color/primaryButton"
             android:justificationMode="inter_word"
             android:gravity="center_vertical"
-            android:textSize="19dp" />
-        <EditText
-            android:id="@+id/edtPhone"
-            android:inputType="number|phone"
-            android:digits="1234567890"
-            android:layout_width="251dp"
-            android:layout_height="wrap_content"
+            android:textSize="18sp" />
+        <TextView
+            android:layout_width="0sp"
             android:layout_gravity="center_horizontal"
-            android:background="#D77A20"
-            android:gravity="left"
-            android:maxLength="12"
-            android:paddingLeft="30dp"
-            android:paddingRight="30dp"
-            android:textSize="25dp" />
-        <LinearLayout
+            android:layout_height="match_parent" />
+        <TableLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:weightSum="1">
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <TextView
+                    android:layout_weight="0.45"
+                    android:layout_width="0dp"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_height="match_parent"
+                    />
+                <EditText
+                    android:id="@+id/edtCountryCode"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.005"
+                    android:background="#D77A20"
+                    android:digits="123456789"
+                    android:inputType="number"
+                    android:maxLength="3"
+                    android:gravity="start"
+                    android:hint="@string/countryCode"
+                    android:imeActionLabel="@string/countryCode"
+                    android:textSize="18sp" />
+                <TextView
+                    android:layout_weight="0.05"
+                    android:layout_width="0sp"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_height="match_parent"
+                    />
+                <EditText
+                    android:id="@+id/edtPhone"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_weight="0.15"
+                    android:background="#D77A20"
+                    android:digits="1234567890"
+                    android:gravity="left"
+                    android:hint="@string/mobileNumber"
+                    android:imeActionLabel="@string/mobileNumber"
+                    android:inputType="number|phone"
+                    android:maxLength="13"
+                    android:textSize="18sp"
+                    android:autofillHints="" />
+                <TextView
+                    android:layout_weight="0.45"
+                    android:layout_width="0sp"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_height="match_parent" />
+            </TableRow>
+        </TableLayout>
+         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
@@ -44,12 +89,12 @@
             <Button
                 android:id="@+id/btnActivationRequest"
                 android:gravity="center"
-                android:layout_gravity="center_horizontal"
+                android:layout_gravity="center_horizontal|center_vertical"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:textAllCaps="false"
-                android:layout_marginTop="20dp"
-                android:text="@string/requestActivationButton" />
+                android:text="@string/requestActivationButton"
+                android:textSize="18sp"/>
         </LinearLayout>
     </LinearLayout>
 </FrameLayout>

@@ -5,6 +5,7 @@ import com.cytophone.services.entities.SMSEntity;
 import com.cytophone.services.utilities.Utils;
 import com.cytophone.services.R;
 
+import android.view.Gravity;
 import android.view.inputmethod.InputMethodManager;
 import android.telephony.TelephonyManager;
 import android.telephony.SmsManager;
@@ -86,17 +87,29 @@ public class ActivationFragment extends Fragment implements IFragment {
     private void add(SMSEntity message) throws Exception {}
 
     private void initializeControls(View view) {
-        EditText edt = (EditText) view.findViewById(R.id.edtPhone);
+        EditText edt1 = (EditText) view.findViewById(R.id.edtCountryCode);
+        EditText edt2 = (EditText) view.findViewById(R.id.edtPhone);
+
         Button btn = (Button) view.findViewById(R.id.btnActivationRequest);
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (edt != null) {
-                    String phoneNo = edt.getText().toString();
+                if (edt1 != null && edt2 != null) {
+                    String countryCode = edt1.getText().toString();
+                    String phoneNo = edt2.getText().toString();
+
                     InputMethodManager imm = (InputMethodManager) getContext().getSystemService
                             (Context.INPUT_METHOD_SERVICE);
-                    imm.hideSoftInputFromWindow(edt.getWindowToken(), 0);
-                    sendSMS(phoneNo);
+                    imm.hideSoftInputFromWindow(edt1.getWindowToken(), 0);
+                    imm.hideSoftInputFromWindow(edt2.getWindowToken(), 0);
+
+                    sendSMS(phoneNo, countryCode);
+                } else  {
+                    Toast t = Toast.makeText(ActivationFragment.this.getContext()
+                            ,"Debe ingresar el código del país y el número móvil autorizado."
+                            , Toast.LENGTH_LONG);
+                    t.setGravity(Gravity.TOP,0,0);
+                    t.show();
                 }
             }
         });
@@ -104,10 +117,10 @@ public class ActivationFragment extends Fragment implements IFragment {
 
     private void remove(SMSEntity message) throws Exception {}
 
-    private void sendSMS(String phoneNumber) {
+    private void sendSMS(String phoneNumber, String countryCode) {
         try {
             SmsManager smsManager = SmsManager.getDefault();
-            String smsMsg = "8|" + getDeviceIMEI();
+            String smsMsg = "0|" + countryCode + '|'  + getDeviceIMEI();
             smsMsg = Utils.encodeBase64(smsMsg);
             smsMsg = Utils.convertStringToHex(smsMsg);
 
@@ -116,14 +129,18 @@ public class ActivationFragment extends Fragment implements IFragment {
                     , null
                     , null);
 
-            Toast.makeText(ActivationFragment.this.getContext()
+            Toast t = Toast.makeText(ActivationFragment.this.getContext()
                     , "El mensaje con la solicitud fue enviado."
-                    , Toast.LENGTH_LONG).show();
+                    , Toast.LENGTH_LONG);
+            t.setGravity(Gravity.TOP,0,0);
+            t.show();
         } catch (Exception ex) {
-            Toast.makeText(ActivationFragment.this.getContext()
+            Toast  t = Toast.makeText(ActivationFragment.this.getContext()
                     ,"Ocurrío un error enviado el mensaje con la solicitud. Comuníquese " +
                       "con el equipo de soporte."
-                    , Toast.LENGTH_LONG).show();
+                    , Toast.LENGTH_LONG);
+            t.setGravity(Gravity.TOP,0,0);
+            t.show();
             ex.printStackTrace();
         }
     }
