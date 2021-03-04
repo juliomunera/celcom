@@ -42,6 +42,7 @@
     <string name="search">Buscar</string>
     <string name="countryCode">País</string>
     <string name="mobileNumber">Número móvil</string>
+    <string name="unlockCode">Código</string>
 
     <string name="cancelLabel"><u>Cancelar</u></string>
 

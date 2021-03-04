@@ -22,6 +22,7 @@ import android.annotation.SuppressLint;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import android.view.WindowManager;
 import android.view.animation.LinearInterpolator;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -40,7 +41,13 @@ public class CallView extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        int flags = WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED |
+            WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON |
+            WindowManager.LayoutParams.FLAG_FULLSCREEN;
+
+        this.getWindow().setFlags(flags, flags);
         setContentView(R.layout.activity_call_view);
+
         Object party;
 
         if(null != (party = getIntent().getSerializableExtra("PartyEntity"))) {

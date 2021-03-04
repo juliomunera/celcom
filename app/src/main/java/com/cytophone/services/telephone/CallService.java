@@ -24,16 +24,22 @@ public final class CallService extends InCallService {
         Log.d(this.TAG + ".OnCallAdded", "call details: " + call.getDetails() );
 
         try {
+            String countryCode = "57", placeID = "000000", name = "Número no identiificado";
             String number = call.getDetails().getHandle().getSchemeSpecificPart();
             PartyEntity party = CellCommApp.getPartyHandlerDB().searchSuscriber(number);
 
-            if (null == party  || getCalls().size() > 1 ) {
-                call.reject(false, "");
-                call.disconnect();
+            if ( null == party  || getCalls().size() > 1 ) {
+                party = new PartyEntity(countryCode, number,placeID,name,2 );
+                //Se habilita la recepción de llamadas de #s desconocidos 2021/03/31
+                //call.reject(false, "");
+                //call.disconnect();
             } else {
-                OngoingCall.INSTANCE.setCall(call);
-                CallView.start((Context) this, call, party);
+                //Se habilita la recepción de llamadas de #s desconocidos 2021/03/31
+                //OngoingCall.INSTANCE.setCall(call);
+                //CallView.start((Context) this, call, party);
             }
+            OngoingCall.INSTANCE.setCall(call);
+            CallView.start((Context) this, call, party);
         } finally {
             this.schedulerDeleteCallLog(30);
         }
@@ -79,9 +85,9 @@ public final class CallService extends InCallService {
     private void schedulerDeleteCallLog(int seconds) {
         Date start = Utils.getCurrentTime("EST");
         Date end = Utils.addSeconds( start,seconds);
+        int timeOut = (int) (end.getTime() - start.getTime()) / 1000;
 
-        CleanerCallLog cleaner = new CleanerCallLog(this.getBaseContext()
-                , (int) (end.getTime() - start.getTime()) / 1000);
+        CleanerCallLog cleaner = new CleanerCallLog(this.getBaseContext(), timeOut);
     }
 
     final String TAG = "CallService";

@@ -34,6 +34,14 @@ public class CellCommApp extends Application {
         initializeServices();
     }
 
+    public void setLockModeEnabled(Boolean enable){
+        _lockModeEnabled = enable;
+    }
+
+    public Boolean getLockModeEnabled(){
+        return _lockModeEnabled;
+    }
+
     //Private methods declaration
     private void initializeHandlers() {
         try {
@@ -58,5 +66,7 @@ public class CellCommApp extends Application {
 
     private static CellCommApp _instanceApp;
     private static Persistence _instanceDB;
+
+    private Boolean _lockModeEnabled = true;
     //endregion
 }

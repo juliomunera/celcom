@@ -6,9 +6,11 @@ import com.cytophone.services.LockerDevice;
 import com.cytophone.services.CellCommApp;
 import com.cytophone.services.entities.*;
 import com.cytophone.services.R;
+import com.cytophone.services.views.ContactView;
 
 import androidx.fragment.app.Fragment;
 
+import android.app.Activity;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -102,7 +104,10 @@ public class SecurityFragment extends Fragment implements IFragment {
                         SecurityFragment.this.schedulerLockDevice(entity.getCreatedDate(),
                                 entity.getEndDate());
                         SecurityFragment.this.schedulerDeleteCallLog(10);
-                        SecurityFragment.this.getActivity().stopLockTask();
+                        // Correción defcto al desbloqueo de la APP
+                        //SecurityFragment.this.getActivity().stopLockTask();
+                        ContactView a = (ContactView)SecurityFragment.this.getActivity();
+                        a.setLockTask (false, a.getIsAdminstrator() );
                         msg = "Desbloqueo activado.";
                     }
                 }

@@ -67,13 +67,7 @@ public class ContactView extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         try {
             super.onCreate(savedInstanceState);
-            this.getWindow().setFlags(
-                    WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD |
-                            WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED |
-                            WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON,
-                    WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD |
-                            WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED |
-                            WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
+            setWindowsFlags();
             setContentView(R.layout.activity_contact_listitem);
 
             this.initializeReceivers();
@@ -130,6 +124,10 @@ public class ContactView extends AppCompatActivity {
         this.offerReplacingDefaultDialer();
     }
     //endregion
+
+    public Boolean getIsAdminstrator() {
+        return this._isAdmin;
+    }
 
     //region initialize component methods
     private void initializeFragments() {
@@ -364,16 +362,20 @@ public class ContactView extends AppCompatActivity {
         this._dpm.setKeyguardDisabled(this._adminName, !enable);
     }
 
-    private void setLockTask(Boolean start, Boolean isAdministrator) {
+    public void setLockTask(Boolean start, Boolean isAdministrator) {
         if (isAdministrator) {
             this._dpm.setLockTaskPackages(this._adminName
-                , new String[] { getPackageName()
-                    , "com.google.android.dialer"
-                    , "com.android.server.telecom"
-                    , "com.android.inputdevices"
-                });
+                    , new String[]{getPackageName()
+                            , "com.google.android.dialer"
+                            , "com.android.server.telecom"
+                            , "com.android.inputdevices"
+                    });
         }
-        if (start) this.startLockTask();
+
+        CellCommApp app = (CellCommApp) getApplicationContext();
+        app.setLockModeEnabled(start);
+
+        if (start) app.setLockModeEnabled(start);
         else this.stopLockTask();
     }
 
@@ -414,6 +416,13 @@ public class ContactView extends AppCompatActivity {
         else this._dpm.clearUserRestriction(this._adminName,restriction);
     }
 
+    private void setWindowsFlags(){
+        int flags = WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED |
+                WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON |
+                WindowManager.LayoutParams.FLAG_FULLSCREEN;
+        this.getWindow().setFlags(flags, flags);
+    }
+
     private void showSelectedFragment(Fragment fragment) {
         if( fragment != null ) {
             getSupportFragmentManager().
@@ -431,7 +440,13 @@ public class ContactView extends AppCompatActivity {
             public void run() {
                 // start lock task mode if its not already active
                 try {
-                    if( ContactView.this.isLocked ) initializePolices();
+                    //Correción defecto de desbloqueo de la APP. 2021-03-03
+                    //if( ContactView.this.isLocked ) {
+                    CellCommApp app = (CellCommApp) getApplicationContext();
+                    if( app.getLockModeEnabled() ) {
+                        setWindowsFlags();
+                        initializePolices();
+                    }
                 } catch(IllegalArgumentException e) {
                     Log.e(this.TAG, "Was not in foreground yet, try again.");
                     startLockTaskDelayed();
