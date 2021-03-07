@@ -3,6 +3,7 @@ package com.cytophone.services.utilities;
 import android.Manifest;
 import android.os.BatteryManager;
 import android.view.View;
+import android.view.WindowManager;
 
 import static java.util.regex.Pattern.compile;
 
@@ -67,5 +68,10 @@ public class Constants {
             BatteryManager.BATTERY_PLUGGED_AC |
             BatteryManager.BATTERY_PLUGGED_USB |
             BatteryManager.BATTERY_PLUGGED_WIRELESS;
+
+    public static final int SCREEN_FLAGS  =
+            WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED |
+            WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON |
+            WindowManager.LayoutParams.FLAG_FULLSCREEN;
 }
 

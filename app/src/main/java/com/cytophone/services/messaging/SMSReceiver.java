@@ -36,7 +36,7 @@ public class SMSReceiver extends BroadcastReceiver {
             action.invoke(handler, new Object[]{ arguments });
             return true;
         } catch (Exception e) {
-            Log.e(this.TAG + ".executeAction", "error: " + e.getMessage());
+            Log.e(this.TAG + ".executeAction", "error -> " + e.getMessage());
             return false;
         }
     }

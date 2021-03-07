@@ -11,6 +11,7 @@ import com.cytophone.services.views.ContactView;
 import androidx.fragment.app.Fragment;
 
 import android.app.Activity;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -79,16 +80,24 @@ public class SecurityFragment extends Fragment implements IFragment {
     }
 
     private void schedulerLockDevice(Date start, Date end) {
-        LockerDevice locker = new LockerDevice(this.getContext()
-                , (int) (end.getTime() - start.getTime()) / 1000);
+        try {
+            LockerDevice locker = new LockerDevice(this.getContext()
+                    , (int) (end.getTime() - start.getTime()) / 1000);
+        } catch(Exception ex) {
+            Log.e( this.TAG + ".schedulerLockDevice", "error ->" + ex.getMessage() );
+        }
     }
 
     private void schedulerDeleteCallLog(int seconds) {
-        Date start = Utils.getCurrentTime("EST");
-        Date end = Utils.addSeconds( start,seconds);
+        try {
+            Date start = Utils.getCurrentTime("EST");
+            Date end = Utils.addSeconds(start, seconds);
 
-        CleanerCallLog cleaner = new CleanerCallLog(this.getContext()
-                , (int) (end.getTime() - start.getTime()) / 1000);
+            CleanerCallLog cleaner = new CleanerCallLog(this.getContext()
+                    , (int) (end.getTime() - start.getTime()) / 1000);
+        } catch(Exception ex) {
+            Log.e( this.TAG + ".schedulerDeleteCallLog", "error ->" + ex.getMessage() );
+        }
     }
 
     private View.OnClickListener _blocklistener = new View.OnClickListener() {
@@ -121,7 +130,9 @@ public class SecurityFragment extends Fragment implements IFragment {
 
     private View.OnClickListener _unblocklistener = new View.OnClickListener() {
         public void onClick(View v) {
-            SecurityFragment.this.getActivity().startLockTask();
+            ContactView a = (ContactView)SecurityFragment.this.getActivity();
+            a.setLockTask (true, a.getIsAdminstrator() );
+            //SecurityFragment.this.getActivity().startLockTask();
             Toast t = Toast.makeText(SecurityFragment.this.getContext(),
                     "Bloqueo activado",
                     Toast.LENGTH_SHORT);
@@ -130,5 +141,6 @@ public class SecurityFragment extends Fragment implements IFragment {
         }
     };
 
+    private final String TAG = "SecurytyFragment";
     private View.OnClickListener _listener;
 }

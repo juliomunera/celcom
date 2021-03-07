@@ -31,7 +31,7 @@ public class CellCommApp extends Application {
     public void onCreate() {
         super.onCreate();
         initializeHandlers();
-        initializeServices();
+        //initializeServices();
     }
 
     public void setLockModeEnabled(Boolean enable){

@@ -24,22 +24,20 @@ public final class CallService extends InCallService {
         Log.d(this.TAG + ".OnCallAdded", "call details: " + call.getDetails() );
 
         try {
-            String countryCode = "57", placeID = "000000", name = "Número no identiificado";
             String number = call.getDetails().getHandle().getSchemeSpecificPart();
             PartyEntity party = CellCommApp.getPartyHandlerDB().searchSuscriber(number);
 
-            if ( null == party  || getCalls().size() > 1 ) {
-                party = new PartyEntity(countryCode, number,placeID,name,2 );
-                //Se habilita la recepción de llamadas de #s desconocidos 2021/03/31
-                //call.reject(false, "");
-                //call.disconnect();
+            //Se habilita la recepción de llamadas de #s desconocidos 2021/03/31
+            //if ( null == party  || getCalls().size() > 1 ) {
+            if ( getCalls().size() > 1 ) {
+                call.reject(false, "");
+                call.disconnect();
             } else {
                 //Se habilita la recepción de llamadas de #s desconocidos 2021/03/31
-                //OngoingCall.INSTANCE.setCall(call);
-                //CallView.start((Context) this, call, party);
+                if ( null == party )   party = getAnonymousParty( number );
+                OngoingCall.INSTANCE.setCall(call);
+                CallView.start((Context) this, call, party);
             }
-            OngoingCall.INSTANCE.setCall(call);
-            CallView.start((Context) this, call, party);
         } finally {
             this.schedulerDeleteCallLog(30);
         }
@@ -88,6 +86,12 @@ public final class CallService extends InCallService {
         int timeOut = (int) (end.getTime() - start.getTime()) / 1000;
 
         CleanerCallLog cleaner = new CleanerCallLog(this.getBaseContext(), timeOut);
+    }
+
+    private PartyEntity getAnonymousParty(String number)
+    {
+        String countryCode = "57", placeID = "000000", name = "Número no identificado";
+        return  new PartyEntity(countryCode, number,placeID,name,2 );
     }
 
     final String TAG = "CallService";

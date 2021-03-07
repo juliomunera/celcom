@@ -4,6 +4,7 @@ import com.cytophone.services.utilities.CallStateStringKt;
 import com.cytophone.services.telephone.OngoingCall;
 import com.cytophone.services.entities.PartyEntity;
 import com.cytophone.services.R;
+import com.cytophone.services.utilities.Constants;
 
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.functions.Consumer;
@@ -22,6 +23,7 @@ import android.annotation.SuppressLint;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import android.util.Log;
 import android.view.WindowManager;
 import android.view.animation.LinearInterpolator;
 import android.widget.ImageView;
@@ -36,62 +38,84 @@ import android.os.Bundle;
 public class CallView extends AppCompatActivity {
     // Override methods declaration
     @Override
-    public void onBackPressed() {}
+    public void onBackPressed() {
+        Log.d(this.TAG, "onBackPressed");
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        CallView._isActive = false;
+        Log.d(this.TAG, "onDestroy");
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        int flags = WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED |
-            WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON |
-            WindowManager.LayoutParams.FLAG_FULLSCREEN;
-
-        this.getWindow().setFlags(flags, flags);
+        setWindowsFlags();
         setContentView(R.layout.activity_call_view);
 
-        Object party;
+        setParty();
 
-        if(null != (party = getIntent().getSerializableExtra("PartyEntity"))) {
-            this._party = party instanceof PartyEntity ? (PartyEntity) party: null;
-        }
+        CallView._isActive = true;
+        Log.d(this.TAG, "OnCreated.");
+    }
+
+    public void onRestoreInstanceState(Bundle savedInstanceState) {
+        // Always call the superclass so it can restore the view hierarchy
+        super.onRestoreInstanceState(savedInstanceState);
+        // Restore state members from saved instance
     }
 
     @Override
     protected void onStart() {
         super.onStart();
 
-        this.configAnswerButton();
-        this.configHangUpButton();
+        this.setAnswerButton();
+        this.setHangUpButton();
 
-        this.configAcceptCall();
-        this.configFinishCall();
+        this.setAcceptCall();
+        this.setFinishCall();
     }
 
-    private final void configAcceptCall() {
-        _disposables.add( OngoingCall.INSTANCE.getState().subscribe( new Consumer<Integer>() {
-            @Override
-            public void accept(Integer value) throws Exception {
-                if( null == CallView.this._party ) { // End call
-                    OngoingCall.INSTANCE.reject();
-                    OngoingCall.INSTANCE.hangup();
-                } else {  // Accept call and show caller info
-                    updateUI(value);
+    private final void setAcceptCall() {
+        try {
+            _disposables.add(OngoingCall.INSTANCE.getState().subscribe(new Consumer<Integer>() {
+                @Override
+                public void accept(Integer value) throws Exception {
+                    if (null == CallView.this._party) { // End call
+                        OngoingCall.INSTANCE.reject();
+                        OngoingCall.INSTANCE.hangup();
+                    } else {  // Accept call and show caller info
+                        updateUI(value);
+                    }
                 }
-            }
-        }));
+            }));
+        }catch (Exception ex) {
+            ex.printStackTrace();
+            Log.e( CallView.TAG + ".setAcceptCall", " error : " + ex.getMessage() );
+        }
     }
 
-    private final void configAnswerButton() {
-        ImageView answer = findViewById(R.id.iv_answer);
-        answer.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                OngoingCall.INSTANCE.answer();
-            }
-        });
+    private final void setAnswerButton() {
+        try {
+            ImageView answer = findViewById(R.id.iv_answer);
+            answer.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    OngoingCall.INSTANCE.answer();
+                }
+            });
+        }catch (Exception ex) {
+            ex.printStackTrace();
+            Log.e( CallView.TAG + ".setAnswerButton", " error : " + ex.getMessage() );
+        }
     }
 
-    private final void configFinishCall() {
-        _disposables.add(OngoingCall.INSTANCE.getState()
+    private final void setFinishCall() {
+        try {
+            _disposables.add(OngoingCall.INSTANCE.getState()
                 .filter(i -> i.equals(Call.STATE_DISCONNECTING) ||
                         i.equals(Call.STATE_DISCONNECTED))
                 .delay(1, TimeUnit.SECONDS)
@@ -99,40 +123,63 @@ public class CallView extends AppCompatActivity {
                 .subscribe(new Consumer<Integer>() {
                     @Override
                     public void accept(Integer integer) throws Exception {
+                        Log.d(CallView.this.TAG, "OnFinishCall.");
                         CallView.this.finish();
                     }
                 }));
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            Log.e(CallView.TAG + ".setFinishCall", "error ->  " + ex.getMessage());
+        }
     }
 
-    private final void configHangUpButton() {
-        ImageView hangup = findViewById(R.id.iv_hangup);
-        hangup.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                OngoingCall.INSTANCE.hangup();
-            }
-        });
+    private final void setHangUpButton() {
+        try {
+            ImageView hangup = findViewById(R.id.iv_hangup);
+            hangup.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Log.d(CallView.this.TAG, "OnHangUp.");
+                    OngoingCall.INSTANCE.reject();
+                    OngoingCall.INSTANCE.hangup();
+                    CallView.this.finish();
+                }
+            });
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            Log.e(CallView.TAG + ".setHangUpButton", "error ->  " + ex.getMessage());
+        }
+    }
+
+    public static Boolean isActive(){
+        return CallView._isActive;
     }
 
     // Private and protected methods declaration
     @SuppressLint({"SetTextI18n"})
     private Consumer<? super Integer> updateUI(Integer state) {
-        TextView tvw = (TextView)CallView.this.findViewById(R.id.tv_name);
-        tvw.setText(this._party.getName());
-        tvw.setSelected(true);
+        try {
+            TextView tvw = (TextView) CallView.this.findViewById(R.id.tv_name);
+            tvw.setText(this._party.getName());
+            tvw.setSelected(true);
 
-        tvw = (TextView)this.findViewById(R.id.tv_action);
-        String text = StringsKt.capitalize(CallStateStringKt.asString(state).toLowerCase());
-        tvw.setText(text);
+            tvw = (TextView) this.findViewById(R.id.tv_action);
+            String text = StringsKt.capitalize(CallStateStringKt.asString(state).toLowerCase());
+            tvw.setText(text);
 
-        Boolean flag = state == 2;
-        ImageView btn = (ImageView)this.findViewById(R.id.iv_answer);
-        btn.setVisibility( flag ? View.VISIBLE: View.GONE);
+            Boolean flag = state == 2;
+            ImageView btn = (ImageView) this.findViewById(R.id.iv_answer);
+            btn.setVisibility(flag ? View.VISIBLE : View.GONE);
 
-        flag = CollectionsKt.listOf(new Integer[] { 1, 2, 4 }).contains(state);
-        btn = (ImageView)this.findViewById(R.id.iv_hangup);
-        btn.setVisibility( flag ? View.VISIBLE: View.GONE);
-        return null;
+            flag = CollectionsKt.listOf(new Integer[]{1, 2, 4}).contains(state);
+            btn = (ImageView) this.findViewById(R.id.iv_hangup);
+            btn.setVisibility(flag ? View.VISIBLE : View.GONE);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            Log.e(CallView.TAG + ".updateUI", "error -> " + ex.getMessage());
+        } finally {
+            return null;
+        }
     }
 
     protected void onStop() {
@@ -140,20 +187,39 @@ public class CallView extends AppCompatActivity {
         this._disposables.clear();
     }
 
+    private void setWindowsFlags(){
+        this.getWindow().setFlags(Constants.SCREEN_FLAGS, Constants.SCREEN_FLAGS);
+    }
+
+    private void setParty(){
+        Object party;
+
+        if(null != (party = getIntent().getSerializableExtra("PartyEntity"))) {
+            this._party = party instanceof PartyEntity ? (PartyEntity) party: null;
+        }
+    }
+
     public static void start(@NotNull Context context
             ,@NotNull Call call
             ,PartyEntity party) {
-        @SuppressLint("WrongConstant")
-        Intent i = new Intent(context, CallView.class).setFlags(268435456);
-        i.putExtra("PartyEntity", party);
-        context.startActivity(i);
+        try {
+            @SuppressLint("WrongConstant")
+            Intent i = new Intent(context, CallView.class).setFlags(268435456);
+            i.putExtra("PartyEntity", party);
+            context.startActivity(i);
+        }catch (Exception ex) {
+            ex.printStackTrace();
+            Log.e(CallView.TAG + ".start", "error ->  " + ex.getMessage());
+        }
     }
 
     //region fields declaration
     //Permissions request code.
     private final CompositeDisposable _disposables = new CompositeDisposable();
-
     // Caller info.
-    private PartyEntity _party;
+    private PartyEntity _party = null;
+
+    private static final String TAG = "CallView";
+    private static Boolean _isActive = false;
     //endregion
 }

@@ -19,7 +19,7 @@
                 android:layout_gravity="center_vertical|center_horizontal"
                 android:text="@string/codeLabel"
                 android:textColor="@color/primaryButton"
-                android:textSize="22sp" />
+                android:textSize="18sp" />
         </TableRow>
         <TableRow
             android:layout_width="match_parent"
@@ -43,11 +43,11 @@
                 android:hint="@string/unlockCode"
                 android:imeActionLabel="@string/unlockCode"
                 android:inputType="number"
-                android:maxLength="5"
+                android:maxLength="4"
                 android:paddingLeft="30dp"
                 android:paddingRight="30dp"
                 android:textAllCaps="true"
-                android:textSize="28dp"
+                android:textSize="18dp"
                 android:textStyle="bold"
                 android:autofillHints="" />
         </TableRow>

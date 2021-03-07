@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.cytophone.services">
+    <supports-screens>
+        android:resizeable="true"
+        android:smallScreens="true"
+        android:normalScreens="true"
+        android:largeScreens="true"
+        android:xlargeScreens="true"
+        android:anyDensity="true"
+    </supports-screens>
     <application
         android:name=".CellCommApp"
         android:allowBackup="true"
@@ -14,8 +22,10 @@
         <!-- Start Activities -->
         <activity android:name=".views.CallView"
             android:screenOrientation="portrait"
+            android:launchMode="singleInstance"
             android:lockTaskMode="if_whitelisted" />
         <activity android:name=".views.ContactView"
+            android:launchMode="singleInstance"
             android:screenOrientation="portrait">
             <intent-filter>
                 <category android:name="android.intent.category.DEFAULT" />
@@ -91,7 +101,7 @@
         </receiver>
         <!-- End BroadcastReceivers -->
         <!-- Start Services -->
-        <service android:name=".CellCommAgent"></service>
+        <!--<service android:name=".CellCommAgent"></service>-->
         <service android:name=".telephone.CallService"
             android:permission="android.permission.BIND_INCALL_SERVICE">
             <meta-data android:name="android.telecom.IN_CALL_SERVICE_UI"

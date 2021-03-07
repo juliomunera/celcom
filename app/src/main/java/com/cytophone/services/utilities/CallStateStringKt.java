@@ -7,7 +7,7 @@ public class CallStateStringKt {
     public static final String asString(int value) {
         switch(value) {
             case 0: return "NEW";
-            case 1:return "DIALING";
+            case 1: return "DIALING";
             case 2: return "RINGING";
             case 3: return "HOLDING";
             case 4: return "ACTIVE";

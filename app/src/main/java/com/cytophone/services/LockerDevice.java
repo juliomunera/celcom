@@ -30,8 +30,8 @@ public class LockerDevice extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        context.sendBroadcast(new Intent(intent.getAction()));
+        context.sendBroadcast(new Intent("CELLCOMM_MESSAGE_STOPLOCK"));
     }
 
-    private final String REMINDER_BUNDLE = "CellCommReminderBundle";
+    private final String TAG = "LockerDevice";
 }

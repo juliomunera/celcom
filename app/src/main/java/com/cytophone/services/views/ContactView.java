@@ -38,11 +38,13 @@ import android.content.Intent;
 import android.provider.Telephony;
 import android.provider.Settings;
 
+import android.telecom.Call;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.telephony.SignalStrength;
 import android.telecom.TelecomManager;
 
+import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 
@@ -64,6 +66,21 @@ import java.util.List;
 public class ContactView extends AppCompatActivity {
     //region events methods
     @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 123) checkSetDefaultResult(resultCode);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if( CallView.isActive() ) {
+            Intent i = new Intent(this, CallView.class);
+            startActivity(i);
+        }
+        Log.d( this.TAG , "onBackPressed");
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         try {
             super.onCreate(savedInstanceState);
@@ -83,15 +100,8 @@ public class ContactView extends AppCompatActivity {
         }catch (Exception ex) {
             ex.printStackTrace();
         }
-    }
 
-    @Override
-    public void onBackPressed() {}
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == 123) checkSetDefaultResult(resultCode);
+        Log.d( this.TAG , "onCreate");
     }
 
     public void onRequestPermissionsResult(int requestCode
@@ -112,10 +122,16 @@ public class ContactView extends AppCompatActivity {
 
     }
 
-    //@Override
-    //protected void onResume(){
-    //    super.onResume();
-    //}
+    @Override
+    protected void onResume(){
+        super.onResume();
+
+        if( CallView.isActive() ) {
+            Intent i = new Intent(this, CallView.class);
+            startActivity(i);
+        }
+        Log.d(this.TAG, "onResume");
+    }
 
     protected void onStart() {
         super.onStart();
@@ -140,7 +156,7 @@ public class ContactView extends AppCompatActivity {
                              ((IFragment) i).getID() == item.getItemId()).findFirst();
                      if (of != null) {
                          if( ((IFragment)of.get()).getID() == R.id.contactdevice) {
-                            showSelectedFragment(getPrincipalFragment());
+                            showSelectedFragment(getAppropriateFragment());
                          } else {
                              showSelectedFragment(of.get());
                          }
@@ -153,7 +169,7 @@ public class ContactView extends AppCompatActivity {
             public void onClick(View v) { ContactView.this.stopLockTask(); }
         });
 
-        this.showSelectedFragment( getPrincipalFragment() );
+        this.showSelectedFragment( getAppropriateFragment() );
     }
 
     public  void initializePolices() {
@@ -168,7 +184,10 @@ public class ContactView extends AppCompatActivity {
             this._isAdmin = false;
         }
 
-        Toast.makeText(this, owner, Toast.LENGTH_SHORT).show();
+        Toast t = Toast.makeText(this, owner, Toast.LENGTH_SHORT);
+        t.setGravity(Gravity.TOP,0,0);
+        t.show();
+
         this.setPolicies(true, this._isAdmin);
     }
     // endregion
@@ -209,7 +228,10 @@ public class ContactView extends AppCompatActivity {
         String message = resultCode != RESULT_OK
             ? "El usuario acepto establecer la aplicación para uso predeterminado."
             : "El usuario no acepto establecer la aplicación para uso predeterminado.";
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+
+        Toast t = Toast.makeText(this, message, Toast.LENGTH_SHORT);
+        t.setGravity(Gravity.TOP,0,0);
+        t.show();
     }
 
     private final void offerReplacingDefaultDialer() {
@@ -265,7 +287,7 @@ public class ContactView extends AppCompatActivity {
     }
 
     //region private methods declaration
-    private Fragment getPrincipalFragment() {
+    private Fragment getAppropriateFragment() {
         try {
             CodeEntity code = CellCommApp.getInstanceDB().codeDAO().getActivationCode();
             if ( code == null ) return new ActivationFragment();
@@ -365,17 +387,18 @@ public class ContactView extends AppCompatActivity {
     public void setLockTask(Boolean start, Boolean isAdministrator) {
         if (isAdministrator) {
             this._dpm.setLockTaskPackages(this._adminName
-                    , new String[]{getPackageName()
-                            , "com.google.android.dialer"
-                            , "com.android.server.telecom"
-                            , "com.android.inputdevices"
-                    });
+                , new String[]{ getPackageName()
+                    , "com.google.android.dialer"
+                    , "com.android.server.telecom"
+                    , "com.android.inputdevices"
+                });
         }
 
+        //Corrección al defecto generado durante el desbloqueo de la APP.
         CellCommApp app = (CellCommApp) getApplicationContext();
         app.setLockModeEnabled(start);
 
-        if (start) app.setLockModeEnabled(start);
+        if (start) this.startLockTask();
         else this.stopLockTask();
     }
 
@@ -417,10 +440,7 @@ public class ContactView extends AppCompatActivity {
     }
 
     private void setWindowsFlags(){
-        int flags = WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED |
-                WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON |
-                WindowManager.LayoutParams.FLAG_FULLSCREEN;
-        this.getWindow().setFlags(flags, flags);
+        this.getWindow().setFlags(Constants.SCREEN_FLAGS, Constants.SCREEN_FLAGS);
     }
 
     private void showSelectedFragment(Fragment fragment) {
@@ -440,11 +460,10 @@ public class ContactView extends AppCompatActivity {
             public void run() {
                 // start lock task mode if its not already active
                 try {
-                    //Correción defecto de desbloqueo de la APP. 2021-03-03
+                    //Corrección del defecto de desbloqueo de la APP. 2021-03-03
                     //if( ContactView.this.isLocked ) {
                     CellCommApp app = (CellCommApp) getApplicationContext();
                     if( app.getLockModeEnabled() ) {
-                        setWindowsFlags();
                         initializePolices();
                     }
                 } catch(IllegalArgumentException e) {
@@ -460,11 +479,12 @@ public class ContactView extends AppCompatActivity {
     private BroadcastReceiver _cntctreceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (intent.getAction().equals("CELLCOMM_MESSAGE_CONTACTMGMT")) {
+            /*if (intent.getAction().equals("CELLCOMM_MESSAGE_CONTACTMGMT")) {
                 updateFragment(intent);
             } else if (intent.getAction().equals("CELLCOMM_MESSAGE_CODEMGMT")) {
-                lockApp(intent);
-            }
+                showFragment(intent);
+            }*/
+            updateFragment(intent);
         }
 
         private void updateFragment(Intent intent) {
@@ -476,28 +496,29 @@ public class ContactView extends AppCompatActivity {
                 _fragments.stream().forEach(f -> ((IFragment) f).applyChanges(action, sms));
                 //}
             } catch (Exception e) {
-                Log.e(this.TAG, "error : " + e.getMessage());
+                Log.e(this.TAG, "error -> " + e.getMessage());
             }
         }
-
-        private void lockApp(Intent intent) {
+        
+        /*
+        private void showFragment(Intent intent) {
             try {
                 SMSEntity sms = (SMSEntity) intent.getSerializableExtra("data");
                 CodeEntity code = sms.getCodeObject();
-                showSelectedFragment(getPrincipalFragment());
+                showSelectedFragment(getAppropriateFragment());
             } catch (Exception e) {
-                Log.e(this.TAG, "error : " + e.getMessage());
+                Log.e(this.TAG, "error -> " + e.getMessage());
             }
         }
-
+        */
         final String TAG = "ContactView.SMSReceiver.onReceive";
     };
 
     private BroadcastReceiver _alarmreceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (intent.getAction().equals("CELLCOMM_MESSAGE_ALARM")) {
-                ContactView.this.startLockTaskDelayed();
+            if (intent.getAction().equals("CELLCOMM_MESSAGE_STOPLOCK")) {
+                ContactView.this.setLockTask (true, ContactView.this.getIsAdminstrator() );
             }
         }
     };
@@ -540,7 +561,8 @@ public class ContactView extends AppCompatActivity {
     private final static int REQUEST_PERMISSION = 0;
     private final String TAG = "ContactView";
 
-    boolean isLocked = true, _isAdmin = true;
+    //boolean isLocked = true;
+    boolean _isAdmin = true;
 
     DevicePolicyManager _dpm = null;
     ComponentName _adminName = null;
