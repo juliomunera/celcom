@@ -8,16 +8,19 @@ import androidx.room.PrimaryKey;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 
-import java.io.Serializable;
-
 import java.util.concurrent.TimeUnit;
 import java.util.UUID;
 import java.util.Date;
 
+import java.text.SimpleDateFormat;
+import java.text.ParseException;
+
+import java.io.Serializable;
+
 @Entity(tableName = "Codes")
 public class CodeEntity implements IEntityBase, Serializable {
     //Getter methods
-    public Date getCreatedDate() {
+    public String getCreatedDate() {
         return this._createdDate;
     }
 
@@ -31,7 +34,7 @@ public class CodeEntity implements IEntityBase, Serializable {
         return this._code;
     }
 
-    public Date getEndDate() {
+    public String getEndDate() {
         return this._endDate;
     }
 
@@ -51,7 +54,13 @@ public class CodeEntity implements IEntityBase, Serializable {
     }
 
     //Setter methods
-    public void setCreatedDate(@NonNull Date createdDate) {
+    public void setCreatedDate(@NonNull String createdDate) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        try{
+            Date date = sdf.parse(createdDate);
+        }catch (ParseException pex) {
+            createdDate = sdf.format(new Date(System.currentTimeMillis()));;
+        }
         this._createdDate = createdDate;
     }
 
@@ -63,7 +72,13 @@ public class CodeEntity implements IEntityBase, Serializable {
         this._countryCode =  countryCode;
     }
 
-    public void setEndDate(@NonNull Date endDate) {
+    public void setEndDate(@NonNull String endDate) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        try {
+            Date date = sdf.parse(endDate);
+        } catch (ParseException pex) {
+            endDate = sdf.format(new Date(System.currentTimeMillis()));
+        }
         this._endDate = endDate;
     }
 
@@ -81,14 +96,16 @@ public class CodeEntity implements IEntityBase, Serializable {
 
     //Constructor methods
     public CodeEntity() {
-        this._createdDate = new Date(System.currentTimeMillis());
+        this._createdDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").
+                format(new Date(System.currentTimeMillis()));
         this._id = UUID.randomUUID().toString();
     }
 
     public CodeEntity(String countryCode, String code, String MSISDN, long seconds, String type){
         this();
 
-        this._endDate = new Date( System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(seconds));
+        this._endDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").
+                format(new Date( System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(seconds)));
         this._countryCode = countryCode;
         this._msisdn = MSISDN;
         this._code = code;
@@ -97,8 +114,8 @@ public class CodeEntity implements IEntityBase, Serializable {
 
     //Fields declaration
     @ColumnInfo(name="createdDate")
-    @TypeConverters(TimestampConverter.class)
-    private Date _createdDate;
+    //@TypeConverters(TimestampConverter.class)
+    private String _createdDate;
 
     @ColumnInfo(name = "code")
     @NonNull
@@ -109,8 +126,8 @@ public class CodeEntity implements IEntityBase, Serializable {
     private String _countryCode;
 
     @ColumnInfo(name="endDate")
-    @TypeConverters(TimestampConverter.class)
-    Date _endDate;
+    //@TypeConverters(TimestampConverter.class)
+    private String _endDate;
 
     @ColumnInfo(name = "id")
     @PrimaryKey

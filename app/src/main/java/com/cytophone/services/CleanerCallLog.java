@@ -2,18 +2,17 @@ package com.cytophone.services;
 
 import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
-
-import android.provider.CallLog;
-
-import android.app.PendingIntent;
-import android.app.AlarmManager;
-
 import android.content.Context;
 import android.content.Intent;
 
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.app.AlarmManager;
+
+import android.provider.CallLog;
+
 import java.util.Calendar;
 import android.util.Log;
-import java.util.Date;
 
 public class CleanerCallLog extends BroadcastReceiver {
     public CleanerCallLog() {}
@@ -36,17 +35,30 @@ public class CleanerCallLog extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        try {
+            this.deleteCallsFromStatusBar(context);
+            this.deleteCallsFromCallLog(context);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    private void deleteCallsFromCallLog(Context context) {
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.HOUR, 1);
-        Date dt = cal.getTime();
 
         String query = CallLog.Calls.DATE + " <= ?";
-        String[] arguments =  new String[] { String.valueOf(dt.getTime()) };
+        String[] arguments = new String[]{String.valueOf(cal.getTime())};
 
         ContentResolver cr = context.getContentResolver();
         int deleted = cr.delete(CallLog.Calls.CONTENT_URI, query, arguments);
+        Log.i(this.TAG + ".onReceive", "total llamadas eliminadas -> " + deleted);
+    }
 
-        Log.i(this.TAG + ".onReceive", "total llamadas eliminadas: " + deleted);
+    private void deleteCallsFromStatusBar(Context context) {
+        String ns = Context.NOTIFICATION_SERVICE;
+        NotificationManager nm = (NotificationManager) context.getSystemService(ns);
+        nm.cancelAll();
     }
 
     private final String TAG = "CleanerCallLog";

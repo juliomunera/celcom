@@ -23,6 +23,7 @@ import android.annotation.SuppressLint;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import android.app.admin.DevicePolicyManager;
 import android.util.Log;
 import android.view.WindowManager;
 import android.view.animation.LinearInterpolator;
@@ -39,7 +40,7 @@ public class CallView extends AppCompatActivity {
     // Override methods declaration
     @Override
     public void onBackPressed() {
-        Log.d(this.TAG, "onBackPressed");
+        Log.d(this.TAG+ ".onBackPressed", "");
     }
 
     @Override
@@ -47,7 +48,7 @@ public class CallView extends AppCompatActivity {
         super.onDestroy();
 
         CallView._isActive = false;
-        Log.d(this.TAG, "onDestroy");
+        Log.d(this.TAG + ".onDestroy", "");
     }
 
     @Override
@@ -94,7 +95,7 @@ public class CallView extends AppCompatActivity {
             }));
         }catch (Exception ex) {
             ex.printStackTrace();
-            Log.e( CallView.TAG + ".setAcceptCall", " error : " + ex.getMessage() );
+            Log.e( CallView.TAG + ".setAcceptCall", ex.getMessage() );
         }
     }
 
@@ -109,7 +110,7 @@ public class CallView extends AppCompatActivity {
             });
         }catch (Exception ex) {
             ex.printStackTrace();
-            Log.e( CallView.TAG + ".setAnswerButton", " error : " + ex.getMessage() );
+            Log.e( CallView.TAG + ".setAnswerButton", ex.getMessage() );
         }
     }
 
@@ -124,12 +125,13 @@ public class CallView extends AppCompatActivity {
                     @Override
                     public void accept(Integer integer) throws Exception {
                         Log.d(CallView.this.TAG, "OnFinishCall.");
+                        //CallView.this.stopLockTask();
                         CallView.this.finish();
                     }
                 }));
         } catch (Exception ex) {
             ex.printStackTrace();
-            Log.e(CallView.TAG + ".setFinishCall", "error ->  " + ex.getMessage());
+            Log.e(CallView.TAG + ".setFinishCall", ex.getMessage());
         }
     }
 
@@ -142,12 +144,13 @@ public class CallView extends AppCompatActivity {
                     Log.d(CallView.this.TAG, "OnHangUp.");
                     OngoingCall.INSTANCE.reject();
                     OngoingCall.INSTANCE.hangup();
+                    //CallView.this.stopLockTask();
                     CallView.this.finish();
                 }
             });
         } catch (Exception ex) {
             ex.printStackTrace();
-            Log.e(CallView.TAG + ".setHangUpButton", "error ->  " + ex.getMessage());
+            Log.e(CallView.TAG + ".setHangUpButton", ex.getMessage());
         }
     }
 
@@ -176,7 +179,7 @@ public class CallView extends AppCompatActivity {
             btn.setVisibility(flag ? View.VISIBLE : View.GONE);
         } catch (Exception ex) {
             ex.printStackTrace();
-            Log.e(CallView.TAG + ".updateUI", "error -> " + ex.getMessage());
+            Log.e(CallView.TAG + ".updateUI", ex.getMessage());
         } finally {
             return null;
         }
@@ -209,7 +212,7 @@ public class CallView extends AppCompatActivity {
             context.startActivity(i);
         }catch (Exception ex) {
             ex.printStackTrace();
-            Log.e(CallView.TAG + ".start", "error ->  " + ex.getMessage());
+            Log.e(CallView.TAG + ".start", ex.getMessage());
         }
     }
 

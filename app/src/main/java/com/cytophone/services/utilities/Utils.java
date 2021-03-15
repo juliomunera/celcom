@@ -47,12 +47,13 @@ public class Utils {
         return json;
     }
 
-    public static boolean isBase64Encode(String string) {
-        Matcher m = Constants.B64_PATTERN.matcher(string);
+    public static boolean isBase64Encode(final String string) {
+        final String sanitized = string.replaceAll("\\s", "");
+        Matcher m = Constants.B64_PATTERN.matcher(sanitized);
         return m.find();
     }
 
-    public static boolean isHexadecimal(String input) {
+    public static boolean isHexadecimal(final String input) {
         Matcher m = Constants.HEXADECIMAL_PATTERN.matcher(input);
         return m.matches();
     }
@@ -61,8 +62,8 @@ public class Utils {
         String msg = "";
         try {
             msg =  new String(Base64.decode(coded.getBytes("UTF-8"), Base64.DEFAULT));
-        } catch (UnsupportedEncodingException e) {
-            Log.e("E/CellComm.Utils", "decodeBase64 ->" + e.getMessage());
+        } catch (Exception ex) {
+            Log.e(Utils.TAG + ".decodeBase64",  ex.getMessage());
         }
         return msg;
     }
@@ -72,7 +73,7 @@ public class Utils {
         try {
             msg =  new String(Base64.encode(text.getBytes("UTF-8"), Base64.DEFAULT));
         } catch (UnsupportedEncodingException e) {
-            Log.e("E/CellComm.Utils", "encodeBase64 ->" + e.getMessage());
+            Log.e(Utils.TAG + ".encodeBase64",  e.getMessage());
         }
         return msg;
     }
@@ -123,4 +124,6 @@ public class Utils {
 
         return clnd.getTime();
     }
+
+    private static final String TAG = "Utils";
 }

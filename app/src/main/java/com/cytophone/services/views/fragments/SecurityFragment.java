@@ -11,6 +11,7 @@ import com.cytophone.services.views.ContactView;
 import androidx.fragment.app.Fragment;
 
 import android.app.Activity;
+import android.content.Context;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -27,6 +28,9 @@ import android.widget.Toast;
 
 import android.os.Bundle;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 public class SecurityFragment extends Fragment implements IFragment {
@@ -56,6 +60,14 @@ public class SecurityFragment extends Fragment implements IFragment {
     private String getCode() {
         EditText edt = this.getView().findViewById(R.id.edtCode);
         return edt.getText().toString();
+    }
+
+    private Date getDate(String dateTime) {
+        try {
+            return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(dateTime);
+        } catch (Exception ex) {
+            return new Date(System.currentTimeMillis());
+        }
     }
 
     private CodeEntity searchCode(String number) {
@@ -96,50 +108,56 @@ public class SecurityFragment extends Fragment implements IFragment {
             CleanerCallLog cleaner = new CleanerCallLog(this.getContext()
                     , (int) (end.getTime() - start.getTime()) / 1000);
         } catch(Exception ex) {
-            Log.e( this.TAG + ".schedulerDeleteCallLog", "error ->" + ex.getMessage() );
+            Log.e( this.TAG + ".schedulerDeleteCallLog",  ex.getMessage() );
         }
     }
 
     private View.OnClickListener _blocklistener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            String msg = "El desbloqueo no pudo efectuarse.";
-            String number = SecurityFragment.this.getCode();
+            try {
+                String msg = "El desbloqueo no pudo efectuarse.";
+                String number = SecurityFragment.this.getCode();
 
-            if (number.length() > 0) {
-                CodeEntity entity = searchCode(number);
-                if (entity != null) {
-                    if (entity.getEndDate().after(new Date(System.currentTimeMillis()))) {
-                        SecurityFragment.this.schedulerLockDevice(entity.getCreatedDate(),
-                                entity.getEndDate());
-                        SecurityFragment.this.schedulerDeleteCallLog(10);
-                        // Correción defcto al desbloqueo de la APP
-                        //SecurityFragment.this.getActivity().stopLockTask();
-                        ContactView a = (ContactView)SecurityFragment.this.getActivity();
-                        a.setLockTask (false, a.getIsAdminstrator() );
-                        msg = "Desbloqueo activado.";
+                if (number.length() > 0) {
+                    CodeEntity entity = searchCode(number);
+                    if (entity != null) {
+                        Date d1 = getDate(entity.getCreatedDate());
+                        Date d2 = getDate(entity.getEndDate());
+
+                        if (d2.after(new Date(System.currentTimeMillis()))) {
+                            SecurityFragment.this.schedulerLockDevice(d1, d2);
+                            SecurityFragment.this.schedulerDeleteCallLog(10);
+
+                            // Corrección al defecto al desbloqueo de la APP
+                            ContactView a = (ContactView) SecurityFragment.this.getActivity();
+                            ((CellCommApp)a.getApplicationContext()).setLockModeEnabled(false);
+                            a.stopLockTaskDelayed();
+                            msg = "Desbloqueo activado.";
+                        }
                     }
                 }
+                showMessage(SecurityFragment.this.getContext(), msg);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-
-            Toast t = Toast.makeText(SecurityFragment.this.getContext(), msg, Toast.LENGTH_SHORT);
-            t.setGravity(Gravity.TOP,0,0);
-            t.show();
         }
     };
 
     private View.OnClickListener _unblocklistener = new View.OnClickListener() {
         public void onClick(View v) {
             ContactView a = (ContactView)SecurityFragment.this.getActivity();
-            a.setLockTask (true, a.getIsAdminstrator() );
-            //SecurityFragment.this.getActivity().startLockTask();
-            Toast t = Toast.makeText(SecurityFragment.this.getContext(),
-                    "Bloqueo activado",
-                    Toast.LENGTH_SHORT);
-            t.setGravity(Gravity.TOP,0,0);
-            t.show();
+            ((CellCommApp)a.getApplicationContext()).setLockModeEnabled(true);
+            a.startLockTaskDelayed();
+            showMessage(SecurityFragment.this.getContext(), "Bloqueo activado");
         }
     };
+
+    private void showMessage(Context context, String message) {
+        Toast t = Toast.makeText(context, message, Toast.LENGTH_SHORT);
+        //t.setGravity(Gravity.TOP, 0, 0);
+        t.show();
+    }
 
     private final String TAG = "SecurytyFragment";
     private View.OnClickListener _listener;

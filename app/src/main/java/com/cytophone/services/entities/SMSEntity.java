@@ -5,20 +5,23 @@ import com.cytophone.services.utilities.*;
 import android.telephony.SmsMessage;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.regex.Matcher;
 import java.util.Date;
 
 public class SMSEntity implements IEntityBase, Serializable {
     // region private methods declaration
     private String decodedMessage(String Message) {
-        /*if (Utils.isHexadecimal(Message)) {
+        /*
+        if (Utils.isHexadecimal(Message)) {
             String hexMsg = Utils.convertHexToString(Message);
             if (hexMsg.length() > 0) {
                 if (Utils.isBase64Encode(hexMsg)) {
                     return Utils.decodeBase64(hexMsg);
                 }
             }
-        }*/
+        }
+        */
         if (Utils.isBase64Encode(Message)) {
             return Utils.decodeBase64(Message);
         }
@@ -28,7 +31,9 @@ public class SMSEntity implements IEntityBase, Serializable {
     private String getActionID() {
         String[] msgParts = this._decodeMessage.split("[|]");
         if( msgParts.length >= 4 ) {
-            if (isItOkAction(msgParts[0])) return msgParts[0];
+            if (isItOkAction(msgParts[0])) {
+                return msgParts[0];
+            }
         }
         return "";
     }
@@ -141,7 +146,7 @@ public class SMSEntity implements IEntityBase, Serializable {
         return this._decodeMessage;
     }
 
-    public Date getMesageDate() {
+    public String getMesageDate() {
         return this._messageDate;
     }
 
@@ -202,7 +207,8 @@ public class SMSEntity implements IEntityBase, Serializable {
         if (null != sms) {
             this._decodeMessage = this.decodedMessage(sms.getDisplayMessageBody());
             this._sourceNumber = sms.getDisplayOriginatingAddress();
-            this._messageDate = new Date(sms.getTimestampMillis());
+            this._messageDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").
+                    format(new Date(sms.getTimestampMillis()));
             this._rawMessage = sms.getDisplayMessageBody();
         }
     }
@@ -224,8 +230,8 @@ public class SMSEntity implements IEntityBase, Serializable {
 
     private String _decodeMessage;
     private String _sourceNumber;
+    private String _messageDate;
     private String _rawMessage;
-    private Date _messageDate;
     // endregion
 }
 

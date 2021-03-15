@@ -8,8 +8,8 @@ import androidx.room.RoomDatabase;
 import androidx.room.Database;
 import androidx.room.Room;
 
-@Database(entities = {PartyEntity.class, EventEntity.class, CodeEntity.class}, version = 11)
-@TypeConverters({DateConverter.class})
+@Database(entities = {PartyEntity.class, EventEntity.class, CodeEntity.class}, version = 12)
+//@TypeConverters({DateConverter.class})
 public abstract class Persistence extends RoomDatabase {
     public static Persistence getInstance(Context context) {
         if (null  == dbInstancce) {
@@ -28,9 +28,9 @@ public abstract class Persistence extends RoomDatabase {
         dbInstancce = null;
     }
 
-    public abstract CodeDAO codeDAO();
     public abstract PartyDAO partyDAO();
     public abstract EventDAO eventDAO();
+    public abstract CodeDAO codeDAO();
 
     private static Persistence dbInstancce;
 

@@ -1,13 +1,19 @@
 package com.cytophone.services.entities;
 
-import com.cytophone.services.dao.*;
+//import com.cytophone.services.dao.*;
+//import androidx.room.TypeConverters;
 
-import androidx.room.TypeConverters;
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.Index;
+
+import java.text.SimpleDateFormat;
+import java.text.ParseException;
+import java.text.DateFormat;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -28,7 +34,7 @@ import java.util.Date;
 )
 public class PartyEntity implements IEntityBase, Serializable  {
     //region getter methods
-    public Date getCreatedDate() {
+    public String getCreatedDate() {
         return this._createdDate;
     }
 
@@ -61,7 +67,7 @@ public class PartyEntity implements IEntityBase, Serializable  {
         return this._roleID;
     }
 
-    public Date getUpdatedDate() {
+    public String getUpdatedDate() {
         return this._updatedDate;
     }
 
@@ -71,7 +77,14 @@ public class PartyEntity implements IEntityBase, Serializable  {
     }
 
     //region setter methods
-    public void setCreatedDate(@NonNull Date createdDate) {
+    public void setCreatedDate(@NonNull String createdDate) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        try {
+            Date date = sdf.parse(createdDate);
+        } catch (Exception ex) {
+            Log.e( "PartyEntity.setCreatedDate", ex.getMessage() );
+            createdDate = sdf.format(new Date(System.currentTimeMillis()));
+        }
         this._createdDate = createdDate;
     }
 
@@ -103,14 +116,23 @@ public class PartyEntity implements IEntityBase, Serializable  {
         this._roleID = roleID;
     }
 
-    public void setUpdatedDate(Date updatedDate) {
+    public void setUpdatedDate(String updatedDate) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        try {
+            Date date = sdf.parse(updatedDate);
+        } catch (Exception ex) {
+            Log.e( "PartyEntity.setUpdatedDate", ex.getMessage() );
+            updatedDate = "";
+        }
         this._updatedDate = updatedDate;
     }
     //endregion
 
     //region constructors methods.
     public PartyEntity() {
-        this._createdDate = new Date(System.currentTimeMillis());
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date date = new Date(System.currentTimeMillis());
+        this._createdDate = dateFormat.format(date);
     }
 
     public PartyEntity(@NonNull String countryCode
@@ -130,8 +152,8 @@ public class PartyEntity implements IEntityBase, Serializable  {
 
     //region fields declarations
     @ColumnInfo(name="createdDate")
-    @TypeConverters(TimestampConverter.class)
-    private Date _createdDate;
+    //@TypeConverters(TimestampConverter.class)
+    private String _createdDate;
 
     @ColumnInfo(name="countryCode")
     @NonNull
@@ -157,7 +179,7 @@ public class PartyEntity implements IEntityBase, Serializable  {
     private Integer _roleID;
 
     @ColumnInfo(name="updatedDate")
-    @TypeConverters(TimestampConverter.class)
-    private Date _updatedDate;
+    //@TypeConverters(TimestampConverter.class)
+    private String _updatedDate;
     //endregion
 }

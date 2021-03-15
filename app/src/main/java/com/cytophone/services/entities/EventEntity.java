@@ -1,8 +1,8 @@
 package com.cytophone.services.entities;
 
-import com.cytophone.services.dao.*;
+//import com.cytophone.services.dao.*;
+//import androidx.room.TypeConverters;
 
-import androidx.room.TypeConverters;
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.PrimaryKey;
@@ -10,12 +10,25 @@ import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.Index;
 
+import java.text.SimpleDateFormat;
+import java.text.ParseException;
+import java.text.DateFormat;
+
 import java.util.Date;
 import java.util.UUID;
 
 @Entity( tableName = "EventLog"
          , indices = { @Index(value = { "createdDate" }, name = "IX_EventLog_createdDate") })
 public class EventEntity implements IEntityBase {
+    @Ignore
+    private Date getDate(String dateTime) {
+        try {
+            return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(dateTime);
+        } catch (ParseException pex) {
+            return null;
+        }
+    }
+
     //region getter methods
     @NonNull
     public String getAPartyNumber() {
@@ -27,11 +40,11 @@ public class EventEntity implements IEntityBase {
         return this._bPartyNumber;
     }
 
-    public Date getCreatedDate() {
+    public String getCreatedDate() {
         return this._createdDate;
     }
 
-    public Date getEndDateTime() {
+    public String getEndDateTime() {
         return this._endDateTime;
     }
 
@@ -55,7 +68,7 @@ public class EventEntity implements IEntityBase {
         this._action = value;
     }
 
-    public Date getStartDateTime() {
+    public String getStartDateTime() {
         return this._startDateTime;
     }
     //endregion
@@ -69,7 +82,13 @@ public class EventEntity implements IEntityBase {
         this._bPartyNumber = number;
     }
 
-    public void setCreatedDate(Date createdDate) {
+    public void setCreatedDate(String createdDate) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        try {
+            Date date = sdf.parse(createdDate);
+        } catch (Exception ex) {
+            createdDate = sdf.format(new Date(System.currentTimeMillis()));
+        }
         this._createdDate = createdDate;
     }
 
@@ -77,7 +96,13 @@ public class EventEntity implements IEntityBase {
         this._id = id;
     }
 
-    public void setEndDateTime(Date dateTime) {
+    public void setEndDateTime(String dateTime) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        try {
+            Date date = sdf.parse(dateTime);
+        } catch (Exception ex) {
+            dateTime = sdf.format(new Date(System.currentTimeMillis()));
+        }
         this._endDateTime = dateTime;
     }
 
@@ -85,7 +110,13 @@ public class EventEntity implements IEntityBase {
         this._eventType = type;
     }
 
-    public void setStartDateTime(Date dateTime) {
+    public void setStartDateTime(String dateTime) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        try {
+            Date date = sdf.parse(dateTime);
+        } catch (Exception ex) {
+            dateTime = sdf.format(new Date(System.currentTimeMillis()));
+        }
         this._startDateTime = dateTime;
     }
     //endregion
@@ -93,7 +124,8 @@ public class EventEntity implements IEntityBase {
     //region constructor methods
     @Ignore()
     public EventEntity() {
-        this._createdDate = new Date(System.currentTimeMillis());
+        DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        this._createdDate =  sdf.format(new Date(System.currentTimeMillis()));
         this._id = UUID.randomUUID().toString();
     }
 
@@ -101,14 +133,15 @@ public class EventEntity implements IEntityBase {
     public EventEntity(@NonNull String aPartyNumber,
                        @NonNull String bPartyNumber,
                        @NonNull String eventType,
-                       @NonNull Date startDateTime,
-                       @NonNull String action) {
+                       @NonNull String startDateTime,
+                       @NonNull String action)  {
         this();
 
-        if ((new Date(System.currentTimeMillis())).compareTo(startDateTime) >= 0) {
-            this._startDateTime = startDateTime;
+        Date date = getDate(startDateTime);
+        if ((new Date(System.currentTimeMillis())).compareTo(date) >= 0) {
+            startDateTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").
+                    format(new Date(System.currentTimeMillis()));
         }
-
         this._startDateTime = startDateTime;
         this._aPartyNumber = aPartyNumber;
         this._bPartyNumber = bPartyNumber;
@@ -119,9 +152,9 @@ public class EventEntity implements IEntityBase {
     public EventEntity(@NonNull String aPartyNumber,
                        @NonNull String bPartyNumber,
                        @NonNull String eventType,
-                       @NonNull Date startDateTime,
-                       @NonNull Date endDateTime,
-                       @NonNull String action) {
+                       @NonNull String startDateTime,
+                       @NonNull String endDateTime,
+                       @NonNull String action)  {
         this(aPartyNumber, bPartyNumber, eventType, startDateTime, action);
         if (endDateTime != null && startDateTime.compareTo(endDateTime) >= 0) {
             this._endDateTime = endDateTime;
@@ -139,17 +172,17 @@ public class EventEntity implements IEntityBase {
     private String _bPartyNumber;
 
     @ColumnInfo(name = "createdDate")
-    @TypeConverters(TimestampConverter.class)
+    //@TypeConverters(TimestampConverter.class)
     @NonNull
-    private Date _createdDate;
+    private String _createdDate;
 
     @ColumnInfo(name = "eventType")
     @NonNull
     private String _eventType;
 
     @ColumnInfo(name = "endDateTime")
-    @TypeConverters(TimestampConverter.class)
-    private Date _endDateTime;
+    //@TypeConverters(TimestampConverter.class)
+    private String _endDateTime;
 
     @ColumnInfo(name = "id")
     @PrimaryKey
@@ -157,8 +190,8 @@ public class EventEntity implements IEntityBase {
     private String _id;
 
     @ColumnInfo(name = "startDateTime") // defaultValue = "DATETIME('now')"
-    @TypeConverters(TimestampConverter.class)
-    private Date _startDateTime;
+    //@TypeConverters(TimestampConverter.class)
+    private String _startDateTime;
 
     @ColumnInfo(name = "action")
     @NonNull

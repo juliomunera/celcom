@@ -7,6 +7,7 @@ import com.cytophone.services.R;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.annotation.NonNull;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.view.View;
@@ -52,9 +53,13 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        holder._number.setText(this._contacts.get(position).getCodedNumber());
-        holder._placeID.setText(this._contacts.get(position).getPlaceID());
-        holder._name.setText(this._contacts.get(position).getName());
+        try {
+            holder._number.setText(this._contacts.get(position).getCodedNumber());
+            holder._placeID.setText(this._contacts.get(position).getPlaceID());
+            holder._name.setText(this._contacts.get(position).getName());
+        } catch (Exception ex) {
+            Log.e(TAG + ".onBindViewHolder", ex.getMessage());
+        }
     }
 
     public void setListener(ItemSelectListener<PartyEntity> listener) {
@@ -97,13 +102,16 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-
             _placeID = itemView.findViewById(R.id.rowCountTextView);
+
+            _contactIcon = itemView.findViewById(R.id.imageView);
+            _phoneIcon = itemView.findViewById(R.id.phoneImage);
+
             _number = itemView.findViewById(R.id.tv_number);
-            _item = itemView.findViewById(R.id.imageView);
             _name = itemView.findViewById(R.id.textView);
 
-            itemView.setOnClickListener(this);
+            _phoneIcon.setOnClickListener ( this );
+            //itemView.setOnClickListener(this);
         }
 
         @Override
@@ -117,10 +125,12 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
         }
 
         TextView  _number, _name, _placeID;
-        ImageView _item;
+        ImageView _contactIcon, _phoneIcon;
     }
 
     //region fields declaration
+    private final String TAG = "ContactAdapter";
+
     private ItemSelectListener<PartyEntity> _listener;
     private List<PartyEntity> _allContacts, _contacts;
     private CustomFilter _filter;

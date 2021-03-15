@@ -18,10 +18,8 @@ public class DateConverter {
             } catch (ParseException e) {
                 e.printStackTrace();
             }
-            return null;
-        } else {
-            return null;
         }
+        return null;
     }
 
     @TypeConverter

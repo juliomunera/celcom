@@ -1,15 +1,17 @@
 package com.cytophone.services.views;
 
-import com.cytophone.services.CellCommApp;
-import com.cytophone.services.entities.CodeEntity;
+import com.cytophone.services.dao.ImportContacts;
+import com.cytophone.services.telephone.OngoingCall;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import com.cytophone.services.DeviceAdministrator;
 import com.cytophone.services.utilities.Constants;
+import com.cytophone.services.entities.CodeEntity;
 import com.cytophone.services.entities.SMSEntity;
 import com.cytophone.services.views.uicontrols.*;
 import com.cytophone.services.utilities.Utils;
 import com.cytophone.services.views.fragments.*;
+import com.cytophone.services.CellCommApp;
 import com.cytophone.services.R;
 
 import org.jetbrains.annotations.NotNull;
@@ -26,6 +28,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.fragment.app.Fragment;
 import androidx.annotation.NonNull;
+import androidx.lifecycle.Lifecycle;
 
 import android.content.BroadcastReceiver;
 import android.content.pm.PackageManager;
@@ -38,7 +41,6 @@ import android.content.Intent;
 import android.provider.Telephony;
 import android.provider.Settings;
 
-import android.telecom.Call;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.telephony.SignalStrength;
@@ -54,7 +56,6 @@ import android.os.Bundle;
 import android.os.Build;
 import android.net.Uri;
 
-import android.view.WindowManager;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -73,9 +74,8 @@ public class ContactView extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        if( CallView.isActive() ) {
-            Intent i = new Intent(this, CallView.class);
-            startActivity(i);
+        if( CallView.isActive() && null != OngoingCall.INSTANCE.getCall() ) {
+            startActivity(new Intent(this, CallView.class));
         }
         Log.d( this.TAG , "onBackPressed");
     }
@@ -83,6 +83,8 @@ public class ContactView extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         try {
+            Log.d( this.TAG , "onCreate");
+
             super.onCreate(savedInstanceState);
             setWindowsFlags();
             setContentView(R.layout.activity_contact_listitem);
@@ -93,42 +95,36 @@ public class ContactView extends AppCompatActivity {
             //this.checkDefaultHome();
             this.checkDefaultSMS();
             this.checkDefaultDialer();
-
             this.initializeFragments();
 
             this.startLockTaskDelayed();
         }catch (Exception ex) {
             ex.printStackTrace();
         }
-
-        Log.d( this.TAG , "onCreate");
     }
 
     public void onRequestPermissionsResult(int requestCode
             , @NotNull String[] permissions
             , @NotNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions,grantResults);
         String msg = "El permiso %s no fue autorizado, la aplicación se finalizará.";
         if (requestCode == REQUEST_CODE_ASK_PERMISSIONS) {
             for (int i = permissions.length - 1; i >= 0; --i) {
                 if (grantResults[i] != PackageManager.PERMISSION_GRANTED) {
-                    Toast.makeText(this
-                        , String.format( msg, permissions[i] )
-                        , Toast.LENGTH_LONG).show();
+                    showMessage( String.format( msg, permissions[i] ) );
                     this.closeNow(); // Exit the app if one permission is not granted.
                     return;
                 }
             }
         }
-
     }
 
     @Override
     protected void onResume(){
         super.onResume();
 
-        if( CallView.isActive() ) {
-            Intent i = new Intent(this, CallView.class);
-            startActivity(i);
+        if( CallView.isActive() && null != OngoingCall.INSTANCE.getCall() ) {
+            startActivity(new Intent(this, CallView.class));
         }
         Log.d(this.TAG, "onResume");
     }
@@ -137,7 +133,7 @@ public class ContactView extends AppCompatActivity {
         super.onStart();
         //this.offerReplacingDefaultHome();
         //this.offerReplacingDefaultSMS();
-        this.offerReplacingDefaultDialer();
+        //this.offerReplacingDefaultDialer();
     }
     //endregion
 
@@ -172,22 +168,34 @@ public class ContactView extends AppCompatActivity {
         this.showSelectedFragment( getAppropriateFragment() );
     }
 
-    public  void initializePolices() {
+    public void deinitializePolicies() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.FROYO) return;
 
-        int owner = R.string.deviceOwner;
+        String owner = "Eres el administrador"; //R.string.deviceOwner;
         this._adminName = DeviceAdministrator.getComponentName(this);
         this._dpm = (DevicePolicyManager) getSystemService(Context.DEVICE_POLICY_SERVICE);
 
         if (!this._dpm.isDeviceOwnerApp(getPackageName())) {
-            owner = R.string.notDeviceOwner;
+            owner = "No eres el propietario"; //R.string.notDeviceOwner;
+        }
+
+        this.showMessage(owner);
+        this.setPolicies(false, false);
+    }
+
+    public  void initializePolicies() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.FROYO) return;
+
+        String owner = "Eres el administrador"; //R.string.deviceOwner;
+        this._adminName = DeviceAdministrator.getComponentName(this);
+        this._dpm = (DevicePolicyManager) getSystemService(Context.DEVICE_POLICY_SERVICE);
+
+        if (!this._dpm.isDeviceOwnerApp(getPackageName())) {
+            owner = "No eres el propietario"; //R.string.notDeviceOwner;
             this._isAdmin = false;
         }
 
-        Toast t = Toast.makeText(this, owner, Toast.LENGTH_SHORT);
-        t.setGravity(Gravity.TOP,0,0);
-        t.show();
-
+        this.showMessage(owner);
         this.setPolicies(true, this._isAdmin);
     }
     // endregion
@@ -229,16 +237,13 @@ public class ContactView extends AppCompatActivity {
             ? "El usuario acepto establecer la aplicación para uso predeterminado."
             : "El usuario no acepto establecer la aplicación para uso predeterminado.";
 
-        Toast t = Toast.makeText(this, message, Toast.LENGTH_SHORT);
-        t.setGravity(Gravity.TOP,0,0);
-        t.show();
+        this.showMessage(message);
     }
 
     private final void offerReplacingDefaultDialer() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return;
 
         final TelecomManager tm = this.getSystemService(TelecomManager.class);
-
         if (this.getPackageName().equals(tm.getDefaultDialerPackage())) {
             final Intent i = new Intent("android.telecom.action.CHANGE_DEFAULT_DIALER").
                 putExtra("android.telecom.extra.CHANGE_DEFAULT_DIALER_PACKAGE_NAME",
@@ -273,12 +278,18 @@ public class ContactView extends AppCompatActivity {
     public void makeCall(String codedNumber) {
         if (PermissionChecker.checkSelfPermission(this,
                 "android.permission.CALL_PHONE") == REQUEST_PERMISSION) {
-            String number = Utils.decodeBase64(codedNumber);
-            //if( number.trim().length() >= 10 ) {
-                Uri uri = Uri.parse("tel:" + number.trim());
-                this.startActivity(new Intent(Intent.ACTION_CALL, uri));
-                ((IFragment)this._fragments.get(0)).setEnable(false);
-            //}
+            if( !isAirplaneModeOn(getApplicationContext()) ) {
+                String number = Utils.decodeBase64(codedNumber);
+                if( number.trim().length() >= 10 ) {
+                    Uri uri = Uri.parse("tel:" + number.trim());
+                    this.startActivity(new Intent(Intent.ACTION_CALL, uri));
+                    ((IFragment) this._fragments.get(0)).setEnable(false);
+                } else {
+                    showMessage("La llamada no puede efectuarse, número incorrecto.");
+                }
+            } else {
+                showMessage("La llamada no puede efectuarse si el dispositivo esta en modo avión.");
+            }
         } else {
             ActivityCompat.requestPermissions( (Activity)this
                 , new String[]{"android.permission.CALL_PHONE"}
@@ -329,20 +340,24 @@ public class ContactView extends AppCompatActivity {
     }
 
     private void initializeReceivers() {
-        IntentFilter filter = new IntentFilter();
-        filter.addAction("CELLCOMM_MESSAGE_CONTACTMGMT");
-        filter.addAction("CELLCOMM_MESSAGE_CODEMGMT");
-        registerReceiver( this._cntctreceiver, filter );
+        try {
+            IntentFilter filter = new IntentFilter();
+            filter.addAction("CELLCOMM_MESSAGE_CONTACTMGMT");
+            filter.addAction("CELLCOMM_MESSAGE_CODEMGMT");
+            registerReceiver(this._cntctreceiver, filter);
 
-        filter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
-        registerReceiver( this._batteryreceiver, filter );
+            filter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+            registerReceiver(this._batteryreceiver, filter);
 
-        filter = new IntentFilter();
-        filter.addAction("CELLCOMM_MESSAGE_STOPLOCK");
-        registerReceiver( this._alarmreceiver, filter );
+            filter = new IntentFilter();
+            filter.addAction("CELLCOMM_MESSAGE_STOPLOCK");
+            registerReceiver(this._alarmreceiver, filter);
 
-        this._phone = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
-        this._phone.listen(phoneListener, PhoneStateListener.LISTEN_SIGNAL_STRENGTHS);
+            this._phone = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+            this._phone.listen(phoneListener, PhoneStateListener.LISTEN_SIGNAL_STRENGTHS);
+        }catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 
     private void enableStayOnWhilePluggedIn(Boolean active) {
@@ -384,8 +399,14 @@ public class ContactView extends AppCompatActivity {
         this._dpm.setKeyguardDisabled(this._adminName, !enable);
     }
 
+    private void setStatusBar(Boolean enable) {
+        this._dpm.setStatusBarDisabled(this._adminName, !enable);
+    }
+
     public void setLockTask(Boolean start, Boolean isAdministrator) {
         if (isAdministrator) {
+            //this._adminName = DeviceAdministrator.getComponentName(this);
+            //this._dpm = (DevicePolicyManager) getSystemService(Context.DEVICE_POLICY_SERVICE);
             this._dpm.setLockTaskPackages(this._adminName
                 , new String[]{ getPackageName()
                     , "com.google.android.dialer"
@@ -395,31 +416,38 @@ public class ContactView extends AppCompatActivity {
         }
 
         //Corrección al defecto generado durante el desbloqueo de la APP.
-        CellCommApp app = (CellCommApp) getApplicationContext();
-        app.setLockModeEnabled(start);
-
+        //CellCommApp app = (CellCommApp) getApplicationContext();
+        //app.setLockModeEnabled(start);
         if (start) this.startLockTask();
         else this.stopLockTask();
     }
 
-    private void setPolicies(Boolean enable, Boolean isAdministrator) {
+    public void setPolicies(Boolean enable, Boolean isAdministrator) {
         if (isAdministrator) {
             this.setRestrictions(enable);
             this.enableStayOnWhilePluggedIn(enable);
             this.setUpdatePolicy(enable);
             this.setAsHomeApp(enable);
             this.setKeyGuardEnabled(enable);
+            //this.setStatusBar(enable);
         }
         this.setLockTask(enable, isAdministrator);
         this.setImmersiveMode(enable);
     }
 
     private void setRestrictions(Boolean disallow) {
+        this.setUserRestriction(UserManager.DISALLOW_BLUETOOTH, disallow);
         this.setUserRestriction(UserManager.DISALLOW_ADD_USER, disallow);
         this.setUserRestriction(UserManager.DISALLOW_SAFE_BOOT, disallow);
+        this.setUserRestriction(UserManager.DISALLOW_CONFIG_WIFI, disallow);
+        this.setUserRestriction(UserManager.DISALLOW_APPS_CONTROL, disallow);
         this.setUserRestriction(UserManager.DISALLOW_FACTORY_RESET, disallow);
-        this.setUserRestriction(UserManager.DISALLOW_ADJUST_VOLUME, disallow);
+        this.setUserRestriction(UserManager.DISALLOW_NETWORK_RESET, disallow);
+        this.setUserRestriction(UserManager.DISALLOW_AIRPLANE_MODE, disallow);
+        //this.setUserRestriction(UserManager.DISALLOW_ADJUST_VOLUME, disallow);
+        this.setUserRestriction(UserManager.DISALLOW_CONFIG_TETHERING, disallow);
         this.setUserRestriction(UserManager.DISALLOW_MOUNT_PHYSICAL_MEDIA, disallow);
+        this.setUserRestriction(UserManager.DISALLOW_CONFIG_MOBILE_NETWORKS, disallow);
     }
 
     private void setSignalLevel(int level) {
@@ -443,6 +471,12 @@ public class ContactView extends AppCompatActivity {
         this.getWindow().setFlags(Constants.SCREEN_FLAGS, Constants.SCREEN_FLAGS);
     }
 
+    private void showMessage(String message) {
+        Toast t = Toast.makeText(this, message, Toast.LENGTH_SHORT);
+        t.setGravity(Gravity.TOP,0,0);
+        t.show();
+    }
+
     private void showSelectedFragment(Fragment fragment) {
         if( fragment != null ) {
             getSupportFragmentManager().
@@ -453,25 +487,59 @@ public class ContactView extends AppCompatActivity {
         }
     }
 
-    private void startLockTaskDelayed () {
+    private static boolean isAirplaneModeOn(Context context) {
+        return Settings.System.getInt(context.getContentResolver(),
+                Settings.Global.AIRPLANE_MODE_ON, 0) != 0;
+
+    }
+
+    public void startLockTaskDelayed () {
         final Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
                 // start lock task mode if its not already active
                 try {
+                    Log.d(this.TAG, "Iniciando el bloqueo de la aplicación.");
                     //Corrección del defecto de desbloqueo de la APP. 2021-03-03
                     //if( ContactView.this.isLocked ) {
                     CellCommApp app = (CellCommApp) getApplicationContext();
-                    if( app.getLockModeEnabled() ) {
-                        initializePolices();
+                    if( app.getLockModeEnabled() &&
+                        getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.RESUMED)) {
+                        Log.d(this.TAG, "Aplicando las políticas en el bloqueo.");
+                        initializePolicies();
                     }
                 } catch(IllegalArgumentException e) {
                     Log.e(this.TAG, "Was not in foreground yet, try again.");
                     startLockTaskDelayed();
                 }
             }
-            final String TAG = "ContactView.StartLockTaskDelayed";
+            final String TAG = "ContactView.startLockTaskDelayed";
+        }, 1);
+        //handler.removeCallbacksAndMessages(null);
+    }
+
+    public void stopLockTaskDelayed () {
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                // start lock task mode if its not already active
+                try {
+                    Log.d(this.TAG, "Iniciando el desbloqueo de la aplicación.");
+                    //Corrección del defecto de desbloqueo de la APP. 2021-03-03
+                    //if( ContactView.this.isLocked ) {
+                    CellCommApp app = (CellCommApp) getApplicationContext();
+                    if( !app.getLockModeEnabled() ) {
+                        Log.d(this.TAG, "Aplicando las políticas en el desbloqueo.");
+                        deinitializePolicies();
+                    }
+                } catch(IllegalArgumentException e) {
+                    Log.e(this.TAG, "Was not in foreground yet, try again.");
+                    stopLockTaskDelayed();
+                }
+            }
+            final String TAG = "ContactView.stoptLockTaskDelayed";
         }, 1);
     }
 
@@ -518,7 +586,9 @@ public class ContactView extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction().equals("CELLCOMM_MESSAGE_STOPLOCK")) {
-                ContactView.this.setLockTask (true, ContactView.this.getIsAdminstrator() );
+                //ContactView.this.setLockTask (true, ContactView.this.getIsAdminstrator() );
+                ((CellCommApp)getApplicationContext()).setLockModeEnabled(true);
+                ContactView.this.startLockTaskDelayed();
             }
         }
     };

@@ -18,6 +18,8 @@ import android.view.View;
 
 import android.os.Bundle;
 import android.util.Log;
+
+import java.util.ArrayList;
 import java.util.List;
 
 public class MessageFragment extends Fragment implements IFragment {
@@ -26,20 +28,19 @@ public class MessageFragment extends Fragment implements IFragment {
                              ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_message, container, false);
-
         if (container != null && view != null) {
             if (container.getContext() != null) {
                 this._messages = CellCommApp.getInstanceDB().eventDAO().get20LastMessages();
-                if( this._messages != null) {
-                    this._adapter = new MessageAdapter(this._messages);
-                    if (this._adapter != null) {
-                        RecyclerView rvw = (RecyclerView) view.findViewById(R.id.recyclerMessages);
-                        rvw.setAdapter(this._adapter);
-                        rvw.setLayoutManager(new LinearLayoutManager(container.getContext()));
-                        rvw.addItemDecoration(new DividerItemDecoration(container.getContext(),
-                                DividerItemDecoration.VERTICAL));
-                        rvw.setItemAnimator(new DefaultItemAnimator());
-                    }
+                if( this._messages == null) this._messages = new ArrayList<>();
+
+                this._adapter = new MessageAdapter(this._messages);
+                if (this._adapter != null) {
+                    RecyclerView rvw = (RecyclerView) view.findViewById(R.id.recyclerMessages);
+                    rvw.setAdapter(this._adapter);
+                    rvw.setLayoutManager(new LinearLayoutManager(container.getContext()));
+                    rvw.addItemDecoration(new DividerItemDecoration(container.getContext(),
+                            DividerItemDecoration.VERTICAL));
+                    rvw.setItemAnimator(new DefaultItemAnimator());
                 }
             }
         }
@@ -51,12 +52,14 @@ public class MessageFragment extends Fragment implements IFragment {
         if ( null == message ) return;
 
         try {
-            Log.e(this.TAG + ".applyChanges","action: " + action);
-
-            this._messages.add(((SMSEntity)message).getEventObject());
-            this._adapter.notifyDataSetChanged();
+            Log.d(this.TAG + ".applyChanges","action -> " + action);
+            if( null != this._messages && null != this._adapter ) {
+                EventEntity event = ((SMSEntity) message).getEventObject();
+                this._messages.add(event);
+                this._adapter.notifyDataSetChanged();
+            }
         } catch (Exception e) {
-            Log.e(this.TAG + ".applyChanges","error: " + e.getMessage());
+            Log.e(this.TAG + ".applyChanges", e.getMessage());
         }
     }
 
@@ -69,8 +72,8 @@ public class MessageFragment extends Fragment implements IFragment {
     {};
 
     // region fields declarations
-    final String TAG = "MessageFragment";
-    List<EventEntity> _messages;
-    MessageAdapter _adapter;
+    private final String TAG = "MessageFragment";
+    private List<EventEntity> _messages;
+    private MessageAdapter _adapter;
     // endregion
 }

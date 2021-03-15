@@ -5,6 +5,8 @@ import com.cytophone.services.R;
 
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.annotation.NonNull;
+
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -32,37 +34,16 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewMess
 
     @Override
     public void onBindViewHolder(@NonNull ViewMessageHolder holder, int position) {
-        String text = this._messages.get(position).getAction().toLowerCase();
+        try{
+            String actionType = this._messages.get(position).getAction().toLowerCase();
+            String date = this._messages.get(position).getCreatedDate();
 
-        text = text.replace("suscriberinsert", this._context.getString(R.string.suscriberinsert))
-            .replace("suscriberdelete", this._context.getString(R.string.suscriberdelete))
-            .replace("authorizatorinsert", this._context.getString(R.string.authorizatorinsert))
-            .replace("authorizatordelete", this._context.getString(R.string.authorizatordelete))
-            .replace("unlockcodeinsert", this._context.getString(R.string.unlock))
-            .replace("deactivationcodeinsert", this._context.getString(R.string.deactivationcode))
-            .replace("activationcodeinsert", this._context.getString(R.string.activationcode));
-
-        holder._text1.setText(text);
-        holder._text2.setText(String.format("%tY-%<tm-%<td %<tH:%<tM:%<tS",
-                _messages.get(position).getCreatedDate()));
-
-        String actionType = this._messages.get(position).getAction().toLowerCase();
-        if (actionType.contains(("suscriber"))) {
-            if (actionType.contains(("insert"))) {
-                holder._image.setImageResource(R.drawable.ic_playlist_add_black_24dp);
-            } else if (actionType.contains(("delete"))) {
-                holder._image.setImageResource(R.drawable.ic_clear_black_24dp);
-            }
-        }else if (actionType.contains(("authorizator"))) {
-            if (actionType.contains(("insert"))) {
-                holder._image.setImageResource(R.drawable.ic_playlist_add_black_24dp);
-            } else if(actionType.contains(("delete"))) {
-                holder._image.setImageResource(R.drawable.ic_clear_black_24dp);
-            }
-        } else if( actionType.contains(("unlock")) ||
-                actionType.contains(("activation")) ||
-                actionType.contains(("deactivation")) ) {
-            holder._image.setImageResource(R.drawable.ic_baseline_lock_open_24);
+            setAction(holder, actionType);
+            //setDate(holder, String.format("%tY-%<tm-%<td %<tH:%<tM:%<tS",date));
+            setDate(holder, this._messages.get(position).getCreatedDate());
+            setHolderIcon(holder, actionType);
+        } catch (Exception ex) {
+            Log.e(TAG + ".onBindViewHolder", ex.getMessage());
         }
     }
 
@@ -71,19 +52,63 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewMess
         return this._messages.size();
     }
 
+    private void setAction(ViewMessageHolder holder, String action) {
+        action = action.replace("suscriberinsert", this._context.getString(R.string.suscriberinsert))
+                .replace("suscriberdelete", this._context.getString(R.string.suscriberdelete))
+                .replace("authorizatorinsert", this._context.getString(R.string.authorizatorinsert))
+                .replace("authorizatordelete", this._context.getString(R.string.authorizatordelete))
+                .replace("unlockcodeinsert", this._context.getString(R.string.unlock))
+                .replace("deactivationcodeinsert", this._context.getString(R.string.deactivationcode))
+                .replace("activationcodeinsert", this._context.getString(R.string.activationcode));
+        holder._action.setText(action);
+    }
+
+    private void setDate(ViewMessageHolder holder, String date) {
+        if( date == null ) date = "";
+        holder._date.setText(date);
+    }
+
+    private void setHolderIcon(ViewMessageHolder holder, String action) {
+        if (action.contains(("suscriber"))) {
+            if (action.contains(("insert"))) {
+                setImage(holder,R.drawable.ic_playlist_add_black_24dp);
+            } else if (action.contains(("delete"))) {
+                setImage(holder,R.drawable.ic_clear_black_24dp);
+            }
+        }else if (action.contains(("authorizator"))) {
+            if (action.contains(("insert"))) {
+                setImage(holder,R.drawable.ic_playlist_add_black_24dp);
+            } else if(action.contains(("delete"))) {
+                setImage(holder,R.drawable.ic_clear_black_24dp);
+            }
+        } else if( action.contains(("unlock")) ||
+                action.contains(("activation")) ||
+                action.contains(("deactivation")) ) {
+            setImage(holder,R.drawable.ic_baseline_lock_open_24);
+        }
+    }
+
+    private void setImage(ViewMessageHolder holder, int resourceID) {
+        holder._icon.setImageResource(resourceID);
+    }
+
     public class ViewMessageHolder extends RecyclerView.ViewHolder {
         public ViewMessageHolder(@NonNull View itemView) {
             super(itemView);
 
-            this._text1 = itemView.findViewById(R.id.myText1);
-            this._text2 = itemView.findViewById(R.id.myText2);
-            this._image = itemView.findViewById(R.id.myImageView);
+            this._action = itemView.findViewById(R.id.myText1);
+            this._date = itemView.findViewById(R.id.myText2);
+            this._icon = itemView.findViewById(R.id.myImageView);
         }
 
-        TextView _text1, _text2;
-        ImageView _image;
+        TextView _action, _date;
+        ImageView _icon;
     }
 
-    List<EventEntity> _messages;
-    Context _context;
+    // region fields declarations
+    private final String TAG = "MessageFragment";
+
+    private List<EventEntity> _messages;
+    private Context _context;
+    // endregion
 }

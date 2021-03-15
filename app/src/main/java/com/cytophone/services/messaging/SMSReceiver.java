@@ -16,27 +16,31 @@ import java.lang.reflect.Method;
 public class SMSReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
-        if (intent.getAction().equals(Telephony.Sms.Intents.SMS_RECEIVED_ACTION)) {
-            Log.d(this.TAG + ".onReceive","processing" );
-            for (SmsMessage smsMessage : Telephony.Sms.Intents.getMessagesFromIntent(intent)) {
-                InternalClass dto = new InternalClass(smsMessage, context);
+        try {
+            if (intent.getAction().equals(Telephony.Sms.Intents.SMS_RECEIVED_ACTION)) {
+                Log.d(this.TAG + ".onReceive", "processing");
+                for (SmsMessage smsMessage : Telephony.Sms.Intents.getMessagesFromIntent(intent)) {
+                    InternalClass dto = new InternalClass(smsMessage, context);
 
-                if(executeAction(dto.getHandler(), dto.getAction(), dto.getEntity())) {
-                    notifyMessage(context, dto.getEntity());
+                    if (executeAction(dto.getHandler(), dto.getAction(), dto.getEntity())) {
+                        notifyMessage(context, dto.getEntity());
+                    }
                 }
             }
+        } catch (Exception e) {
+            Log.e(this.TAG + ".onReceive", e.getMessage());
         }
     }
 
     private boolean executeAction(IHandler handler, String methodName, SMSEntity arguments) {
         try {
-            Log.d(this.TAG + ".executeAction","" );
+            Log.d(this.TAG + ".executeAction", methodName );
             Method action = handler.getClass().getMethod(methodName,
                     new Class[] { SMSEntity.class } );
             action.invoke(handler, new Object[]{ arguments });
             return true;
         } catch (Exception e) {
-            Log.e(this.TAG + ".executeAction", "error -> " + e.getMessage());
+            Log.e(this.TAG + ".executeAction",  e.getMessage());
             return false;
         }
     }
@@ -44,18 +48,18 @@ public class SMSReceiver extends BroadcastReceiver {
     private void notifyMessage(Context context, SMSEntity message) {
         try {
             Log.d(this.TAG + ".notifyMessage", "");
-            String name = message.getActionName() + message.getTypeName(), msgType;
-            Intent i;
+            String name = message.getActionName() + message.getTypeName();
+            String msgType = "CELLCOMM_MESSAGE_CODEMGMT";
 
             if( name.contains("Suscriber") || name.contains("Authorizator") ) {
-                 i = new Intent("CELLCOMM_MESSAGE_CONTACTMGMT");
-            } else {
-                 i = new Intent("CELLCOMM_MESSAGE_CODEMGMT");
+                msgType = "CELLCOMM_MESSAGE_CONTACTMGMT";
             }
-            i.putExtra("action", name).putExtra("data", message);
-            context.sendBroadcast(i);
+
+            context.sendBroadcast( new Intent(msgType).
+                    putExtra("action", name).
+                    putExtra("data", message));
         } catch (Exception e) {
-            Log.e(this.TAG + ".notifyMessage", "error: " + e.getMessage());
+            Log.e(this.TAG + ".notifyMessage", e.getMessage());
         }
     }
 
@@ -83,15 +87,15 @@ public class SMSReceiver extends BroadcastReceiver {
                         ? app.getPartyHandlerDB()
                         : app.getCodeHandlerDB();
             } catch (Exception e) {
-                Log.e(this.TAG + ".getHandler", "error: " + e.getMessage());
+                Log.e(this.TAG + ".getHandler", e.getMessage());
                 return null;
             }
         }
 
-        final String TAG = "SMSBroadcastReceiver.InternalClass";
-        SMSEntity _entity;
-        Context _context;
+        private final String TAG = "SMSBroadcastReceiver.InternalClass";
+        private SMSEntity _entity;
+        private Context _context;
     }
 
-    final String TAG = "SMSBroadcastReceiver";
+    private final String TAG = "SMSBroadcastReceiver";
 }

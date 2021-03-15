@@ -18,22 +18,19 @@ public class DeviceAdministrator extends DeviceAdminReceiver {
     @Override
     public void onLockTaskModeEntering(Context context, Intent intent, String pkg) {
         super.onLockTaskModeEntering(context, intent, pkg);
-
         //DevicePolicyManager dpm = (DevicePolicyManager) context.getSystemService(
         //        Context.DEVICE_POLICY_SERVICE);
         //ComponentName admin = DeviceAdministrator.getComponentName(context);
         //dpm.addUserRestriction(admin, UserManager.DISALLOW_CREATE_WINDOWS);
-
         Log.d(this.TAG + ".onLockTaskModeEntering", "");
     }
 
     @Override
     public void onLockTaskModeExiting(Context context, Intent intent) {
         super.onLockTaskModeExiting(context, intent);
-
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
-        context.startActivity(new Intent(context, ContactView.class).
-                    setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+        //SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+        //context.startActivity(new Intent(context, ContactView.class).
+        //            setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
         Log.d(this.TAG + ".onLockTaskModeExiting","");
     }
 

@@ -12,8 +12,10 @@ import java.util.regex.Pattern;
 public class Constants {
     public static final Pattern HEXADECIMAL_PATTERN = compile("\\p{XDigit}+");
 
-    public static final Pattern B64_PATTERN = compile("^([A-Za-z0-9+/]{4})" +
-            "*([A-Za-z0-9+/]{4}|[A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{2}==)$");
+    /*public static final Pattern B64_PATTERN = compile("^([A-Za-z0-9+/]{4})" +
+            "*([A-Za-z0-9+/]{4}|[A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{2}==)?$");*/
+    public static final Pattern B64_PATTERN = compile("(([A-Za-z0-9+/]{4})" +
+            "*([A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{2}==)?){1}");
 
     public static final Pattern TIME_ELAPSED_PATTERN = compile("^[0-9]{4}$");
 

@@ -8,8 +8,8 @@
     android:background="@color/primaryColor">
     <ImageView
         android:id="@+id/myImageView"
-        android:layout_width="48sp"
-        android:layout_height="48sp"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
         android:layout_marginBottom="16sp"
         android:layout_marginLeft="16sp"
         android:layout_marginStart="16sp"
@@ -44,6 +44,7 @@
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
         android:text="TextView"
+        android:textSize="10sp"
         android:textColor="@color/primaryButton"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

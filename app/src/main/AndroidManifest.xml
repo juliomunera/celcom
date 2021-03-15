@@ -1,14 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.cytophone.services">
-    <supports-screens>
-        android:resizeable="true"
-        android:smallScreens="true"
-        android:normalScreens="true"
-        android:largeScreens="true"
-        android:xlargeScreens="true"
-        android:anyDensity="true"
-    </supports-screens>
+    <!-- Protected Broadcast -->
+    <protected-broadcast android:name="CELLCOMM_MESSAGE_CONTACTMGMT" />
+    <protected-broadcast android:name="CELLCOMM_MESSAGE_CODEMGMT" />
+    <protected-broadcast android:name="CELLCOMM_MESSAGE_STOPLOCK" />
+    <!-- Permissions -->
+    <!-- BOOT permission -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.REORDER_TASKS" />
+    <!-- Phone  permissions -->
+    <uses-permission android:name="android.permission.MANAGE_OWN_CALLS" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.WRITE_CALL_LOG" />
+    <uses-permission android:name="android.permission.READ_CALL_LOG" />
+    <uses-permission android:name="android.permission.CALL_PHONE" />
+    <!-- SMS permissions -->
+    <uses-permission android:name="android.permission.RECEIVE_MMS" />
+    <uses-permission android:name="android.permission.RECEIVE_SMS" />
+    <uses-permission android:name="android.permission.WRITE_SMS" />
+    <uses-permission android:name="android.permission.READ_SMS" />
+    <uses-permission android:name="android.permission.SEND_SMS" />
     <application
         android:name=".CellCommApp"
         android:allowBackup="true"
@@ -17,20 +29,22 @@
         android:launchMode="singleTask"
         android:roundIcon="@mipmap/icon_cytophone_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme"
-        android:testOnly="false">
+        android:testOnly="false"
+        android:theme="@style/AppTheme">
         <!-- Start Activities -->
-        <activity android:name=".views.CallView"
-            android:screenOrientation="portrait"
-            android:launchMode="singleInstance"
-            android:lockTaskMode="if_whitelisted" />
-        <activity android:name=".views.ContactView"
-            android:launchMode="singleInstance"
+        <activity
+            android:name=".views.CallView"
+            android:lockTaskMode="if_whitelisted"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".views.ContactView"
+            android:lockTaskMode="if_whitelisted"
             android:screenOrientation="portrait">
             <intent-filter>
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.LAUNCHER" />
                 <category android:name="android.intent.category.HOME" />
+
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
             <intent-filter>
@@ -44,18 +58,19 @@
             </intent-filter>
             <intent-filter>
                 <category android:name="android.intent.category.DEFAULT" />
+
                 <action android:name="android.intent.action.DIAL" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
                 <action android:name="android.intent.action.SENDTO" />
+
                 <data android:scheme="sms" />
                 <data android:scheme="smsto" />
                 <data android:scheme="mms" />
                 <data android:scheme="mmsto" />
             </intent-filter>
-        </activity>
-        <!-- End Activities -->
+        </activity> <!-- End Activities -->
         <!-- Start BroadcastReceivers -->
         <receiver
             android:name=".messaging.SMSReceiver"
@@ -67,7 +82,9 @@
                 <action android:name="android.provider.Telephony.SMS_RECEIVED" />
                 <action android:name="android.provider.Telephony.SMS_DELIVER" />
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
+
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
         </receiver>
@@ -77,37 +94,53 @@
             android:permission="android.permission.BROADCAST_WAP_PUSH">
             <intent-filter android:priority="999">
                 <action android:name="android.provider.Telephony.WAP_PUSH_DELIVER" />
+
                 <data android:mimeType="application/vnd.wap.mms-message" />
             </intent-filter>
         </receiver>
         <receiver android:name=".LockerDevice" />
         <receiver android:name=".CleanerCallLog" />
-        <receiver android:name=".DeviceAdministrator"
+        <receiver
+            android:name=".DeviceAdministrator"
             android:description="@string/app_name"
             android:label="@string/app_name"
             android:permission="android.permission.BIND_DEVICE_ADMIN">
             <meta-data
                 android:name="android.app.device_admin"
                 android:resource="@xml/device_policies" />
+
             <intent-filter>
                 <action android:name="android.app.action.DEVICE_ADMIN_ENABLED" />
             </intent-filter>
         </receiver>
-        <receiver android:name=".StartAppOnBoot">
-            <intent-filter>
+        <receiver android:name=".StartAppOnBoot"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter android:priority="1">
+                <category android:name="android.intent.category.DEFAULT"/>
+
+                <action android:name="android.intent.action.REBOOT"/>
+                <action android:name="android.intent.action.USER_PRESENT"/>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
-                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+                <action android:name="android.in
+                tent.action.QUICKBOOT_POWERON" />
+                <!--For HTC devices-->
+                <action android:name="com.htc.intent.action.QUICKBOOT_POWERON"/>
+                <action android:name="android.intent.action.LOCKED_BOOT_COMPLETED" />
             </intent-filter>
-        </receiver>
-        <!-- End BroadcastReceivers -->
+        </receiver> <!-- End BroadcastReceivers -->
         <!-- Start Services -->
-        <!--<service android:name=".CellCommAgent"></service>-->
-        <service android:name=".telephone.CallService"
+        <!-- <service android:name=".CellCommAgent"></service> -->
+        <service
+            android:name=".telephone.CallService"
             android:permission="android.permission.BIND_INCALL_SERVICE">
-            <meta-data android:name="android.telecom.IN_CALL_SERVICE_UI"
+            <meta-data
+                android:name="android.telecom.IN_CALL_SERVICE_UI"
                 android:value="true" />
-            <meta-data android:name="android.telecom.IN_CALL_SERVICE_RINGING"
+            <meta-data
+                android:name="android.telecom.IN_CALL_SERVICE_RINGING"
                 android:value="true" />
+
             <intent-filter>
                 <action android:name="android.telecom.InCallService" />
             </intent-filter>
@@ -126,23 +159,5 @@
                 <data android:scheme="mmsto" />
             </intent-filter>
         </service>
-        <!-- End Services -->
     </application>
-    }
-
-    <!-- BOOT permission -->
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-    <uses-permission android:name="android.permission.REORDER_TASKS" />
-    <!-- Phone  permissions -->
-    <uses-permission android:name="android.permission.MANAGE_OWN_CALLS" />
-    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-    <uses-permission android:name="android.permission.WRITE_CALL_LOG" />
-    <uses-permission android:name="android.permission.READ_CALL_LOG" />
-    <uses-permission android:name="android.permission.CALL_PHONE" />
-    <!-- SMS permissions -->
-    <uses-permission android:name="android.permission.RECEIVE_MMS" />
-    <uses-permission android:name="android.permission.RECEIVE_SMS" />
-    <uses-permission android:name="android.permission.WRITE_SMS" />
-    <uses-permission android:name="android.permission.READ_SMS" />
-    <uses-permission android:name="android.permission.SEND_SMS" />
 </manifest>

@@ -12,25 +12,26 @@ import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.content.Context;
-import android.graphics.Color;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
-
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.view.KeyEvent;
 import android.view.View;
 
+import androidx.fragment.app.Fragment;
+
 import android.text.TextWatcher;
 import android.text.Editable;
 
+import android.content.Context;
+
+import android.widget.EditText;
+import android.widget.TextView;
+
 import android.os.Bundle;
 import android.util.Log;
+
+import java.util.ArrayList;
 import java.util.List;
 
 public class ContactsFragment extends Fragment implements IFragment {
@@ -54,14 +55,17 @@ public class ContactsFragment extends Fragment implements IFragment {
         if( message == null ) return;
 
         try {
-            Log.e(this.TAG + ".applyChanges", "action: " + action);
-
-            if ( action.contains("delete") )  this.remove((SMSEntity)message);
-            else if ( action.contains("insert") ) this.add((SMSEntity)message);
-
-            this._adapter.notifyDataSetChanged();
+            Log.d(this.TAG + ".applyChanges", action);
+            if( null != this._adapter && null != this._parties ) {
+                if (action.contains("delete")) {
+                    this.remove((SMSEntity) message);
+                } else if (action.contains("insert")) {
+                    this.add((SMSEntity) message);
+                }
+                this._adapter.notifyDataSetChanged();
+            }
         }catch (Exception e){
-            Log.e(this.TAG + ".applyChanges", "error: " + e.getMessage());
+            Log.e(this.TAG + ".applyChanges", e.getMessage());
         }
     }
 
@@ -70,8 +74,7 @@ public class ContactsFragment extends Fragment implements IFragment {
         return R.id.contactdevice;
     }
 
-    public void setEnable(boolean enabled)
-    {
+    public void setEnable(boolean enabled) {
         RecyclerView rvw = (RecyclerView) this.getView().findViewById(R.id.recyclerView);
         rvw.setEnabled(enabled);
     }
@@ -85,26 +88,26 @@ public class ContactsFragment extends Fragment implements IFragment {
 
     private void initializeAdapter(View view, ViewGroup container) {
         this._parties = CellCommApp.getInstanceDB().partyDAO().getAllOrderSuscribers();
-        if( this._parties != null ) {
-            this._adapter = new ContactAdapter(this._parties);
-            if (this._adapter != null) {
-                this._adapter.setListener(new ItemSelectListener<PartyEntity>() {
-                    @Override
-                    public void onSelect(PartyEntity item) {
-                        ((ContactView) ContactsFragment.this.getActivity()).
-                                makeCall(item.getCodedNumber());
-                    }
-                });
+        if( this._parties == null )  this._parties = new ArrayList<>();
 
-                RecyclerView rvw = (RecyclerView) view.findViewById(R.id.recyclerView);
-                rvw.setAdapter(this._adapter);
-                rvw.setLayoutManager(new LinearLayoutManager(container.getContext()
-                        , LinearLayoutManager.VERTICAL
-                        , false));
-                rvw.addItemDecoration(new DividerItemDecoration(container.getContext()
-                        , DividerItemDecoration.VERTICAL));
-                rvw.setItemAnimator(new DefaultItemAnimator());
-            }
+        this._adapter = new ContactAdapter(this._parties);
+        if (this._adapter != null) {
+            this._adapter.setListener(new ItemSelectListener<PartyEntity>() {
+                @Override
+                public void onSelect(PartyEntity item) {
+                    ((ContactView) ContactsFragment.this.getActivity()).
+                            makeCall(item.getCodedNumber());
+                }
+            });
+
+            RecyclerView rvw = (RecyclerView) view.findViewById(R.id.recyclerView);
+            rvw.setAdapter(this._adapter);
+            rvw.setLayoutManager(new LinearLayoutManager(container.getContext()
+                    , LinearLayoutManager.VERTICAL
+                    , false));
+            rvw.addItemDecoration(new DividerItemDecoration(container.getContext()
+                    , DividerItemDecoration.VERTICAL));
+            rvw.setItemAnimator(new DefaultItemAnimator());
         }
     }
 
@@ -160,9 +163,9 @@ public class ContactsFragment extends Fragment implements IFragment {
     // endregion
 
     // region fields declarations
-    final String TAG = "ContactsFragment";
+    private final String TAG = "ContactsFragment";
 
-    List<PartyEntity> _parties;
-    ContactAdapter _adapter;
+    private  List<PartyEntity> _parties;
+    private ContactAdapter _adapter;
     // endregion
 }

@@ -9,6 +9,7 @@ import com.cytophone.services.CellCommApp;
 import org.jetbrains.annotations.NotNull;
 
 import android.telecom.InCallService;
+import android.provider.Settings;
 import android.content.Context;
 import android.content.Intent;
 import android.telecom.Call;
@@ -21,7 +22,7 @@ public final class CallService extends InCallService {
     @Override
     public void onCallAdded(@NotNull Call call) {
         super.onCallAdded(call);
-        Log.d(this.TAG + ".OnCallAdded", "call details: " + call.getDetails() );
+        Log.d(this.TAG + ".OnCallAdded", "details -> " + call.getDetails() );
 
         try {
             String number = call.getDetails().getHandle().getSchemeSpecificPart();
@@ -29,7 +30,7 @@ public final class CallService extends InCallService {
 
             //Se habilita la recepción de llamadas de #s desconocidos 2021/03/31
             //if ( null == party  || getCalls().size() > 1 ) {
-            if ( getCalls().size() > 1 ) {
+            if ( getCalls().size() > 1 || isAirplaneModeOn(getApplicationContext())) {
                 call.reject(false, "");
                 call.disconnect();
             } else {
@@ -46,7 +47,7 @@ public final class CallService extends InCallService {
     @Override
     public void onCallRemoved(@NotNull Call call) {
         super.onCallRemoved(call);
-        Log.d(this.TAG + ".OnCallRemoved", "call details: " + call.getDetails() );
+        Log.d(this.TAG + ".OnCallRemoved", "details -> " + call.getDetails() );
 
         try {
             Call currentCall = OngoingCall.INSTANCE.getCall();
@@ -64,13 +65,13 @@ public final class CallService extends InCallService {
     public void onConnectionEvent(Call call, String event, Bundle extras) {
         super.onConnectionEvent(call, event, extras);
 
-        Log.d(this.TAG + ".onConnectionEvent", "disconnect code: " +
+        Log.d(this.TAG + ".onConnectionEvent", "disconnect code -> " +
                 call.getDetails().getDisconnectCause().getCode());
-        Log.d(this.TAG + ".onConnectionEvent", "disconnect reason: " +
+        Log.d(this.TAG + ".onConnectionEvent", "disconnect reason -> " +
                 call.getDetails().getDisconnectCause().getReason());
-        Log.d(this.TAG + ".onConnectionEvent", "disconnect description: " +
+        Log.d(this.TAG + ".onConnectionEvent", "disconnect description -> " +
                 call.getDetails().getDisconnectCause().getDescription());
-        Log.d(this.TAG + ".onConnectionEvent", "event: " + event);
+        Log.d(this.TAG + ".onConnectionEvent", "event -> " + event);
     }
 
     @Override
@@ -80,19 +81,26 @@ public final class CallService extends InCallService {
         return START_STICKY;
     }
 
-    private void schedulerDeleteCallLog(int seconds) {
-        Date start = Utils.getCurrentTime("EST");
-        Date end = Utils.addSeconds( start,seconds);
-        int timeOut = (int) (end.getTime() - start.getTime()) / 1000;
-
-        CleanerCallLog cleaner = new CleanerCallLog(this.getBaseContext(), timeOut);
-    }
-
+    //region Private methods
     private PartyEntity getAnonymousParty(String number)
     {
         String countryCode = "57", placeID = "000000", name = "Número no identificado";
         return  new PartyEntity(countryCode, number,placeID,name,2 );
     }
 
-    final String TAG = "CallService";
+    private void schedulerDeleteCallLog(int seconds) {
+        Date start = Utils.getCurrentTime("EST");
+        Date end = Utils.addSeconds( start, seconds );
+        int timeOut = (int) (end.getTime() - start.getTime()) / 1000;
+
+        CleanerCallLog cleaner = new CleanerCallLog(this.getBaseContext(), timeOut);
+    }
+
+    private static boolean isAirplaneModeOn(Context context) {
+        return Settings.System.getInt(context.getContentResolver(),
+                Settings.Global.AIRPLANE_MODE_ON, 0) != 0;
+    }
+    //endregion
+
+    private final String TAG = "CallService";
 }
